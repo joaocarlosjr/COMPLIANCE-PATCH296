@@ -1,0 +1,34 @@
+CREATE OR REPLACE TRIGGER T_A_I_U_CONHEC_TRANSP_01
+AFTER INSERT OR UPDATE
+    OF DM_ST_PROC
+    ON "CSF_OWN"."CONHEC_TRANSP"
+ REFERENCING OLD AS OLD NEW AS NEW
+ FOR EACH ROW
+DECLARE
+--
+-- EM 30/12/2020  - LUIZ ARMANDO AZONI.
+-- REDMINE        - #75106 - ticket de criação do objeto
+-- CRIAÇÃO DO TRIGGER PARA REGISTRAR A ALTERAÇÃO DO DM_ST_PROC DA TABELA CONHEC_TRANSP
+--
+BEGIN
+
+   IF ((NVL(:NEW.DM_ST_PROC,0) = 0 AND :OLD.DM_ST_PROC IS NULL)) OR -- INCLUSÃO INICIAL DA NOTA FISCAL
+       (NVL(:NEW.DM_ST_PROC,-1) <> NVL(:OLD.DM_ST_PROC,0)) THEN -- NOTA FISCAL JÁ INCLUÍDA, MANUTENÇÃO NO REGISTRO
+      --
+      INSERT INTO CSF_OWN.HIST_ST_CONHEC_TRANSP ( ID
+											    , CONHECTRANSP_ID
+											    , DM_ST_PROC
+											    , DT_HR
+											    )
+									     VALUES ( CSF_OWN.HISTSTCONHECTRANSP_SEQ.NEXTVAL
+											    , :NEW.ID
+											    , NVL(:NEW.DM_ST_PROC,0)
+											    , SYSDATE
+											    );
+      --
+   END IF;
+EXCEPTION
+  WHEN OTHERS THEN
+    raise_application_error(-20103, 'Erro Geral na execução da Trigger - T_A_I_U_CONHEC_TRANSP_01. Erro: ' || sqlerrm);
+END;
+/

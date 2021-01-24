@@ -1,0 +1,781 @@
+create or replace package csf_own.pk_arq_nfs_cidade is
+
+-----------------------------------------------------------------------------------------------
+-- Especificação da package de Geração de Arquivo de Nota Fiscal de Serviços Tomados por cidade
+-----------------------------------------------------------------------------------------------
+--   
+-- Em 15/12/2020 - Renan Alves     
+-- Redmine #74327 - Obrigação Serviços Tomados - RJ
+-- Foi alterado o do campo valor do ISS, caso a variável vn_vl_imp_iss_ret seja maior que zero,
+-- o valor do ISS, sairá com o valor vn_vl_imp_iss_ret, caso contrário utiliza o valor vn_vl_imp_trib
+-- Rotina: pkb_gera_arq_cid_3304557   
+-- Patch_2.9.5.3 / Patch_2.9.4.6 / Release_2.9.6          
+--  
+-- Em 03/12/2020  - João Carlos
+-- Redmine #73514 - Retornando as Notas escrituradas e que estão somente como armazenamento
+-- Descrição      - Inserida condição nvl(nf.dm_arm_nfe_terc, 0) = 0 para retornar somente notas escrituradas
+-- Rotina         - Alteradas todas as rotinas onde retornam relatório de notas por cidade.
+--
+-- Em 06/10/2020 - - Allan Magrini   
+-- Redmine #67587, 69849, 70950, 72123 - Serviços tomados ISS CASTILHO-SP
+-- Criação dos serviços tomados de ISS CASTILHO-SP e ajustes.
+-- Rotina: pkb_gera_arq_cid_3511003    
+--
+-- Em 18/08/2020 - Allan Magrini
+-- Redmine #70316,70695 e 67584  Feed - serviços tomados de ISS Mirassol
+-- Ajustes nos campos solicitado
+-- Rotina alterada : pkb_gera_arq_cid_2700300    
+--
+-- Em 26/08/2020 - - Allan Magrini   
+-- Redmine #70200, 70473, 70850 e 70897 - Feed - Serviços tomados ISS Arapiraca-AL
+-- Criação dos serviços tomados de Arapiraca
+-- Rotina: pkb_gera_arq_cid_2700300    
+--
+-- Em 09/07/2020 - - Allan Magrini   
+-- Redmine #67581 - Serviços tomados ISS Arapiraca-AL
+-- Criação dos serviços tomados de Arapiraca
+-- Rotina: pkb_gera_arq_cid_2700300    
+--
+-- Em 09/07/2020 - - Allan Magrini   
+-- Redmine #67584 - Serviços tomados ISS MIRASSOL-SP
+-- Criação dos serviços tomados de Mirassol
+-- Rotina: pkb_gera_arq_cid_3530300    
+--
+-- Em 09/07/2020 - Allan Magrini
+-- Redmine #66529, 67254, 67914, 69060, 69376 Feed - serviços tomados de São Jose dos campos
+-- Ajustes nos campos solicitado
+-- Rotina alterada : pkb_gera_arq_cid_3549904
+--
+-- Em 14/04/2020 - Luis Marques
+-- Redmine #66870 - Serviços Tomados de ISS de Curitiba - Inclusão de notas de serviço do tipo Nota Fiscal
+-- Rotina alterada: pkb_gera_arq_cid_4106902 - Retirado condição no cursor de tipo de movimento 3-RPA ou sem tipo
+--                  está sendo tratado na geração do arquivo o tipo nulo, colcoado mensagens de alerta.
+--
+-- Em 04/03/2020 - Allan Magrini 
+-- Redmine #57189 - Adaptações ISS Serviço Tomado
+-- Alterado o padrão de ginfes para serviços tomados de São Jose dos campos
+-- Procedure Alterada: pkb_gera_arq_cid_dm_ginfes
+-- Rotina criada : pkb_gera_arq_cid_3549904 
+-- Liberado na versão - Release_2.9.3, Patch_2.9.2.3 e Patch_2.9.1.6  
+--
+-- Em 03/04/2020 - Allan Magrini 
+-- Redmine #66517 Tratar o campo referente a Data de pagamento
+-- Foi tratado o campo com um NVL, quando o campo DT_SAI_ENT for nulo, enviar o campo DT_EMISS.
+-- Procedure Alterada: PKB_GERA_ARQ_CID_3106200 
+-- Liberado na versão - Release_2.9.4, Patch_2.9.2.4 e Patch_2.9.3.1 
+-- 
+-- Em 02/04/2020 - Allan Magrini 
+-- Redmine #66247 Opção SN - Serv. Tomados BH 
+-- Quando a variável “vn_simp_nacional” vir nula, vai preencher com a informação 2, que é referente ao regime normal.
+-- Procedure Alterada: PKB_GERA_ARQ_CID_3106200 
+-- Liberado na versão - Release_2.9.4, Patch_2.9.2.4 e Patch_2.9.3.1 
+--   
+-- Em 02/02/2020 - Renan Alves    
+-- Redmine #61939 - Serviços Tomados de ISS - Campo Grande - MS
+-- Criação dos serviços tomados de Campo Grande
+-- Rotina: pkb_gera_arq_cid_5002704            
+--   
+-- Em 19/02/2019 - Renan Alves    
+-- Redmine #63692 - Padronização de param. geral sistema (INSC_MUNICIPAL)
+-- Foi alterado o MODULO_SISTEMA.COD_MODULO de 'ISS' para 'SERVICO_TOMADO'
+-- Foi alterado o GRUPO_SISTEMA.COD_GRUPO de 'NAO_EXIBIR_CAMPO' para 'SERV_TOM_4106902'
+-- Rotina: pkb_gera_arq_cid_4205407             
+--   
+-- Em 12/02/2020 - Luiz Armando Azoni   
+-- Redmine #63863 - foi retirada a condição que verifica se a cidade do IBGE for de Curitiba pega o proximo item.
+--					foi adicinado no curso C_nf esta condição "and (cm.cd = 3 or cm.cd is null)" conforme solicitado no chamado			 
+-- Rotina: pkb_gera_arq_cid_4106902
+--   
+-- Em 17/01/2019 - Renan Alves    
+-- Redmine #63386 - Arquivo ISS não está gerando os dados das notas.
+-- Foi realizado a alteração no select, retirando alguns tabelas pois, conforme verificado ISS
+-- não tem informações nas tabelas utilizadas, portanto, foi retirada as tabelas e corrigido o select
+-- que realiza a geração das informações de ISS.
+-- Rotina: pkb_gera_arq_cid_4205407             
+-- 
+-- Em 24/01/2020 - Marcos Ferreira
+-- Redmine #63891 - Customização no processo de Geração de Danfe 01_CR060_ENGIE_DANFE_V3
+-- Rotina: pkb_gera_arq_cid_3304557
+-- Alteração: Adaptado chamada da fumção pk_csf.fkg_ret_vl_param_geral_sistema 
+--
+-- Em 10/01/2020 - Allan Magrini 
+-- Redmine #57189 - Serviços Tomados de ISS para Volta Redonda - RJ
+-- Criação dos serviços tomados de Volta Redonda - RJ
+-- Procedure Alterada: pkb_gera_arq_cid_3306305 
+--
+-- Em 20/12/2019 - Allan Magrini 
+-- Redmine #61484 - Arquivo Curitiba/PR - Ajuste IM NFSe Terceiros
+-- Alteração: Colocada validação para verificar se existe parâmetro para não gerar a inscrição Municipal.
+-- Procedure Alterada: pkb_gera_arq_cid_4106902
+--  
+-- Em 02/01/2019 - Renan Alves    
+-- Redmine #62645 - Serviços Tomados de ISS Florianópolis - SC
+-- Criação dos serviços tomados de Florianópolis
+-- Rotina: pkb_gera_arq_cid_4205407           
+-- 
+-- Em 11/12/2019 - Allan Magrini 
+-- Redmine #62395 - Feed - nao está saindo a cidade da pessoa física
+-- Alteração: ajustado o select com (+) na tabela juridica que alimenta o campo vv_descr_cidade_p, campo 57
+-- Procedure Alterada: pkb_gera_arq_cid_3503307
+-- 
+-- Em 13/11/2019 - Renan Alves  
+-- Redmine #60838 - Ausencia campos dentro do arquivo TXT serviços tomados da Mata de São João
+-- Foram alteradas as colunas VL_TOTAL_NF, VL_BASE_CALC_ISS e VL_ISS
+-- Rotina: pkb_gera_arq_cid_2921005         
+-- 
+-- Em 13/11/2019 - Allan Magrini 
+-- Redmine #61139 - Erros na validação do arquivo ISS - V2
+-- Alteração: Corrigido processo de geração do arquivo, adicionado campo fantasia na fkg_recupera_dados_pessoa 
+-- e adicionado cursor c_nf  mf.cod_mod in ('55','99')
+-- Procedure Alterada: pkb_gera_arq_cid_3503307
+--
+-- Em 23/10/2019 - Allan Magrini 
+-- Redmine #60090 - Serviços Tomados - Campos invalidos - Aviva 
+-- Alteração: Corrigido processo de geração do arquivo.
+-- Procedure Alterada: pkb_gera_arq_cid_5218789 
+--
+-- Em 22/10/2019 - Renan Alves  
+-- Redmine #57737 - Desenvolver arquivo Serviços tomados Mata de São João  
+-- Criação dos serviços tomados de Mata de São João
+-- Rotina: pkb_gera_arq_cid_2921005 
+--
+-- Em 15/10/2019 - Allan Magrini
+-- Redmine #59969 - Erro ao exportar arquivo de nota fiscal serviço (serviço tomado) - Aviva
+-- Alteração: Corrigido processo de geração do arquivo.
+-- Procedure Alterada: pkb_gera_arq_cid_5218789
+--
+-- Em 08/10/2019 - Renan Alves
+-- Redmine #59236 - Adequação de serviços tomados - RPA - 1: Adequação dos domínios
+-- Redmine #59237 - Adequação de serviços tomados - RPA - 2: Ajuste da exportação de serviços tomados
+-- Foi incluído no select do cursor C_NF
+-- Procedure Alterada: pkb_gera_arq_cid_4106902  
+--
+-- Em 25/09/2019 - Allan Magrini 
+-- Redmine #58964 - feed - erros arquivo araras
+-- Alteração: Correção na origem da informação do campo sn_iss_retido e setado null nos campos vv_im e vv_ibge_cidade_p quando não tem retorno da informação   
+-- Procedure Alterada: pkb_gera_arq_cid_3503307
+--
+-- Em 19/09/2019  - Karina de Paula
+-- Redmine #58946 - feed - Está saindo a nfs-e em período diferente da fatura
+-- Rotina Alterada: pkb_gera_arq_cid_3304557 => Retirado o símbolo "=>" ao chamar a função fkg_dt_vencto_nf pq na versão 10g não compila
+--
+-- Em 11/09/2019 - Allan Magrini
+-- Redmine #56360 - Funcionalidade Serviços Tomados de ISS de Rio Quente - GO
+-- Alteração: 1) incluida a procedure pkb_gera_arq_cid_5218789 e incluida a chamada na pkb_gera_arquivo
+-- Procedure Alterada: pkb_gera_arquivo
+--
+-- Em 10/09/2019  - Karina de Paula
+-- Redmine #53722 - Serviços Tomados de ISS - RJ - Exportação pela vencimento da duplictada
+-- Rotina Alterada: pkb_gera_arq_cid_3304557 => Incluído o parâmetro do FATO GERADOR para ser usado como parâmetro no cursor c_nfs
+--
+-- Em 10/09/2019 - Renan Alves
+-- Redmine #58239 - Código de Obra - Fortaleza/CE
+-- Foi alterado o número da CNO pelo código de obra, no cursor C_NFS e no momento em que gera o arquivo.
+-- Rotina: pkb_gera_arq_cid_2304400
+--
+-- Em 04/09/2019 - Allan Magrini 
+-- Redmine #58375: Gerar notas fiscais integradas como mercantil com cfops 1933 e 2933
+-- Alteração: foi retirada do cursor a condição  mf.cod_mod = '99' e colocado inf.cfop in (1933,2933)
+-- Procedure Alterada: pkb_gera_arq_cid_3503307
+--
+-- Em 04/09/2019 - Allan Magrini 
+-- Redmine #58339: Corrigir indicador de Retenção na fonte - pkb_gera_arq_cid_3503307
+-- Alteração: O campo dm_trib_mun_prest, passar a verificar o campo NF_COMPL_SERV.DM_NAT_OPER.
+--            Se DM_NAT_OPER for 1 - Tomador pagará e Se DM_NAT_OPER for 2 - Prestador pagará 
+-- Procedure Alterada: pkb_gera_arq_cid_3503307
+--
+-- Em 03/09/2019 - Renan Alves
+-- Redmine #57735 - Arquivo Cuiaba/MT
+-- Foi alterado a coluna "Tributado no município" no select do cursor C_NFS e no IF
+-- Rotina: pkb_gera_arq_cid_5103403  
+--
+-- Em 29/08/2019 - Allan Magrini 
+-- Redmine #58213: Campo vn_vl_aliquota com tratamento 'sum' incorreto
+-- Alteração: Corrigido o select vn_vl_aliquota, tirando o sum e colocando group by  
+-- Procedure Alterada: pkb_gera_arq_cid_3503307
+--
+-- Em 26/08/2019 - Allan Magrini 
+-- Redmine #57942: Corrigir geração dos campos vv_ibge_cidade e vv_sigla_estado ISS Araras e orderar o cursor das nf por dt_emiss2 e nro_nf
+-- Alteração: Corrigido o select que monta os campos vv_ibge_cidade e vv_sigla_estado   
+-- Procedure Alterada: pkb_gera_arq_cid_3503307
+--
+-- Em 21/08/2019 - Allan Magrini  
+-- Redmine #57707: Serviços tomados Araras - SP Corrigir geração ISS Araras para agrupar por nota fis
+-- Alteração: Corrigido o cursor de geração de nf e agrupados os valores dos itens da nota e 
+--            alterada a validação de data da nota para emissão dm_ind_emit = 1 terceiro para considerar somente nf.dt_emiss  
+--            ajuste no valor total do serviço        
+-- Procedure Alterada: pkb_gera_arq_cid_3503307
+--
+-- Em 14/08/2019 - Allan Magrini 
+-- Redmine #57568: Serviços tomados Araras - SP Implementar regra para opção do Simples Nacional
+-- Alteração: Alterada a fase 2, incluido validação no campo cd_regime_especial_tributacao, Preenchimento do campo sn_optante_simples_nacional e vl_base_calculo      
+-- Procedure Alterada: pkb_gera_arq_cid_3503307
+--
+-- Em 14/08/2019 - Allan Magrini 
+-- Redmine #57316: Ajustes arquivo de Serviços Tomados de ISS - Projeto Ancar Arquivo São Bernardo do Campo/SP
+-- Alteração:  Incluido o valor no CodigoDaObra e alterada a fase 4 para NFSe tomada com obra
+-- Procedure Alterada: pkb_gera_arq_cid_dm_ginfes
+--
+-- Em 14/08/2019 - Allan Magrini 
+-- Redmine #57316: Ajustes arquivo de Serviços Tomados de ISS - Projeto Ancar Arquivo Maracanaú/CE
+-- Alteração:  Incluido o valor no CodigoDaObra 
+-- Procedure Alterada: pkb_gera_arq_cid_3509502
+--
+-- Em 14/08/2019 - Allan Magrini 
+-- Redmine #57277: Ajustes arquivo de Serviços Tomados de ISS - Projeto Ancar Arquivo Campinas/SP
+-- Alteração:  alterado o cursor de nf para gerar o arquivo para nf de Municícpio do Prestador diferente do Município do Tomador
+-- Procedure Alterada: pkb_gera_arq_cid_3509502
+--
+-- Em 08/08/2019 - Allan Magrini 
+-- Redmine #57306 - Correções complementares arquivo serviços tomados - Araras
+-- Alteração:  adicionada regra para colocar ponto no campo vv_cd_lista_serv , adicionado 4 casas decimais no campo vn_vl_aliquota 
+--             e alterada a query de impostos para pegar o campo vl_deducao corretamente 
+-- Procedure Alterada:  pkb_gera_arq_cid_3503307
+--
+-- Em 07/08/2019 - Allan Magrini 
+-- Redmine #57128 - Correções complementares arquivo serviços tomados - Araras
+-- Alteração: Corrigidos a query de impostos e a saida de valor para sair ponto (.) somente em casa decimal, 
+--            alterada o id para coletar as informações do prestador, adicionado | no final de cada linha
+--            Colocado formatação no campo cep, informado o campo de retenção do iss e n_iss_tributavel vai ficar fixo 1,
+--            alterado o cursor de nf para gerar o arquivo para nf de Municícpio do Prestador diferente do Município do Tomador
+-- Procedure Alterada:  pkb_gera_arq_cid_3503307
+--
+-- Em 11/07/2019 - Allan Magrini 
+-- Redmine #56966 - Funcionalidade Serviços Tomados de ISS de Araras - SP
+-- Alteração: 1) incluida a procedure pkb_gera_arq_cid_3503307 e incluida a chamada na pkb_gera_arquivo      
+-- Procedure Alterada: pkb_gera_arquivo
+--
+-- Em 11/07/2019 - Allan Magrini
+-- Redmine #54896 - Funcionalidade Serviços Tomados de ISS de Palhoça
+-- Alteração: 1) incluida a procedure pkb_gera_arq_cid_4211900 e incluida a chamada na pkb_gera_arquivo      
+-- Procedure Alterada: pkb_gera_arquivo
+--
+-- Em 16/04/2019 - Renan Alves
+-- Redmine #53626 - Serviços Tomados de Campinas ISS - Campo vv_cod_siafi_local conforme o dm_tipo do ISS e o dm_ind_emit
+--  • Foi incluído a coluna DM_IND_EMIT no select do cursor C_NFS .
+--  • Foi incluído DM_TIPO da tabela IMP_ITEMNF, no select que recupera  alíquota ISS.
+--  • Foi realizado uma verificação se a nota fiscal for de terceiro (1) e o imposto for do tipo normal (0) o campo SIAFI deve ser referente ao município do participante da nota fiscal.
+-- Rotina: pkb_gera_arq_cid_3509502
+--
+-- Em 16/04/2019 - Renan Alves
+-- Redmine #53605 - Serviços Tomados de ISS – Fortaleza
+-- Foi incluído o campo CODTRIBMUNICIPIO_ID no cursor C_NFS, a onde será utilizado para retornar o CNAE, utilizando a função PK_CSF.FKG_CODTRIBMUNICIPIO_CD.
+-- Rotina: pkb_gera_arq_cid_2304400
+--
+-- Em 16/04/2019 - Renan Alves
+-- Redmine #53601 - Serviços Tomados de ISS de São Paulo Campo - Discriminação dos Serviços
+-- Foi incluído um MAX no select que retorna à descrição (VV_TP_SERV_DESCR) do tipo de serviço.
+-- Rotina: pkb_gera_arq_cid_3550308
+--
+-- Em 16/04/2019 - Renan Alves
+-- Redmine #53594 - Serviços Tomados de ISS - Rio de Janeiro - Campo Inscrição Municipal para fornecedores onde localizados fora do município do Rio de Janeiro
+-- Foi incluído uma verificação no IBGE (VV_IBGE_CIDADE) da cidade do participante, aonde, quando o IBGE for referente ao município do Rio de Janeiro, ele recupera a inscrição municipal do prestador.
+-- Rotina: pkb_gera_arq_cid_3304557
+--
+-- Em 29/03/2019 - Fernando Basso
+-- Redmine: #52584 - Alterar geração de arquivo de serviços tomados - Fortaleza/CE
+-- Alterações: Formatação do campo Alíquota para ter no máximo 3 posições preenchida com 0 a esquerda 
+-- Procedure Alterada: pkb_gera_arq_cid_2304400 
+--
+-- Em 27/03/2019 - Fernando Basso
+-- Redmine: #52359 - Alterar geração de arquivo de serviços tomados - Fortaleza/CE
+-- Alterações: 1) Correção na quantidade de campos que são gerados no processo
+--             2) Alterado a IM do campo 46 para empresa logada
+--             3) Acerto da descrição do serviço
+--             4) Alterado a IM do campo 6 para aparecer somente se for de Fortaliza
+-- Procedure Alterada: pkb_gera_arq_cid_2304400 
+--
+-- Em 26/03/2019 - Eduardo Linden
+-- Redmine #52814: Retirar tipo do logradouro 'Rua' na rotina pk_arq_nfs_cidade.pkb_gera_arq_cid_dm_ginfes
+-- Remoção da tipo do logradouro 'Rua' na rotina pk_arq_nfs_cidade.pkb_gera_arq_cid_dm_ginfes.
+-- Procedure Alterada: pkb_gera_arq_cid_dm_ginfes
+--
+-- Em 15/03/2019 - Fernando Basso
+-- Redmine #52114 - Arquivo serviços tomados - Maracanau/CE - Notas com ISS Retido
+-- Alteração: 3) fixar notas intermunicipais (cidade da nota diferente da cidade da empresa)
+-- Procedure Alterada: pkb_gera_arq_cid_2307650 
+--
+-- Em 12/03/2019 - Fernando Basso
+-- Redmine #52214 - Suporte Canais: Correção de serviços tomados de ISS - Cuiabá/MT
+-- Alteração: 1) Retirada do valor do campo Data de Pagamento
+--            2) Alteração do valor do campo Modelo de 9 para 4
+-- Procedure Alterada: pkb_gera_arq_cid_5103403 
+--
+-- Em 12/03/2019 - Fernando Basso
+-- Redmine #52114 - Arquivo serviços tomados - Maracanau/CE - Notas com ISS Retido
+-- Alteração: 1) Correção na geração de arquivo de ISS - considerar tanto retido como não retido
+--            2) Retornar no campo Data Emissão a coluna dt_emissao ao invés de dt_sai_ent
+-- Procedure Alterada: pkb_gera_arq_cid_2307650 
+--
+-- Em 12/03/2019 - Fernando Basso
+-- Redmine #52074 - Serviços tomados de ISS - Campinas
+-- Alteração: Correção da alimentação da data de emissão para dt_emissão da nota_fiscal
+-- Procedure Alterada: pkb_gera_arq_cid_3509502 
+--
+-- Em 08/03/2019 - Fernando Basso
+-- Redmine #52039 - Serviços tomados ISS - Padrão Grinfes
+-- Alteração: 1) incluido os IBGEs 3303500, 3549904 e 3548708 para diferenciação de Isenta e não retida
+--            2) Retirado o Título do logradouro fixo de 'Dr'
+-- Procedure Alterada: pkb_gera_arq_cid_dm_ginfes 
+--
+-- Em 27/02/2019 - Fernando Basso
+-- Redmine #51940 - Alterar geração de arquivo de serviços tomados - Fortaleza/CE
+-- Alteração: Para o campo e-mail na cidade de Fortaleza os caractere ';' é substituido por ' '
+-- Procedure Alterada: pkb_gera_arq_cid_2304400 
+--
+-- Em 11/02/2019 - Marcos Ferreira
+-- Redmine #51200 - Correção de serviços tomados de ISS - Cuiabá/MT
+-- Solicitação: Alteração cursor c_nfs para atender a atividade
+-- Alterações: 1) Cursor c_nfs: Alterado campo valor de vl_total_nf para vl_total_serv
+--             2) Montagem do gl_conteudo, mudar a mascara da data
+--             3) Correção cursor c_nfs, inverter join com tabela pessoa. O prestador está trocado com o tomador
+-- Procedures Alteradas: pkb_gera_arq_cid_5103403
+--
+-- Em 29/01/2019 - Renan Alves
+-- Redmine #50708 - Tratar preenchimento do campo - 4.4 – Relação de Operações (Serviços Tomados de ISS - Campinas)
+-- Alteração: Foi realizado uma tratativa para a coluna operação da nota fiscal recebida.
+--
+-- Em 28/01/2019 - Renan Alves
+-- Redmine #50854 - Serviços Tomados de ISS - Santos
+-- Alteração: Foi comentado a coluna VL_IMP_TRIB da pkb_gera_arq_cid_dm_ginfes, o select deve considerar impostos com valores zerados.
+--
+-- Em 28/01/2019 - Renan Alves
+-- Redmine #50094 - Arquivo serviços tomados São Paulo
+-- Alteração: Foi alterado a coluna VL_TOTAL_NF para VL_TOTAL_SERV que é referente valor total de serviço.
+--            Foi alterado a coluna REC.VL_TOTAL_NF para REC.VL_TOTAL_SERV no totalizador VN_TOTAL_VL_SERV.
+-- Rotina: pkb_gera_arq_cid_3550308
+--
+-- Em 15/01/2019 - Renan Alves
+-- Redmine #45555 - Desenvolver Serviços Tomados de ISS para Londrina Paraná
+-- Rotina: pkb_gera_arq_cid_4113700
+--
+-- Em 11/01/2019 - Renan Alves
+-- Redmine #47275 - Desenvolver Serviços Tomados de ISS para Prefeitura de Fortaleza
+-- Rotina: pkb_gera_arq_cid_2304400
+--
+-- Em 03/01/2019 - Karina de Paula
+-- Redmine #50024 - Geração data de Competência - Serv. Tomados RJ
+-- Alteração: Alterado o cursor c_nfs para trazer separadas as datas nf.dt_sai_ent e nf.dt_emiss
+--            Incluido o select da tabela nfcobr_dup para recuperar a data de vecto da nf
+--            Incluido tratamento diferente para composicao da data que compoem o arquivo conforme a regra abaixo:
+--             Se houver linha de imposto do Tipo ISS e o mesmo for do tipo "1-Retenção", mandar a DT_VENCTO da tabela NFCOBR_DUP;
+--             Se houver linha de imposto do Tipo ISS e o mesmo for do tipo "0-Imposto", mandar a DT_EMISS do documento fiscal;
+-- Rotina Alterada: pkb_gera_arq_cid_3304557 
+------------------------------------------------------------------------------------------------
+-- Em 27/06/2013 - Angela Inês.
+-- Redmine Atividade #77 - Arquivo ISS Curitiba.
+-- Registros com tamanhos incorretos. 
+--
+-- Em 06/01/2015 - Angela Inês.
+-- Redmine #5616 - Adequação dos objetos que utilizam dos novos conceitos de Mult-Org.
+--
+-- Em 18/07/2015 - Rogério Silva
+-- Redmine #9798 - Implementação de processo de Exportação de Arquivo de NFS Tomador de Barueri/SP
+--
+-- Em 20/07/2015 - Rogério Silva
+-- Redmine #9818 - Implementação de processo de Exportação de Arquivo de NFS Tomador de Itapevi/SP
+--
+-- Em 27/07/2015 - Angela Inês.
+-- Redmine #10117 - Escrituração de documentos fiscais - Processos.
+-- Inclusão do novo conceito de recuperação de data dos documentos fiscais para retorno dos registros.
+--
+-- Em 05/08/2015 - Rogério Silva
+-- Redmine #9829 - Implementação do processo de exportação de Nota Fiscais de serviços Tomados para a prefeitura do Rio de Janeiro/RJ
+--
+-- Em 21/08/2015 - Rogério Silva
+-- Redmine #9848 - Implementação de processo de Exportação de Arquivo de NFS Tomador de Porto Alegre/RS
+--
+-- Em 15/09/2015 - Rogério Silva
+-- Redmine #11467 - Erro na composição do arquivo
+--
+-- Em 15/09/2015 - Rogério Silva
+-- Redmine #11229 - Defeitos
+--
+-- Em 06/10/2015 - Fábio Tavares
+-- Redmine #12060 - Implementação de processo de Exportação de Arquivo de NFS tomador de Belo Horizonte/MG
+--
+-- Em 14/10/2015 - Fábio Tavares
+-- Redmine #10115 - Implementação de processo de Exportação de Arquivo de NFS tomador de Camaçari/BA
+--
+-- Em 19/10/2015 - Fábio Tavares
+-- Redmine #9860 - Implementação de processo de Exportação de Notas Fiscais de Serviços Tomados para GissOnline
+--
+-- Em 27/10/2015 - Fábio Tavares
+-- Redmine #9860 - Implementação de processo de Exportação de Notas Fiscais de Serviços Tomados para Santana do Parnaiba - São Paulo
+--
+-- Em 29/01/2016  - Fábio Tavares
+-- Redmine #14450 - Implementação do processo de Exportação de Notas Fiscais de Serviços Tomados para Belem - PA
+--
+-- Em 12/02/2016 - Fábio Tavares
+-- Redmine #15321 - Correção do processo de Exportação para Cidade Belem - PA
+-- Código do IBGE estava incorreto.
+--
+-- Em 15/02/2016 - Fábio Tavares
+-- Redmine #15428 - Estava exportando notas fiscais de terceiros como EMITIDAS.
+--
+-- Em 26/02/2016  - Rogério Silva.
+-- Redmine #15812 - Nota de serviço - Tomador - SP
+--
+-- Em 09/05/2016 - Rogério Silva.
+-- Redmine #18352 - Integração de Informação Adicional com o Caractere PIPE e ENTER (\n)
+--
+-- Em 28/07/2016 - Fábio Tavares
+-- Redmine #21557 - ERROS DES BH
+--
+-- Em 11/08/2016 - Angela Inês.
+-- Redmine #22313 - Correção na geração do arquivo para Curitiba.
+-- Para recuperar os itens das notas fiscais de serviço (nota_fiscal/item_nota_fiscal), modelo '99', não é necessário identificar se a nota está relacionada com
+-- item de complemento de serviço (itemnf_compl_serv), pois o mesmo pode não existir e ainda, nos registros para Cidade de Curitiba-PR, os campos utilizados não
+-- são da tabela de complemento (itemnf_compl_serv).
+-- Rotina: pkb_gera_arq_cid_4106902.
+--
+-- Em 12/08/2016 - Angela Inês.
+-- Redmine #22347 - Correção na geração do arquivo de NFSe - Rio de Janeiro.
+-- Informar notas fiscais que não tenham participante que sejam do município do Rio de Janeiro (nota_fiscal.pessoa_id/pessoa.cidade_id/estado.sigla_estado<>'RJ').
+-- Rotina: pkb_gera_arq_cid_3304557.
+--
+-- Em 12/08/2016 - Angela Inês.
+-- Redmine #22350 - Correção na geração do arquivo de NFSe - Belo Horizonte.
+-- Considerar somente a data de emissão própria (nota_fiscal.dt_emiss), para considerar dentro do período solicitado para geração do arquivo.
+-- Rotina: pkb_gera_arq_cid_3106200.
+--
+-- Em 24/08/2016 - Angela Inês.
+-- Redmine #22772 - Correção na geração do arquivo NFSe - Cidade Belem - PA.
+-- 1) Para recuperar a CIDADE da Empresa da Nota Fiscal, estava sendo utilizado um valor 'fixo' incorretamente. Corrigir para utilizar o identificador da empresa
+-- em questão, da nota fiscal.
+-- 2) Recuperar a cidade do Complemento do Item da nota fiscal (itemnf_compl_serv.cidade_id), e se for nula, recuperar do item da nota fiscal
+-- (item_nota_Fiscal.cidade_ibge), para compôr o campo SIAFI.
+-- Rotina: pkb_gera_arq_cid_1501402.
+--
+-- Em 30/08/2016 - Angela Inês.
+-- Redmine #22987 - Desenvolver leiaute de arquivo TXT para a Cidade de Manaus-AM.
+-- Desenvolver o processo de emissão do arquivo no formato TXT para a cidade de Manaus-AM, com código de IBGE 1302603.
+-- Rotina: pkb_gera_arq_cid_1302603.
+--
+-- Em 31/08/2016 - Angela Inês.
+-- Redmine #23031 - Correção na geração do arquivo de Cidade - Manaus.
+-- Inicializar os campos com espaços ou zeros, quando os valores recuperados forem nulos.
+-- Redmine #23050 - Correção na geração do arquivo de Cidade - Manaus.
+-- Ao inicializar os campos que podem estar nulos, considerar espaço para caractere e zeros para numéricos.
+-- Rotina: pkb_gera_arq_cid_1302603.
+--
+-- Em 28/09/2016 - Fábio Tavares Santana
+-- Redmine #23046 - Nota Fiscal de Serviço Tomado Jaboatão dos Guararapes/PE
+-- Desenvolvimento do processo para exportação de notas em formato de xml.
+--
+-- Em 11/10/2016 - Angela Inês.
+-- Redmine #24308 - Correção na geração do arquivo de NFS - Belo Horizonte - DES.
+-- 1) Informar a inscrição municipal somente para cidades do estado de Belo Horizonte.
+-- 2) Informar com 8 caracteres numéricos o campo CEP, com zeros a esquerda para completar o tamanho do campo.
+-- Rotina: pkb_gera_arq_cid_3106200.
+--
+-- Em 19/01/2017 - Leandro Savenhago
+-- Redmine #27504 - RIO - ARQUIVO ISS DE SERVIÇOS TOMADOS
+-- Rotina: pkb_gera_arq_cid_3304557
+-- Realizado correção na montagem do arquivo, conforme indicado na atividade do redmine
+--
+-- Em 01/02/2017 - Fábio Tavares
+-- Redmine #27627 e #27623 Implementação para a cidade de Juazeiro-BA e Maraba-PA
+--                    
+-- Em 14/02/2017 - Fábio Tavares
+-- Redmine #28358 - OPTUM - CURITIBA - ARQUIVO ISS DE SERVIÇOS TOMADOS
+--
+-- Em 17/02/2017 - Fábio Tavares
+-- Redmine #28522 - feedback o campo IM quando não tem nao está ficando o espaço em branco
+-- rotina: pkb_gera_arq_cid_1504208
+--
+-- Em 17/02/2017 - Fábio Tavares
+-- Redmine #28519 - feedback gerar arquivo Juazeiro]
+-- rotina: pkb_gera_arq_cid_2918407  
+--
+-- Em 21/02/2017 - Fábio Tavares
+-- Redmine #28638 - outro erro, quando a nota de terceiro é do estado RJ e de outra cidade, não está saindo no arquivo.
+-- Rotina: pkb_gera_arq_cid_3304557
+--
+-- Em 23/02/2017 - Fábio Tavares
+-- Redmine #28696 -  Gerar o arquivo, os documentos pelo período, data de emissão do documento do Compliance, campo "DT_EMISS", Curitiba.
+--
+-- Em 02/03/2017 - Fábio Tavares
+-- Redmine #28878 - CORREÇÃO/MELHORIA NA GERAÇÃO DO TXT NFSE SANTANA PARNAIBA
+-- Rotina: pkb_gera_arq_cid_3547304
+--
+-- Em 15/03/2017 - Fábio Tavares
+-- Redmine #29383 e #29313 - Ajustes de Arquivo de NFS Tomado para São Paulo e Rio de Janeiro.
+-- Rotina: pkb_gera_arq_cid_3304557 e pkb_gera_arq_cid_3550308;
+--
+-- Em 11/04/2017 - Fábio Tavares
+-- Redmine #27483 - Melhorias referentes ao plano de contas referencial referente ao Periodo ativo.
+-- Rotina: pkb_gera_arq_cid_2607901.
+--
+-- Em 13/05/2017 - Leandro Savenhago
+-- Redmine #29114 - Desenvolvimento dos Serviços Tomados para o município de Vitória no ES
+-- Rotina: pkb_gera_arq_cid_2607901.
+--
+-- Em 06/06/2017 - Melina Carniel
+-- Redmine #31271 - Desenvolvimento dos Serviços Tomados para o município de São Luís no MA
+-- Rotina: pkb_gera_arq_cid_2111300.
+--
+-- Em 20/06/2017 - Melina Carniel
+-- Redmine #31229 - Desenvolvimento dos Serviços Tomados para o município de Natal no RN
+-- Rotina: pkb_gera_arq_cid_2408102.
+--
+-- Em 21/06/2017 - Melina Carniel
+-- Redmine #31292 - Desenvolvimento dos Serviços Tomados para o município de Sorocaba - SP
+-- Rotina: pkb_gera_arq_cid_3552205.
+--
+-- Em 03/07/2017 - Melina Carniel
+-- Redmine #31292 - Desenvolvimento dos Serviços Tomados para o município de Campinas/SP,
+-- São José/SC e Louveira/SP
+-- Rotina: pkb_gera_arq_cid_3509502, pkb_gera_arq_cid_4216602 e pkb_gera_arq_cid_3527306.
+--
+-- Em 07/07/2017 - Fábio Tavares
+-- Redmine #31486 - Desenvolver a Funcionalidade de Serviços Tomados para o município de Nova Santa Rita - RS
+-- Rotina: pkb_gera_arq_cid_4313375.
+--
+-- Em 10/07/2017 - Fábio Tavares
+-- Redmine #32630 - feed- arquivo São Luis MA
+-- Rotina: pkb_gera_arq_cid_2111300.
+--
+-- Em 10/07/2017 - Fábio Tavares
+-- Redmine #32630 - erro ao exportar o arquivo SOROCABA
+-- Rotina: pkb_gera_arq_cid_3552205.
+--
+-- Em 11/07/2017 - Fábio Tavares
+-- Redmine #32726 - Finalizar Atividade - Desenvolver Serviços Tomados para Contagem - MG
+-- Rotina: pkb_gera_arq_cid_3118601.
+--
+-- Em 12/07/2017 - Fábio Tavares
+-- Redmine #32792 - Verificar a geração do arquivo para a prefeitura de NATAL - Solicitação da Karina.
+-- Rotina: pkb_gera_arq_cid_2408102. 
+--
+-- Em 18/07/2017 - Fábio Tavares
+-- Redmine #32900 - Serviços Tomados para São Caetano do Sul - SP Padrão GINFES
+-- Rotina: pkb_gera_arq_cid_dm_ginfes.
+--
+-- Em 24/07/2017 - Fábio Tavares
+-- Redmine #32724 - Finalizar Atividade - Desenvolver Serviços Tomados para CABEDELO - PB
+-- Rotina: pkb_gera_arq_cid_2503209.
+--
+-- Em 03/08/2017 - Marcelo Ono
+-- Redmine #33314 - Erro ao exportar o arquivo de Nota Fiscal de Serviço da Cidade de Louveira - SP
+-- Rotina: pkb_gera_arq_cid_3527306. 
+--
+-- Em 04/08/2017 - Marcelo Ono
+-- Redmine #33319 - Erro ao exportar o arquivo de Nota Fiscal de Serviço da Cidade de São José - SC
+-- Rotina: pkb_gera_arq_cid_4216602.
+--
+-- Em 07/08/2017 - Marcelo Ono
+-- Redmine #33327 - Erro ao exportar o arquivo de Nota Fiscal de Serviço da Cidade de Contagem - MG
+-- Rotina: pkb_gera_arq_cid_3118601.
+--
+-- Em 08/08/2017 - Marcelo Ono
+-- Redmine #33422 - Erro ao exportar o arquivo de Nota Fiscal de Serviço da Cidade de Nova Santa Rita - RS
+-- Rotina: pkb_gera_arq_cid_4313375.
+--
+-- Em 09/08/2017 - Marcelo Ono
+-- Redmine #33437 - Erro ao exportar o arquivo de Nota Fiscal de Serviço da Cidade de Cabedelo - PB
+-- Rotina: pkb_gera_arq_cid_2503209.
+--
+-- Em 10/08/2017 - Marcelo Ono
+-- Redmine #33497 - Erro ao exportar o arquivo de Nota Fiscal de Serviço da Cidade de Cabedelo - PB
+-- Rotina: pkb_gera_arq_cid_2503209.
+--
+-- Em 10/08/2017 - Marcelo Ono
+-- Redmine #33497 - Erro ao exportar o arquivo de Nota Fiscal de Serviço da Cidade de Contagem - MG
+-- Rotina: pkb_gera_arq_cid_3118601.
+--
+-- Em 29/08/2017 - Fábio Tavares
+-- Redmine #33206 - Defeito - o arquivo está gerando como se fosse serviço prestado e não tomado
+-- Rotina: pkb_gera_arq_cid_dm_ginfes.
+--
+-- Em 01/12/2017 - Marcelo Ono
+-- Redmine #37081 - Alteração no processo de Exportação de Notas Fiscais de Serviços Tomados para GissOnline.
+-- Recuperar a Atividade ou Serviço prestado de acordo com o código do serviço municipal, e caso o código do serviço municipal esteja nulo, recuperar
+-- o código da lista de serviço do item.
+-- Rotina: pkb_gera_arq_cid_dm_ginfes.
+--
+-- Em 13/12/2017 - Angela Inês.
+-- Redmine #37538 - Correção na geração do arquivo, modelo GISSOnLine, para Nota Fiscal de Serviço.
+-- Para o valor do campo relacionado com a alíquota de ISS, informar nulo quando o valor for 0(zero), caso contrário, montar de acordo com a máscara numérica
+-- (processo já existente).
+-- Rotina: pkb_gera_arq_cid_dm_ginfes.
+-- Redmine #37571 - Correção na geração do arquivo, modelo GISSOnLine, para Nota Fiscal de Serviço.
+-- 1) Eliminar os caracteres '.', '/' e '-' nos campos Inscrição Municipal (nota_fiscal.pessoa_id/pessoa/juridica.im), e Inscrição Estadual
+-- (nota_fiscal.pessoa_id/pessoa/juridica.ie).
+-- 2) Considerar as notas fiscais de serviço que possuem código da lista de serviço vinculado ao item da nota fiscal (nota_fiscal/item_nota_fiscal.cd_lista_serv),
+-- ou que possuem código de tributação do município vinculado ao complemento do item da nota fiscal (nota_fiscal/item_nota_fiscal/itemnf_compl_serv.codtribmunicipio_id).
+-- Rotina: pkb_gera_arq_cid_dm_ginfes.
+--
+-- Em 19/12/2017 - Marcos Garcia
+-- Redmine #37180 - Verificar montagem do txt de NFSe - Santana do Parnaíba
+-- Recuperação do valor da nota, com base no cálculo que utiliza o valor de cada item multiplicado pelo seu valor.
+-- Rotina: pkb_gera_arq_cid_3547304.
+--
+-- Em 26/12/2017 - Angela Inês.
+-- Redmine #37871 - Atualização nos processos de emissão de arquivo texto de notas fiscais de serviço.
+-- Voltar a correção feita para o processo do menu sped/iss/arquivo de nota fiscal de serviço, mantendo a recuparação do valor da nota fiscal de acordo com
+-- o total líquido da nota (nota_fiscal_total.vl_total_nf).
+-- Rotina: pkb_gera_arq_cid_3547304.
+--
+-- Em 02/01/2018 - Leandro Savenhago
+-- Redmine #37830 - Gerar arquivo de GissOnline através do código da Nota
+-- Formatar o "código da atividade" com mascara, para que seu formato fique igual ao do "código da lista de serviço 116/03"
+-- Rotina: pkb_gera_arq_cid_dm_ginfes.
+--
+-- Em 03/01/2018 - Angela Inês.
+-- Redmine #38100 - Correção no processo para geração do arquivo de Serviço Tomado de ISS para GissOnLine.
+-- Somar os valores de Item Bruto das notas fiscais agrupando por:
+-- 1) Identificador da nota fiscal: nota_fiscal.id
+-- 2) Data de emissão da nota fiscal: nota_fiscal.dt_emiss
+-- 3) Número da nota fiscal: nota_fiscal.nro_nf
+-- 4) Série da nota fiscal: nota_fiscal.serie
+-- 5) Identificador do participante da nota fiscal: nota_fiscal.pessoa_id
+-- 6) Identificador da empresa que emitiu a nota fiscal: nota_fiscal.empresa_id
+-- 7) Código de tributação do munícipio vinculado com o complemento do item da nota fiscal: item_nota_fiscal.codtribmunicipio_id
+-- 8) Código da lista de serviço vinculado com o complemento do item da nota fiscal: item_nota_fiscal.cd_lista_serv
+-- 9) Código IBGE da cidade vinculado ao item da nota fiscal: item_nota_fiscal.cidade_ibge
+-- 10) Identificador da cidade da empresa que emitiu a nota fiscal: cidade.id
+-- 11) Código IBGE da cidade vinculado com a empresa que emitiu a nota fiscal: cidade.ibge_cidade
+-- Com essas informações recuperamos os valores de alíquota e base de cálculo do imposto ISS do tipo Retido: imp_itemnf.dm_tipo=1/imp_itemnf.tipoimp_id=ISS.
+-- Além dessas alterações foram feitas correções para melhoria de desempenho do processo, performance.
+-- Rotina: pkb_gera_arq_cid_dm_ginfes.
+--
+-- Em 09/01/2018 - Fábio Tavares Santana
+-- Redmine #38076 - Geração de Servicos Tomados de ISS - Gissonline - Campo se destaca se o participante da NFSe é Simples Nacional (S/N)
+-- Rotina: pkb_gera_arq_cid_dm_ginfes.
+--
+-- Em 10/01/2018 - Fábio Tavares Santana
+-- Redmine #38126 - Realizar tratamento do campo de inscrição estadual que está saindo com valor Isento na Package
+-- Rotina: pkb_gera_arq_cid_dm_ginfes.
+--
+-- Em 24/01/2018 - Leandro Savenhago
+-- Redmine #38388 - Geração do arquivo de Serviços Tomados de ISS para Gissonline
+-- Rotina: pkb_gera_arq_cid_dm_ginfes.
+--
+-- Em 06/06/2018 - Marcos Ferreira
+-- Redmine #36961 - Desenvolver a Funcionalidade de Serviços Tomados para o município de Nova Lima - MG
+-- Rotina: pkb_gera_arq_cid_3144805.
+--
+-- Em 26/06/2018 - Marcos Ferreira
+-- Redmine #40737 - Geração de valores incorretos em serviços tomados de Santos
+-- Serviços tomados para o município de Santos devem utilizar códigos específico de retenção de imposto
+-- Rotina: pkb_gera_arq_cid_dm_ginfes.
+--
+-- Em 04/07/2018  - Karina de Paula
+-- Redmine #40812 - Desenvolver Serviços Tomados de Cuiabá/MT
+-- Rotina Criada: pkb_gera_arq_cid_5103403 para atender prefeitura de Cuiaba - MT
+--                pkb_gera_arquivo => Incluída a chamada da nova rotina
+--
+-- Em 05/07/2018  - Karina de Paula
+-- Redmine #40081 - Desenvolver Serviços Tomados de Cuiabá/MT
+-- Rotina Criada: pkb_gera_arq_cid_2307650 para atender prefeitura de Maracanaú - CE
+--                pkb_gera_arquivo => Incluída a chamada da nova rotina
+--
+-- Em 13/07/2018  - Karina de Paula
+-- Redmine #44947 - corrigir especificação quando o imposto é ISS retido
+-- Rotina Alterada: pkb_gera_arq_cid_5103403 => Alterado o campo vl_base_calc_iss da nota_fiscal_total para o vl_base_calc da imp_itemnf
+-- Redmine #44969 - Acerto de alguns campos de Maracanau
+--
+-- Em 16/07/2018  - Karina de Paula
+-- Redmine #43469 - Desenvolver Serviços Tomados de ISS de Tiangua - CE
+-- Rotina Criada: pkb_gera_arq_cid_2313401
+--
+-- Em 15/08/2018  - Eduardo da Silva Linden
+-- Redmine #45857 - Desenvolver Serviços Tomados - Gravataí - RS
+-- Rotina Criada: pkb_gera_arq_cid_4309209
+--
+-- Em 17/08/2018  - Eduardo da Silva Linden
+-- Redmine #45857 - Desenvolver Serviços Tomados - São José dos Pinhais  - PR
+-- Rotina Criada: pkb_gera_arq_cid_4125506
+--
+-- Em 05/09/2018  - Eduardo da Silva Linden
+-- Redmine #46667 - Ajustar os campos "Valor contábil do documento." (ini78 fim18) , "Local da prestação do serviço" (ini139 fim7)  e  "Código de endereçamento postal" (ini186 fim8) 
+-- Rotina Alterada: pkb_gera_arq_cid_4125506
+--
+-- Em 10/09/2018 - Marcos Ferreira
+-- Redmine #46754 - Incluir novo domínio - 'Não Incidência'
+-- Solicitação: Incluir o nono domínio 'Não Incidência', na estrutura: 'NF_COMPL_SERV.DM_NAT_OPER'.
+-- Alterações: Inclusão do do novo item do domínio 8 = 'Não Incidência'
+-- Procedures Alteradas: pkb_gera_arq_cid_3118601 / pkb_gera_arq_cid_4313375 / pkb_gera_arq_cid_1504208 / pkb_gera_arq_cid_1302603 / pkb_gera_arq_cid_2611606 / pkb_gera_arq_cid_3523404 / pkb_gera_arq_cid_3550308 /  pkb_gera_arq_cid_2111300 / pkb_gera_arq_cid_3144805 /
+--
+-- Em 19/10/2018 - Angela Inês.
+-- Redmine #47955 - Correção na geração dos Serviços Tomados de ISS de Maracanau.
+-- 1) Considerar a cidade da empresa vinculada com a Nota Fiscal, como sendo de Maracanau. Hoje o processo está considerando o participante da Nota Fiscal.
+-- 2) Considerar a existência do imposto retido de ISS das Notas Fiscais. Hoje o processo está considerando todos os impostos.
+-- Rotina: pkb_gera_arq_cid_2307650.
+--
+-- Em 24/10/2018 - Eduardo Linden
+-- Redmine #47812 - Serviços Tomados de ISS - pk_arq_nfs_cidade.pkb_gera_arq_cid_3550308 - Variável vd_dt_ini_abert
+-- Foi incluido as datas de dt_exe_serv, dt_sai_ent e dt_emiss para obtenção da data para variavel vd_dt_ini_abert
+-- Rotina: pkb_gera_arq_cid_3550308.
+--
+-- Em 25/10/2018 - Eduardo Linden
+-- Redmine #47316 - Serviços Tomados de ISS - Município de Cuiabá - Correção na Geração
+-- O cursor c_nfs foi alterado a fim de trazer dados das notas fiscais com imposto ISS somente (retido ou não).
+-- Alem da inclusão da clausula nvl(nf.dm_arm_nfe_terc, 0) = 0 e soma do valor de base de calculo (imp_itemnf.vl_base_calc).
+-- Rotina: pkb_gera_arq_cid_5103403
+--
+-- Em 26/10/2018 - Eduardo Linden
+-- Redmine #48166 - feed - para montar a data está considerando também notas que o participante é de sao paulo
+-- Foi incluido clausulas no select para obter data para variavel vd_dt_ini_abert, a fim de tratar participantes que não sejam do municipio de São Paulo.
+-- Rotina: pkb_gera_arq_cid_3550308.
+--
+-- Em 07/11/2018 - Angela Inês.
+-- Redmine #48488 - Correção na geração do arquivo de NFS de Campinas - Dados de Cobrança.
+-- Para recuperar as notas fiscais de serviço, está sendo considerado que a mesma tenha que possuir Dados de Cobrança. O arquivo para cidade de Campinas não
+-- necessita dessas informações, portanto, a consideração deve ser eliminada.
+-- Rotina: pkb_gera_arq_cid_3509502.
+--
+-- Em 26/11/2018 - Marcos Ferreira
+-- Redmine #48134 - Serviços Tomados de ISS - Cuiaba-- Novas Alterações
+-- Solicitação: 1) Tratar modelos Nota Fiscal de Serviço e Nota Fiscal Conjugada. 
+--              2) Considerar somente notas onde o Tomador é de outro município que o Prestador
+-- Alterações:  1) Alteração no if do vn_fase = 5, Feito de-para com Modelo de nota Conjugada
+--              2) Alterado o Cursor c_nfs. 
+-- Procedures Alteradas: pkb_gera_arq_cid_5103403
+--
+--
+-------------------------------------------------------------------------------------------
+-- Constantes
+
+   CR  CONSTANT VARCHAR2(4000) := CHR(13);
+   LF  CONSTANT VARCHAR2(4000) := CHR(10);
+   FINAL_DE_LINHA CONSTANT VARCHAR2(4000) := CR || LF;
+
+-------------------------------------------------------------------------------------------------------
+
+   type t_estr_arq_nfs_cidade is table of estr_arq_nfs_cidade%rowtype index by binary_integer;
+   vt_estr_arq_nfs_cidade t_estr_arq_nfs_cidade;
+
+   gn_empresa_id        estr_arq_nfs_cidade.empresa_id%type := null;    
+   gn_usuario_id        estr_arq_nfs_cidade.usuario_id%type := null;
+   gn_dm_ind_emit       nota_fiscal.dm_ind_emit%type := null;
+   gn_cidade_id         cidade.id%type := null;
+   gv_ibge_cidade       cidade.ibge_cidade%type := null;
+   gd_dt_ini            date := null;
+   gd_dt_fin            date := null; 
+   gl_conteudo          estr_arq_nfs_cidade.conteudo%type := null;  
+   gn_dm_dt_escr_dfepoe empresa.dm_dt_escr_dfepoe%type;
+   gn_en_tipo           number := null;
+   gv_vlr_param         param_geral_sistema.vlr_param%type;
+   gv_erro              varchar2(400); 
+-- 
+-- ================================================================================================================== --
+-- Função para retornar a data de vencimento da primeira parcela de cobrança da nota fiscal
+function fkg_dt_vencto_nf ( en_notafiscal_id in nota_fiscal.id%type ) return date;
+--
+-- ================================================================================================================== --
+-- Procedimento de geração do arquivo
+procedure pkb_gera_arquivo ( en_empresa_id  in estr_arq_nfs_cidade.empresa_id%type
+                           , en_usuario_id  in estr_arq_nfs_cidade.usuario_id%type
+                           , en_dm_ind_emit in nota_fiscal.dm_ind_emit%type
+                           , en_cidade_id   in cidade.id%type
+                           , ed_dt_ini      in date
+                           , ed_dt_fin      in date
+                           , en_tipo        in number
+                           );
+--
+-- ================================================================================================================== --
+
+end pk_arq_nfs_cidade;
+/
