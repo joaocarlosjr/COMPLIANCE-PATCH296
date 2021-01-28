@@ -24431,17 +24431,40 @@ PROCEDURE PKB_INTEGR_NOTA_FISCAL_FISCO ( EST_LOG_GENERICO_NF           IN OUT NO
    --
    vn_fase           number := 0;
    vn_loggenerico_id log_generico_nf.id%type;
+   vn_dm_tipo        NFInfor_Adic.dm_tipo%type;
    --
 BEGIN
    --
    vn_fase := 1;
    --
+   begin
+      --
+      select a.dm_tipo
+        into vn_dm_tipo 	    
+        from NFInfor_Adic a
+       where a.notafiscal_id = est_row_Nota_Fiscal_Fisco.notafiscal_id;
+      --
+   exception
+      when others then
+         vn_dm_tipo := null;	  
+   end;   
+   --  
+   vn_fase := 1.1;      
+   -- 
    if nvl(est_row_Nota_Fiscal_Fisco.notafiscal_id,0) = 0
       and nvl(est_log_generico_nf.count,0) = 0  then
       --
-      vn_fase := 1.1;
+      vn_fase := 1.2;
       --
-      gv_mensagem_log := 'Não informada a Nota Fiscal para relacionar as Informações do Fisco.';
+      gv_mensagem_log := 'Não informada a Nota Fiscal para relacionar as informações do documento de arrecação referenciado.';
+      -- 	  
+      if nvl(vn_dm_tipo,0) = 1 then
+         --	  
+         gv_mensagem_log := trim(gv_mensagem_log)||' Informações Complementar da Nota Fiscal do tipo 1-Fisco, '||
+                            'Informacões do documento de arrecadação referenciado são obrigatórias neste caso. Informar via Web-Service na tabela '||
+                            '<Nota_Fiscal_Fisco> ou via open interface através da view <VW_CSF_NOTA_FISCAL_FISCO>.';							
+         --							
+      end if;      	        
       --
       vn_loggenerico_id := null;
       --

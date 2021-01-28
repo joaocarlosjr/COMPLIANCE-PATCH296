@@ -11,6 +11,13 @@ prompt 30b_CSF_OWN_pk_csf
 @@30b_CSF_OWN_pk_csf.pkb
 show err
 
+prompt 34a_csf_own_pk_integr_view
+@@34a_csf_own_pk_integr_view.pks
+show err
+prompt 34b_csf_own_pk_integr_view
+@@34b_csf_own_pk_integr_view.pkb
+show err
+
 prompt 39a_pk_csf_ct.pks
 @@39a_pk_csf_ct.pks
 show err

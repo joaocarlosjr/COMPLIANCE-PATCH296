@@ -1903,6 +1903,101 @@ Prompt INI Redmine #75312 - Atualização tabela param_ipm
 Prompt FIM Redmine #75312 - Atualização tabela param_ipm
 --------------------------------------------------------------------------------------------------------------------------------------
  
+ -------------------------------------------------------------------------------------------------------------------------------
+Prompt INI Redmine #71035 - Integração para nota_fiscal_fisco
+-------------------------------------------------------------------------------------------------------------------------------
+ 
+declare
+  vn_qtde    number;
+begin
+  begin
+     select count(1)
+       into vn_qtde
+       from all_tables t
+      where t.OWNER = 'CSF_OWN'  
+        and t.TABLE_NAME = 'NOTA_FISCAL_FISCO';
+   exception
+      when others then
+         vn_qtde := 0;
+   end;	
+   --   
+   if vn_qtde > 0 then
+      -- 
+      -- Add comments to the table   
+      BEGIN
+         EXECUTE IMMEDIATE 'comment on table CSF_OWN.NOTA_FISCAL_FISCO is ''Tabela de Documento de Arrecadação Referenciado''';
+      EXCEPTION
+         WHEN OTHERS THEN
+            RAISE_APPLICATION_ERROR ( -20101, 'Erro ao alterar comentario de NOTA_FISCAL_FISCO - '||SQLERRM );
+      END;	  
+      -- 
+   end if;
+   --  
+   commit;
+   --   
+end;
+/
+
+declare
+  --    
+  vn_existe number := null;
+  --
+begin
+  --
+  begin
+    select count(1)
+      into vn_existe
+      from all_synonyms a
+     where upper(a.owner)      = 'CSF_OWN'
+       and upper(a.table_name) = 'VW_CSF_NOTA_FISCAL_FISCO';
+  exception
+    when others then
+      vn_existe := 0;
+  end;
+  --
+  if nvl(vn_existe, 0) = 0 then
+    --
+    begin
+     execute immediate 'create or replace synonym CSF_OWN.VW_CSF_NOTA_FISCAL_FISCO for CSF_INT.VW_CSF_NOTA_FISCAL_FISCO';
+    exception
+      when others then
+        raise_application_error(-20101, 'Erro no script #70824. Problemas ao criar synonym para a tabela CSF_OWN.VW_CSF_NOTA_FISCAL_FISCO.' || sqlerrm);
+    end;
+    --
+  end if;
+  --
+  commit; 
+  --
+end;
+/
+
+begin
+   --
+   begin
+      insert into csf_own.obj_util_integr ( id
+                                          , obj_name
+                                          , dm_ativo
+                                          )
+                                   values ( csf_own.objutilintegr_seq.nextval
+                                          , 'VW_CSF_NOTA_FISCAL_FISCO'
+                                          , 1
+                                          );
+   exception
+      when others then
+         update csf_own.obj_util_integr
+            set dm_ativo = 1           
+          where obj_name = 'VW_CSF_NOTA_FISCAL_FISCO';
+   end;
+   --  
+   commit;
+   --   
+end;   
+/
+
+--------------------------------------------------------------------------------------------------------------------------------------
+Prompt FIM Redmine #71035 - Integração para nota_fiscal_fisco
+--------------------------------------------------------------------------------------------------------------------------------------
+
 ----------------------------------------------------------------------------------------
 Prompt FIM Patch 2.9.6.1 - Alteracoes no CSF_OWN
 ------------------------------------------------------------------------------------------
