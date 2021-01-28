@@ -5,6 +5,11 @@ create or replace package csf_own.pk_csf_api is
 -- Especificação do pacote de integração de notas fiscais para o CSF
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --
+-- Em 20/01/2021   - Luis Marques - 2.9.6-1 / 2.9.7
+-- Redmine #71035  - ntegração para nota_fiscal_fisco
+-- Rotina Alterada - PKB_INTEGR_NOTA_FISCAL_FISCO - Incluida verificação se o "DM_TIPO" da tabela NfInfor_ADIC form 1-Fisco as
+--                   informações do documento de arrecadação referenciado (nota_fiscal_fisco) são obrigatórias.
+--
 -- Em 07/01/2021   - Luis Marques - 2.9.5-4 / 2.9.6-1 / 2.9.7
 -- Redmine #74199  - Alterar regra de validação para notas de importação de legado
 -- Rotina Alterada - PKB_INTEGR_NOTA_FISCAL, PKB_INTEGR_NOTA_FISCAL_FF - Incluida variável global "GN_DM_LEGADO" para se utilizado 
@@ -2757,6 +2762,7 @@ create or replace package csf_own.pk_csf_api is
    erro_de_validacao       constant number := 1;
    erro_de_sistema         constant number := 2;
    nota_fiscal_integrada   constant number := 16;
+   erro_imp_arq            constant number := 28;   
    cons_sit_nfe_sefaz      constant number := 30;
    info_canc_nfe           constant number := 31;
    informacao              constant number := 35;
