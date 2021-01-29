@@ -204,9 +204,14 @@ begin
    --
    if vn_modulo_id = 0 then
       --
-      insert into CSF_OWN.MODULO_SISTEMA
-      values(CSF_OWN.MODULOSISTEMA_SEQ.NEXTVAL, 'OBRIG_FEDERAL', 'Obrigações Federais', 'Modulo que agrupa todas as obrigações federais exceto as contabeis ECD e ECF')
-      returning id into vn_modulo_id;
+      begin	  
+         insert into CSF_OWN.MODULO_SISTEMA
+         values(CSF_OWN.MODULOSISTEMA_SEQ.NEXTVAL, 'OBRIG_FEDERAL', 'Obrigações Federais', 'Modulo que agrupa todas as obrigações federais exceto as contabeis ECD e ECF')
+         returning id into vn_modulo_id;
+      exception
+         when others then
+            null;
+      end;			
       --
    end if;
    --
@@ -226,9 +231,14 @@ begin
    --
    if vn_grupo_id = 0 then
       --
-      insert into CSF_OWN.GRUPO_SISTEMA
-      values(CSF_OWN.GRUPOSISTEMA_SEQ.NextVal, vn_modulo_id, 'EFD_CONTRIB', 'Parâmetro relacionados ao EFD Contribuições','Parâmetro relacionados ao EFD Contribuições')
-      returning id into vn_grupo_id;
+      begin	  
+         insert into CSF_OWN.GRUPO_SISTEMA
+         values(CSF_OWN.GRUPOSISTEMA_SEQ.NextVal, vn_modulo_id, 'EFD_CONTRIB', 'Parâmetro relacionados ao EFD Contribuições','Parâmetro relacionados ao EFD Contribuições')
+         returning id into vn_grupo_id;
+      exception
+         when others then
+            null;
+      end;			
       --
    end if; 
    --  
@@ -273,17 +283,22 @@ begin
                end;
          end;
          --
-         insert into CSF_OWN.PARAM_GERAL_SISTEMA
-         values( CSF_OWN.PARAMGERALSISTEMA_SEQ.NextVal
-               , x.id
-               , null
-               , vn_modulo_id
-               , vn_grupo_id
-               , 'TIPO_CRED_GRUPO_CST_60'
-               , 'Indica como deve ser montado o registro de tipo de crédito do M100/M500 quando o CST de Pis e Cofins for do grupo 60 (60, 61, 62...). Por padrão, toda vez que for utilizado esse CST será montado tipo de crédito 106, 206 ou 306, porém é possível indicar que esses só devem ser montados se a pessoa da nota for um produtor rural - indicado na PESSOA_TIPO_PARAM. Se o parâmetro for ativado, o tipo de crédito padrão passa a ser 107, 207 e 307 e para que seja montado 106, 206 ou 306 será necessário indicar pessoal da nota como produtor rural = Sim. Valores possíveis: 0 = Monta por padrão 106, 206 e 306 / 1 = Monta por padrão 107, 207 e 307.'
-               , '0'
-               , vn_usuario_id
-               , sysdate);
+         begin		 
+            insert into CSF_OWN.PARAM_GERAL_SISTEMA
+            values( CSF_OWN.PARAMGERALSISTEMA_SEQ.NextVal
+                  , x.id
+                  , null
+                  , vn_modulo_id
+                  , vn_grupo_id
+                  , 'TIPO_CRED_GRUPO_CST_60'
+                  , 'Indica como deve ser montado o registro de tipo de crédito do M100/M500 quando o CST de Pis e Cofins for do grupo 60 (60, 61, 62...). Por padrão, toda vez que for utilizado esse CST será montado tipo de crédito 106, 206 ou 306, porém é possível indicar que esses só devem ser montados se a pessoa da nota for um produtor rural - indicado na PESSOA_TIPO_PARAM. Se o parâmetro for ativado, o tipo de crédito padrão passa a ser 107, 207 e 307 e para que seja montado 106, 206 ou 306 será necessário indicar pessoal da nota como produtor rural = Sim. Valores possíveis: 0 = Monta por padrão 106, 206 e 306 / 1 = Monta por padrão 107, 207 e 307.'
+                  , '0'
+                  , vn_usuario_id
+                  , sysdate);
+         exception
+            when others then
+               null;
+         end; 			
          --
       end if;   
       --
@@ -299,6 +314,7 @@ end;
 --------------------------------------------------------------------------------------------------------------------------------------
 Prompt Fim - Redmine #74820 - Parametro geral do sistema TIPO_CRED_GRUPO_CST_60
 --------------------------------------------------------------------------------------------------------------------------------------
+
 --------------------------------------------------------------------------------------------------------------------------------------
 Prompt Inicio - Redmine #74671  - Inclusão do Flexfield UNID_ORG - VW_CSF_CONHEC_TRANSP_EFD_FF
 --------------------------------------------------------------------------------------------------------------------------------------
