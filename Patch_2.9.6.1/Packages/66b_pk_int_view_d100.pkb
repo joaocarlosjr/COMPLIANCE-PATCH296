@@ -3177,7 +3177,7 @@ begin
                                            ev_descr_cidade_fim => 'XX', -- preenchido com vlr default
                                            ev_sigla_uf_fim     => 'XX', -- preenchido com vlr default
                                            ev_dm_modal         => '01', -- preenchido com vlr default
-                                           en_dm_tp_serv       => 0 -- preenchido com vlr default
+                                           en_dm_tp_serv       => 0 ,-- preenchido com vlr default
                                            --
                                            ev_cd_unid_org      => null -- preenchido com vlr default                                           
                                            );
