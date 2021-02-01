@@ -5,7 +5,18 @@ create or replace package csf_own.pk_valida_ambiente_ct is
 -- Especificação do pacote da API para ler os Conhecimentos de Transportes com DM_ST_PROC = 0 (Não validada)
 -- e chamar os procedimentos para validar os dados
 --
--- Em 11/01/2020   - Karina de Paula
+-- Em 19/01/2020   - Karina de Paula
+-- Redmine #75107  - Tabelas que envolvem o processo de CCE conhec_transp_CCE ou evento_cte_cce/evento_cte e também r_loteintws_ct
+-- Rotina Criada   - pkb_ler_conhec_transp_cce / pkb_vld_conhec_transp_cce
+-- Rotina Alterada - pkb_integracao/pkb_integracao_mo => Incluida a chamada da pkb_ler_conhec_transp_cce e organizada as chamadas duplicadas
+--                 - pkb_ler_ct_int_ws => Incluida a chamada da pkb_vld_conhec_transp_cce
+-- Liberado        - Patch_2.9.6.1
+--
+-- Em 14/01/2021   - Karina de Paula
+-- Redmine #74902/75152/75102
+-- Liberado        - Release_2.9.6 e Patch_2.9.6.1
+--
+-- Em 11/01/2021   - Karina de Paula
 -- Redmine #74870  - Ajuste na validação de SIGLA_IBGE_EMIT e DESCR_CIDADE_EMIT
 -- Rotina Alterada - Ajuste na validação de SIGLA_IBGE_EMIT e DESCR_CIDADE_EMIT
 -- Liberado        - Release_2.9.6

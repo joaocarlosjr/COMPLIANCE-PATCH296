@@ -4,12 +4,16 @@ create or replace package csf_own.pk_despr_integr is
 -- Especificação da package de Desprocessar Integração de Dados Fiscais
 ------------------------------------------------------------------------------------------
 --
+-- Em 25/01/2021  - Wendel Albino -  Patch_2.9.6-1 / Release_2.9.6
+-- Redmine #75210 - Desprocessamento do Registro do Inventário não está implementado para a nova tabela do Módulo Inventário
+-- Rotina Alterada- pkb_despr_inventario -> Inclusao de tabela limpeza ( invent_inf_comp_merc_st )
+--
 -- Em 25/11/2020 - Renan Alves
 -- Redmine #73895 - Desprocessamento do Bloco M não funcionou
 -- Foi alterado o lugar do delete que realiza o desprocessamento (exclusão) dos registros M300
 -- e M700 que ficavam dentro dos cursores de PIS e COFINS.
--- Rotina: pkb_despr_m_pc  
--- Patch_2.9.6.1 / Patch_2.9.5.4 / Release_2.9.7
+-- Rotina: pkb_despr_m_pc
+-- Patch_2.9.5.3 / Patch_2.9.4.6 / Release_2.9.6
 --
 -- Em 07/10/2020 - Renan Alves
 -- Redmine #72197 - Desprocessamento do Bloco M não funciona
@@ -32,10 +36,10 @@ create or replace package csf_own.pk_despr_integr is
 --
 -- Em 10/02/2020 - Eduardo Linden
 -- Redmine #64229 - Correção dos pontos discutidos para integração M300/350
--- Alteração na busca de registros na tabela sobre os periodos considerados. 
+-- Alteração na busca de registros na tabela sobre os periodos considerados.
 -- Eram considerados somente periodo anual, passa a ser considerado o periodo encaminhado no parametro da rotina.
--- Rotina Alterada: pkb_despr_dados_secf  
--- Liberado na versão - Release_2.9.3, Patch_2.9.2.2 e Patch_2.9.1.5   
+-- Rotina Alterada: pkb_despr_dados_secf
+-- Liberado na versão - Release_2.9.3, Patch_2.9.2.2 e Patch_2.9.1.5
 --
 -- Em 24/01/2020 - Luis Marques
 -- Redmine #64069 - defeito - precisa ser informado o empresa_id no log_generico
@@ -45,7 +49,7 @@ create or replace package csf_own.pk_despr_integr is
 -- Redmine #63345 - Desprocessamento de integração de Notas com data inválida
 -- Rotina Alterada: pkb_despr_integr - Colocada verificação de data final menor que data inicial, caso aconteça
 --                  objeto não será desprocessado.
--- 
+--
 -- Em 03/01/2020 - Luiz Armando Azoni
 -- Redmine #62279 Ajuste na pk_despr_integr pois o nome ficou errado
 --
@@ -566,7 +570,7 @@ procedure pkb_despr_infexp ( en_empresa_id in empresa.id%type
 procedure pkb_despr_cad_geral ( en_empresa_id in empresa.id%Type
                               , en_usuario_id in neo_usuario.id%type
                               , ed_dt_ini     in date
-                              , ed_dt_fin     in date 
+                              , ed_dt_fin     in date
                               );
 
 ------------------------------------------------------------------------------------------
@@ -575,8 +579,8 @@ procedure pkb_despr_cad_geral ( en_empresa_id in empresa.id%Type
 procedure pkb_despr_m_pc(en_empresa_id in empresa.id%Type,
                          en_usuario_id in neo_usuario.id%type,
                          ed_dt_ini     in date,
-                         ed_dt_fin     in date); 
-                         
+                         ed_dt_fin     in date);
+
 ------------------------------------------------------------------------------------------
 
 procedure pkb_despr_integr ( en_empresa_id   in empresa.id%type

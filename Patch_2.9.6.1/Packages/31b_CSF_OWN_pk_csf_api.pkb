@@ -2108,6 +2108,18 @@ BEGIN
            delete from itemnf_res_icms_st
             where itemnf_id = rec.id;
            --
+		   --#75222
+		   vn_fase := 2.25;
+           --
+           delete from NF_INF_COMPL_OPER_SAI_ST
+            where itemnf_id = rec.id;
+           --
+           vn_fase := 2.26;
+           --
+		   --#75222
+           delete from NF_INF_COMPL_OPER_ENT_ST
+            where itemnf_id = rec.id;
+           --
          end loop;
          --
          vn_fase := 3;
@@ -19063,7 +19075,8 @@ BEGIN
    --
    --est_row_Item_Nota_Fiscal.infAdProd        := trim( pk_csf.fkg_converte ( est_row_Item_Nota_Fiscal.infAdProd ) );
    --est_row_Item_Nota_Fiscal.infAdProd        := trim( pk_csf.fkg_converte ( ev_string => est_row_Item_Nota_Fiscal.infAdProd, en_ret_underline => 0 ) );
-   est_row_Item_Nota_Fiscal.infAdProd        := trim( pk_csf.fkg_limpa_acento2 ( est_row_Item_Nota_Fiscal.infAdProd ) );
+   --est_row_Item_Nota_Fiscal.infAdProd        := trim( pk_csf.fkg_limpa_acento2 ( est_row_Item_Nota_Fiscal.infAdProd ) );
+   est_row_Item_Nota_Fiscal.infAdProd        := trim(pk_csf.fkg_converte ( est_row_Item_Nota_Fiscal.infAdProd, 0, 1, 2, 1, 1, 1 ));
    --
    est_row_Item_Nota_Fiscal.dm_mod_base_calc := nvl(est_row_Item_Nota_Fiscal.dm_mod_base_calc,0);
    est_row_Item_Nota_Fiscal.cnpj_produtor    := lpad(trim( est_row_Item_Nota_Fiscal.cnpj_produtor ), 14, '0');
@@ -24332,7 +24345,8 @@ BEGIN
       --est_row_NFInfor_Adic.conteudo := trim( pk_csf.fkg_converte ( ev_string            => est_row_NFInfor_Adic.conteudo
       --                                                           , en_remove_spc_extra  => 0 ) );
       --
-      est_row_NFInfor_Adic.conteudo := trim(pk_csf.fkg_limpa_acento2 ( est_row_NFInfor_Adic.conteudo ));
+      --est_row_NFInfor_Adic.conteudo := trim(pk_csf.fkg_limpa_acento2 ( est_row_NFInfor_Adic.conteudo ));
+      est_row_NFInfor_Adic.conteudo := trim(pk_csf.fkg_converte ( est_row_NFInfor_Adic.conteudo, 0, 1, 2, 1, 1, 1 ));
       --
    end if;
    --
@@ -52622,7 +52636,7 @@ BEGIN
       --
       vn_fase := 4;
       --
-      if nvl(vn_dm_ind_oper,0) = 0 and -- Entrada
+      if vn_dm_ind_oper = 0 and -- Entrada
          nvl(vn_qtde_cfop_sai,0) > 0 then
          --
          vn_fase := 4.1;
@@ -52645,7 +52659,7 @@ BEGIN
       --
       vn_fase := 5;
       --
-      if nvl(vn_dm_ind_oper,0) = 1 and -- Saída
+      if vn_dm_ind_oper  = 1 and -- Saída
          nvl(vn_qtde_cfop_entr,0) > 0 then
          --
          vn_fase := 5.1;
@@ -53901,6 +53915,9 @@ PROCEDURE PKB_AJUSTA_TOTAL_NF ( EN_NOTAFISCAL_ID IN NOTA_FISCAL.ID%TYPE ) IS
    vn_vl_fcp_st              nota_fiscal_total.vl_fcp_st%type;
    vn_vl_fcp_st_ret          nota_fiscal_total.vl_fcp_st_ret%type;
    vn_vl_ipi_devol           nota_fiscal_total.vl_ipi_devol%type;
+   vn_vl_pis_imp             nota_fiscal_total.vl_pis_imp%type;    -- #73027
+   vn_vl_cofins_imp          nota_fiscal_total.vl_cofins_imp%type; -- #73027
+   vn_vl_cofins_majorada     nota_fiscal_total.vl_cofins_majorada%type;  -- #73027
    --
    vn_dm_ajusta_total_nf     empresa.dm_ajusta_total_nf%type := 0;
    vn_empresa_id             empresa.id%type;
@@ -53918,7 +53935,8 @@ PROCEDURE PKB_AJUSTA_TOTAL_NF ( EN_NOTAFISCAL_ID IN NOTA_FISCAL.ID%TYPE ) IS
    --
    vn_ajuste_vl_total_item   number := 0;
    vn_vl_base_calc_icms_serv nota_fiscal_total.vl_base_calc_icms%type := 0;
-   -- 
+   vv_vlr_parametro           csf_own.param_geral_sistema.vlr_param%type; --Variavel que recebe o valor do parametro #73027
+   --
    cursor c_param (en_empresa_id in param_efd_icms_ipi.empresa_id%type) is
       select pe.dm_sm_vicms_import_vloper
            , pe.dm_sm_vpiscof_import_vloper
@@ -54760,7 +54778,112 @@ BEGIN
          if nvl(vn_vl_comb_pobr_uf_dest,0) <= 0 then
             vn_vl_comb_pobr_uf_dest := null;
          end if;
-         --		 
+         --
+         vn_fase := 29;
+         --
+         ----Executar sempre que o parâmetro GERA_COFINS_MAJORADO estiver habilitado #73027
+         --
+         -- Recupera valor do parametro para a empresa. #73027
+         begin    
+            select prm.vlr_param   
+                   into vv_vlr_parametro
+              from csf_own.param_geral_sistema prm
+             where prm.empresa_id =  vn_empresa_id
+               and prm.modulo_id = (select id 
+                                      from csf_own.modulo_sistema 
+                                     where UPPER(cod_modulo) = UPPER('EMISSAO_DOC'))
+               and prm.grupo_id  = (select id 
+                                      from csf_own.grupo_sistema 
+                                     where UPPER(cod_grupo) = UPPER('NF_IMPORTACAO') 
+                                       and modulo_id = (select id 
+                                                          from csf_own.modulo_sistema 
+                                                         where UPPER(cod_modulo) = UPPER('EMISSAO_DOC')))
+               and UPPER(prm.param_name) = UPPER('GERA_COFINS_MAJORADO');
+         exception
+           when others then
+             vv_vlr_parametro:= null; 
+         end;   
+         --	
+         -- Verifica se o parametro esta habilitado para a empresa, para validac?o o parametro precisa ser '1'. #72372
+         if (vv_vlr_parametro is not null and vv_vlr_parametro = '1') then	
+             --
+             ---- soma valores 15-Pis Importação dos itens #73027
+             begin
+                select sum(imp.vl_imp_trib)
+                  into vn_vl_pis_imp
+                  from item_nota_fiscal inf
+                     , imp_itemnf       imp
+                     , tipo_imposto     ti
+                 where inf.notafiscal_id = en_notafiscal_id
+             and imp.itemnf_id     = inf.id
+             and imp.dm_tipo       = 0 -- 0-imposto, 1-retenção #73027
+             and ti.id             = imp.tipoimp_id
+             and ti.cd             = 15; -- PIS Importação
+             exception
+                when others then
+                   vn_vl_pis_imp := 0;
+             end;
+             --
+             vn_fase := 30;
+             --
+             ---- soma valores 16-Cofins Importação #73027
+             begin
+                select sum(imp.vl_imp_trib)
+                  into vn_vl_cofins_imp
+                  from item_nota_fiscal inf
+                     , imp_itemnf       imp
+                     , tipo_imposto     ti
+                 where inf.notafiscal_id = en_notafiscal_id
+             and imp.itemnf_id     = inf.id
+             and imp.dm_tipo       = 0 -- 0-imposto, 1-retenção
+             and ti.id             = imp.tipoimp_id
+             and ti.cd             = 16; -- COFINS Importação
+             exception
+                when others then
+                   vn_vl_cofins_imp := 0;
+             end;
+             --
+             -- Valor cofins Majorada, dirença entre cofins importação e valor cofins destacado #73027
+             vn_vl_cofins_majorada := nvl(vn_vl_cofins_imp, 0) - nvl(vn_vl_imp_trib_cofins, 0);
+             --            
+         end if;    
+         --
+         vn_fase := 30;
+         --
+         vv_vlr_parametro:= null;
+         --
+         --Executar sempre que o prâmetro SOMA_COFINS_MAJOR_TOT_NF  estiver habilitado #73027
+         --
+         -- Recupera valor do parametro para a empresa. #73027
+         begin    
+            select prm.vlr_param   
+                   into vv_vlr_parametro
+              from csf_own.param_geral_sistema prm
+             where prm.empresa_id =  vn_empresa_id
+               and prm.modulo_id = (select id 
+                                      from csf_own.modulo_sistema 
+                                     where UPPER(cod_modulo) = UPPER('EMISSAO_DOC'))
+               and prm.grupo_id  = (select id 
+                                      from csf_own.grupo_sistema 
+                                     where UPPER(cod_grupo) = UPPER('NF_IMPORTACAO') 
+                                       and modulo_id = (select id 
+                                                          from csf_own.modulo_sistema 
+                                                         where UPPER(cod_modulo) = UPPER('EMISSAO_DOC')))
+               and UPPER(prm.param_name) = UPPER('SOMA_COFINS_MAJOR_TOT_NF');
+         exception
+           when others then
+             vv_vlr_parametro:= null; 
+         end;   
+         --
+         vn_fase := 31;
+         --
+         -- Verifica se o parametro esta habilitado para a empresa, para validação o parametro precisa ser '1'. #72372
+         if (vv_vlr_parametro is not null and vv_vlr_parametro = '1') then	
+             --
+             vn_vl_total_nf := nvl(vn_vl_total_nf,0) + nvl(vn_vl_cofins_majorada, 0);
+             --
+         end if;
+         
          vn_fase := 99;
          -- atualiza dados
          --
@@ -54811,6 +54934,9 @@ BEGIN
               , nt.vl_fcp_st_ret         = vn_vl_fcp_st_ret
               , nt.vl_pis_st             = vn_vl_pis_st
               , nt.vl_cofins_st          = vn_vl_cofins_st
+              , nt.vl_pis_imp            = nvl(vn_vl_pis_imp, 0)             --#73027
+              , nt.vl_cofins_imp         = nvl(vn_vl_cofins_imp, 0)          --#73027
+              , nt.vl_cofins_majorada    = nvl(vn_vl_cofins_majorada, 0)     --#73027
           where nt.notafiscal_id = en_notafiscal_id;
          --
          -- Variavel global usada no trigger T_A_I_U_Nota_Fiscal_Total_01 (limpa)
@@ -59345,7 +59471,7 @@ BEGIN
                     into vn_considera_tp_oper
                     from cfop cf
                    where cf.id = rec_itemnf.cfop_id
-                     and cf.tipooperacao_id in (3,10); -- 3-Devolução / 10-Vendas 
+                     and cf.tipooperacao_id in (3,9,10); -- 3-Devolução / 10-Vendas / 9-outros
                   --					 
                exception
                   when others then

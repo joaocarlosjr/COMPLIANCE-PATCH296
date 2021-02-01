@@ -11,11 +11,22 @@ prompt 30b_CSF_OWN_pk_csf
 @@30b_CSF_OWN_pk_csf.pkb
 show err
 
+prompt 31a_CSF_OWN_pk_csf_api
+@@31a_CSF_OWN_pk_csf_api.pks
+show err
+prompt 31b_CSF_OWN_pk_csf_api
+@@31b_CSF_OWN_pk_csf_api.pkb
+show err
+
 prompt 34a_csf_own_pk_integr_view
 @@34a_csf_own_pk_integr_view.pks
 show err
 prompt 34b_csf_own_pk_integr_view
 @@34b_csf_own_pk_integr_view.pkb
+show err
+
+prompt 35_pb_gera_danfe_nfe
+@@35_pb_gera_danfe_nfe.prc
 show err
 
 prompt 39a_pk_csf_ct.pks
@@ -30,13 +41,6 @@ prompt 40a_CT_CSF_OWN_pk_csf_api_ct.pks
 show err
 prompt 40b_CT_CSF_OWN_pk_csf_api_ct.pkb
 @@40b_CT_CSF_OWN_pk_csf_api_ct.pkb
-show err
-
-prompt 31a_CSF_OWN_pk_csf_api
-@@31a_CSF_OWN_pk_csf_api.pks
-show err
-prompt 31b_CSF_OWN_pk_csf_api
-@@31b_CSF_OWN_pk_csf_api.pkb
 show err
 
 prompt 41a_CSF_OWN_pk_valida_ambiente_ct.pks
@@ -79,6 +83,20 @@ prompt 74a_pk_apur_icms
 show err
 prompt 74b_pk_apur_icms
 @@74b_pk_apur_icms.pkb
+show err
+
+prompt 76a_pk_apur_icms_st
+@@76a_pk_apur_icms_st.pks
+show err
+prompt 76b_pk_apur_icms_st
+@@76b_pk_apur_icms_st.pkb
+show err
+
+prompt 77a_pk_vld_amb_efd
+@@77a_pk_vld_amb_efd.pks
+show err
+prompt 77b_pk_vld_amb_efd
+@@77b_pk_vld_amb_efd.pkb
 show err
 
 prompt 90a_pk_csf_ciap
@@ -151,6 +169,13 @@ prompt 170b_pk_vld_amb_d100
 @@170b_pk_vld_amb_d100.pkb
 show err
 
+prompt 192a_pk_limpa_open_interf
+@@192a_pk_limpa_open_interf.pks
+show err
+prompt 192b_pk_limpa_open_interf
+@@192b_pk_limpa_open_interf.pkb
+show err
+
 prompt 211a_pk_despr_integr
 @@211a_pk_despr_integr.pks
 show err
@@ -193,6 +218,13 @@ prompt 503b_pk_calc_dief
 @@503b_pk_calc_dief.pkb
 show err
 
+prompt 524a_pk_csf_gera_dados_fci.pks
+@@524a_pk_csf_gera_dados_fci.pks
+show err
+prompt 524b_pk_csf_gera_dados_fci.pkb
+@@524b_pk_csf_gera_dados_fci.pkb
+show err
+
 prompt 540a_pk_csf_calc_fiscal
 @@540a_pk_csf_calc_fiscal.pks
 show err
@@ -207,6 +239,13 @@ prompt 542b_pk_csf_api_calc_fiscal.pkb
 @@542b_pk_csf_api_calc_fiscal.pkb
 show err
 
+prompt 606a_pk_gera_dados_reinf
+@@606a_pk_gera_dados_reinf.pks
+show err
+prompt 606b_pk_gera_dados_reinf
+@@606b_pk_gera_dados_reinf.pkb
+show err
+
 prompt 643a_pk_int_view_bloco_m_pc.pks
 @@643a_pk_int_view_bloco_m_pc.pks
 show err
@@ -219,6 +258,10 @@ prompt 659a_pk_csf_api_cons_sit.pks
 show err
 prompt 659b_pk_csf_api_cons_sit.pkb
 @@659b_pk_csf_api_cons_sit.pkb
+show err
+
+prompt pb_cria_sequence
+@@pb_cria_sequence.prc
 show err
 
 Prompt Catalogar Objetos Invalidos

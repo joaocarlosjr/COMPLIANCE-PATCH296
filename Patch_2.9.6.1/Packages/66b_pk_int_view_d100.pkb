@@ -3179,7 +3179,7 @@ begin
                                            ev_dm_modal         => '01', -- preenchido com vlr default
                                            en_dm_tp_serv       => 0 ,-- preenchido com vlr default
                                            --
-                                           ev_cd_unid_org      => null -- preenchido com vlr default                                           
+                                           ev_cd_unid_org      => null -- preenchido com vlr default
                                            );
         --
         vn_fase := 9.6;

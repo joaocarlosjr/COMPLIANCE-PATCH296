@@ -4,6 +4,22 @@ Prompt INI Release 2.9.6.1 - Alteracoes no CSF_WORK
 SET DEFINE OFF
 /
 
+-------------------------------------------------------------------------------------------------------------------------------
+Prompt INI - Redmine 75107_75515
+-------------------------------------------------------------------------------------------------------------------------------
+begin
+   execute immediate 'create or replace synonym CSF_WORK.CONHEC_TRANSP_CCE   for CSF_OWN.CONHEC_TRANSP_CCE';
+   execute immediate 'create or replace synonym CSF_WORK.CONHECTRANSPCCE_SEQ for CSF_OWN.CONHECTRANSPCCE_SEQ';
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 75107_75515. Criacao da tabela synonym. Erro: ' || sqlerrm);      
+end;
+/
+   
+-------------------------------------------------------------------------------------------------------------------------------
+Prompt INI - Redmine 75107_75515
+-------------------------------------------------------------------------------------------------------------------------------
+
 ---------------------------------------------------------------------------------------------
 Prompt FIM Release 2.9.6.1 - Alteracoes no CSF_WORK
 ---------------------------------------------------------------------------------------------

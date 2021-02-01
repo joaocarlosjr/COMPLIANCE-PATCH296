@@ -6996,14 +6996,52 @@ begin
    --
    vn_fase := 2.3;
    --
+   --Popula a variável vv_cod_mod com o código do modelo de documento -- #75241
+   begin
+      select mf.cod_mod
+        into vv_cod_mod
+        from nota_fiscal nf
+           , mod_fiscal  mf
+       where nf.id = en_notafiscal_id
+         and mf.id = nf.modfiscal_id;
+   exception
+      when others then
+         vv_cod_mod := '99';
+   end;
+   --
    -- Valida os códigos de "Base de Càlculo do Crédito" inválidos para Serviço
    if ev_cod_bc_cred_pc not in ('03', '05', '06', '07', '13', '15', '16', '17')
       and ev_cod_bc_cred_pc is not null
+      and vv_cod_mod <> 'ND'  -- #75241
       then
       --
       vn_fase := 2.4;
       --
       gv_mensagem_log := '"Código da Base de Cálculo do Crédito" inválido para serviço ('||ev_cod_bc_cred_pc||').';
+      --
+      vn_loggenericonf_id := null;
+      --
+      pkb_log_generico_nf ( sn_loggenericonf_id  => vn_loggenericonf_id
+                                  , ev_mensagem        => gv_cabec_log
+                                  , ev_resumo          => gv_mensagem_log
+                                  , en_tipo_log        => erro_de_validacao
+                                  , en_referencia_id   => gn_referencia_id
+                                  , ev_obj_referencia  => gv_obj_referencia );
+      --
+      -- Armazena o "loggenerico_id" na memória
+      pkb_gt_log_generico_nf ( en_loggenericonf_id    => vn_loggenericonf_id
+                                     , est_log_generico_nf  => est_log_generico_nf );
+      --
+   end if;
+   --
+   vn_fase := 2.5;
+   --
+   -- Valida se o código de "Base de Càlculo do Crédito" for nulo e for ND -- #75241
+   if vv_cod_mod = 'ND' and ev_cod_bc_cred_pc is null then
+      --
+      vn_fase := 2.6;
+      --
+      gv_mensagem_log := '"Código da Base de Cálculo do Crédito para ND não pode ser nulo" inválido para serviço ('||ev_cod_bc_cred_pc||').';
       --
       vn_loggenericonf_id := null;
       --

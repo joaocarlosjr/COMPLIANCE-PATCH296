@@ -4,6 +4,16 @@ create or replace package csf_own.pk_csf_api_ct is
 -- Especificação do pacote da API do Conhecimento de Transporte
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 --
+-- Em 19/01/2020   - Karina de Paula
+-- Redmine #75107  - Tabelas que envolvem o processo de CCE conhec_transp_CCE ou evento_cte_cce/evento_cte e também r_loteintws_ct
+-- Rotina Criada   - gt_row_conhec_transp_cce / pkb_integr_conhec_transp_cce    
+--                 - pkb_excluir_dados_ct => Incluido delete da tabela conhec_transp_cce
+-- Liberado        - Patch_2.9.6.1
+--
+-- Em 14/01/2021   - Karina de Paula
+-- Redmine #74902/75152/75102
+-- Liberado        - Release_2.9.6 e Patch_2.9.6.1
+--
 -- Em 08/01/2020   - Karina de Paula
 -- Redmine #74868  - Erro de Validação: Dominio conhec_transp.dm_st_integra
 --          74768  - Liberar de validação CTE legado
@@ -599,6 +609,8 @@ create or replace package csf_own.pk_csf_api_ct is
 --
    gt_row_ct_compdoc_cofins          ct_comp_doc_cofins%rowtype;
 --
+   gt_row_conhec_transp_cce          conhec_transp_cce%rowtype;
+--
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
    gv_cabec_log          log_generico_ct.mensagem%TYPE;
@@ -739,7 +751,14 @@ procedure pkb_integr_evento_cte ( est_log_generico              in out nocopy  d
                                 , est_row_evento_cte            in out nocopy  evento_cte%rowtype
                                 , ev_tipoeventosefaz_cd         in             tipo_evento_sefaz.cd%type
                                 );
-
+--
+-- ====================================================================================================== --
+-- Integra dados do Conhecimento Transporte CCE
+procedure pkb_integr_conhec_transp_cce ( est_log_generico          in out nocopy  dbms_sql.number_table
+                                       , est_row_conhec_transp_cce in out nocopy  conhec_transp_cce%rowtype
+                                       , ev_tipoeventosefaz_cd     in             tipo_evento_sefaz.cd%type
+                                       );
+--
 -------------------------------------------------------------------------------------------------------
 -- Integra dados do Multimodal
 

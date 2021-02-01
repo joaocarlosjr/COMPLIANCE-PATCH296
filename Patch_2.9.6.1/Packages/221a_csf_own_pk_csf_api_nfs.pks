@@ -4,6 +4,13 @@ create or replace package csf_own.pk_csf_api_nfs is
 -- Especificação do pacote de integração de notas fiscais de serviços para o CSF
 -------------------------------------------------------------------------------------------------------
 --
+-- Em 21/01/2021   - João Carlos
+-- Redmine #75241  - Validação Indevida - ND (Código da Base de Cálculo do Crédito)
+-- Rotina Alterada - pkb_integr_itemnf_compl_serv - Inserida validação para ND quando o código da base
+--                 - de crédito for nulo e correção da validação quando código for diferente de ('03', '05', '06', '07', '13', '15', '16', '17'),
+--                 - foi retirada desta validação as notas ND (Nota de Débito)
+-- Patch           - 2.9.6-1 / 2.9.5.4
+--
 -- Em 07/01/2021   - Eduardo Linden
 -- Redmine #74979  - Correção sobre Flexfield - Notas fiscais de servicos
 -- Rotina alterada - pkb_integr_imp_itemnf_ff => Troca do tipo numerico para caracter para FF CD_TIPO_RET_IMP 

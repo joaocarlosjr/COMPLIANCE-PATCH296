@@ -3,6 +3,24 @@ create or replace package csf_own.pk_gera_arq_gia is
 -------------------------------------------------------------------------------------------------------
 -- Especificação do pacote de Geração do Arquivo da GIA
 -------------------------------------------------------------------------------------------------------
+-- 
+-- Em 21/01/2021 - Renan Alves 
+-- Redmine #75224 - Segmento J Sendo Montado Incorretamente
+-- Foi incluído uma verificação nas variáveis gv_num_tare e gv_dt_vencimento para que
+-- seja realizado a montagem do segmento J.
+-- Rotina: pkb_gera_arq_gia_to 
+-- Patch_2.9.6.1 / Patch_2.9.5.4 / Release_2.9.7 
+--
+-- Em 18/01/2021    - João Carlos - 2.9.5-4 / 2.9.6-1 / 2.9.7
+-- Redmine #73913   - DIPAM - Totalizar valores do 2.2 no código 3.1
+-- Rotina Alterada  - pkb_gera_arq_gia_sp -> Criação de rotina para exportação do CodDIP 3.1 da DIPAM - registro CR30, exportação será realizada
+--                  - se o parâmetro geral do sistema estiver habilitado com "S".
+--
+-- Em 25/01/2021    - Wendel Albino - 2.9.6-1 / 2.9.5-4 / 2.9.7
+-- Redmine #74544   - Ajuste para deduzir valores na DIPAM
+-- Rotina Alterada  - pkb_gera_arq_gia_sp -> alterado select do cursor c_cr_30_nf para quando um cfop for usado pra uma finalidade diferente do seu cadastro.
+--                  - ex: usar um cfop 1949 com a finalidade de devolucao abatendo os valores ,
+--                  -   sendo que o tipo de operacao dele é 9-outras. 
 --
 -- Em 06/01/2021    - Wendel Albino - 2.9.4-6 / 2.9.5-3 / 2.9.6
 -- Redmine #72920   - Extrema demora na geração da GIA

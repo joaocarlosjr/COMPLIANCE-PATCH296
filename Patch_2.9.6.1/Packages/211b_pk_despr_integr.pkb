@@ -184,13 +184,28 @@ begin
             --
             vn_fase := 6.1;
             --
-            delete from r_loteintws_inventario where inventario_id = rec.id;
+            delete 
+              from r_loteintws_inventario 
+             where inventario_id = rec.id;
             --
-            delete from invent_cst where inventario_id = rec.id;
+            vn_fase := 6.2;
+            --
+            delete 
+              from invent_cst 
+             where inventario_id = rec.id;
+            --
+            vn_fase := 6.3;
+            --
+            --#75210 Inclusao de tabela limpeza
+            delete 
+              from invent_inf_comp_merc_st
+             where inventario_id = rec.id;
             --
             vn_fase := 7;
             --
-            delete from inventario where id = rec.id;
+            delete 
+              from inventario 
+            where id = rec.id;
             --
          else
             --
@@ -755,7 +770,7 @@ begin
               --
               vn_fase := 6.5;
               --
-              delete from cupom_fiscal where id = rec.id;        
+              delete from cupom_fiscal where id = rec.id;
               --
               vn_fase := 7.1;
 
@@ -11290,9 +11305,9 @@ procedure pkb_despr_m_pc(en_empresa_id in empresa.id%Type,
   vn_multorg_id     mult_org.id%type;
   vn_objintegr_id   obj_integr.id%type;
   --
-  cursor c_pis is 
-    select p.empresa_id, 
-           i.id infadicdifpis_id, 
+  cursor c_pis is
+    select p.empresa_id,
+           i.id infadicdifpis_id,
            p.dt_ini dt_ref
       from per_cons_contr_pis p,
            cons_contr_pis     c,
@@ -11306,8 +11321,8 @@ procedure pkb_despr_m_pc(en_empresa_id in empresa.id%Type,
        and i.detconscontrpis_id = d.id;
   --
   cursor c_cofins is
-    select p.empresa_id, 
-           i.id infadicdifcofins_id, 
+    select p.empresa_id,
+           i.id infadicdifcofins_id,
            p.dt_ini dt_ref
       from per_cons_contr_cofins p,
            cons_contr_cofins     c,
@@ -11377,8 +11392,8 @@ begin
         vn_fase := 7;
         --
         begin
-          delete 
-            from inf_adic_dif_pis i 
+          delete
+            from inf_adic_dif_pis i
            where i.id = rec.infadicdifpis_id;
         exception
           when others then
@@ -11388,7 +11403,7 @@ begin
         vn_fase := 8;
         --
         begin
-          delete 
+          delete
             from contr_pis_dif_per_ant c
            where c.empresa_id = en_empresa_id
              and c.dt_ini     = ed_dt_ini
@@ -11424,7 +11439,7 @@ begin
       vn_fase := 11;
       --
       begin
-        delete 
+        delete
           from contr_pis_dif_per_ant c
          where c.empresa_id = en_empresa_id
            and c.dt_ini     = ed_dt_ini
@@ -11462,7 +11477,7 @@ begin
         vn_fase := 14;
         --
         begin
-          delete 
+          delete
             from inf_adic_dif_cofins i
            where i.id = rec.infadicdifcofins_id;
         exception
@@ -11473,7 +11488,7 @@ begin
         vn_fase := 15;
         --
         begin
-          delete 
+          delete
             from contr_cofins_dif_per_ant c
            where c.empresa_id = en_empresa_id
              and c.dt_ini     = ed_dt_ini
@@ -11507,7 +11522,7 @@ begin
       vn_fase := 18;
       --
       begin
-        delete 
+        delete
           from contr_cofins_dif_per_ant c
          where c.empresa_id = en_empresa_id
            and c.dt_ini     = ed_dt_ini
@@ -11586,9 +11601,9 @@ begin
   --
   -- Busca o código da tabela vv_obj_integr conforme o parâmetro en_objintegr_id.
   begin
-    select cd, 
+    select cd,
            descr
-      into vv_obj_integr, 
+      into vv_obj_integr,
            vv_descr
       from obj_integr
      where id = en_objintegr_id;
@@ -11619,7 +11634,7 @@ begin
   --
   vn_fase := 3;
   --
-  -- Recuperando o código do tipo do objeto informado 
+  -- Recuperando o código do tipo do objeto informado
   begin
     select toi.cd
       into gv_cd_tipo_obj_integr
@@ -11789,7 +11804,7 @@ begin
                       en_usuario_id => en_usuario_id,
                       ed_dt_ini     => ed_dt_ini,
                       ed_dt_fin     => ed_dt_fin);
-      
+
       elsif gv_cd_tipo_obj_integr = '2' then
         --
         vn_fase := 21.2;

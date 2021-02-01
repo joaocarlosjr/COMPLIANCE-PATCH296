@@ -12,10 +12,6 @@ prompt T_A_I_U_CONHEC_TRANSP_01
 @@T_A_I_U_CONHEC_TRANSP_01.TRG
 show err
 
-prompt T_A_I_U_MULTORG_02.trg
-@@T_A_I_U_MULTORG_02.trg
-show err
-
 Prompt Catalogar Objetos Invalidos.trg
 @@rec_obj_invalid.sql.
 
