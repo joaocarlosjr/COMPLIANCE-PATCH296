@@ -31773,7 +31773,8 @@ procedure pkb_gera_arq_gia_sc is
             q.codigo    quadro,
             i.codigo    item,
             i.descricao,
-            d.conteudo
+            d.conteudo,
+            d.qtde_trab
        from det_dime d,
             registro_dime r,
             quadro_dime q,
@@ -33570,7 +33571,7 @@ begin
       elsif rec.item = '140' then -- Tem Escrita Contábil
         vt_tab_tp21(1).escr_contabil := substr(rec.conteudo, 1, 1);
       elsif rec.item = '150' then -- Quantidade de Trabalhadores na Atividade
-        vt_tab_tp21(1).qte_trab_ativ := substr(rec.conteudo, 1, 5);
+        vt_tab_tp21(1).qte_trab_ativ := substr(rec.qtde_trab, 1, 5);
       end if;
       --
       vn_fase := 8.4;
@@ -37199,6 +37200,8 @@ procedure pkb_gera_arq_gia_sp is
   vn_estado_uf              varchar2(2); 
   vn_nflocal_id             number; 
   vn_valor_mun              number(15,2);
+  vn_vl_coddip_31           number(15,2);  -- #73913
+  vv_vlr_parametro          csf_own.param_geral_sistema.vlr_param%type; -- #73913
   --
   vn_dmsmicmsstipinrecbsoutr empresa.dm_sm_icmsst_ipinrec_bs_outr%type;
   --
@@ -37682,7 +37685,7 @@ procedure pkb_gera_arq_gia_sp is
   --
   --#72920
   cursor c_cr_30_nf is
-    select coddip_empresa, municipio_empresa, round(sum(valor),2) valor 
+    select coddip_empresa, municipio_empresa, round(sum(valor),2) valor
       from (select nf.empresa_id, nf.pessoa_id,
                    dg.cd coddip_empresa,
                    case
@@ -37706,7 +37709,11 @@ procedure pkb_gera_arq_gia_sp is
                           end
                          else
                           case
-                            when nvl(pdg.perc_rateio_item, 0) = 0 and c.tipooperacao_id not in (select t.id from tipo_operacao t where t.cd = 3) then
+                            when (nvl(pdg.perc_rateio_item, 0) = 0 
+                                  and (c.tipooperacao_id not in (select t.id from tipo_operacao t where t.cd = 3)
+                                      and nf.dm_fin_nfe in (1,2) --NF-e normal NF-e complementar --#74544
+                                      )
+                                  ) then
                                    (nvl(inf.vl_item_bruto, 0) +
                                     nvl(inf.vl_frete, 0) +
                                     nvl(inf.vl_seguro, 0) + nvl(inf.vl_outro, 0) +
@@ -37716,7 +37723,9 @@ procedure pkb_gera_arq_gia_sp is
                                         and imp.tipoimp_id = ti.id
                                         and ti.cd in (2, 3, 7))) -
                                           nvl(inf.vl_desc, 0)
-                            when c.tipooperacao_id not in (select t.id from tipo_operacao t where t.cd = 3) then
+                            when (c.tipooperacao_id not in (select t.id from tipo_operacao t where t.cd = 3)
+                                  and nf.dm_fin_nfe in (1,2) --NF-e normal NF-e complementar --#74544
+                                  ) then 
                                    ((nvl(inf.vl_item_bruto, 0) +
                                      nvl(inf.vl_frete, 0) + nvl(inf.vl_seguro, 0) +
                                      nvl(inf.vl_outro, 0) +
@@ -37747,7 +37756,11 @@ procedure pkb_gera_arq_gia_sp is
                           end
                          else
                           case
-                            when nvl(pdg.perc_rateio_item, 0) = 0 and c.tipooperacao_id in (select t.id from tipo_operacao t where t.cd = 3) then
+                            when (nvl(pdg.perc_rateio_item, 0) = 0 
+                                  and (c.tipooperacao_id in (select t.id from tipo_operacao t where t.cd = 3)
+                                    or nf.dm_fin_nfe = 4 --NF-e normal NF-e complementar --#74544
+                                    )
+                                  ) then
                                    (nvl(inf.vl_item_bruto, 0) +
                                     nvl(inf.vl_frete, 0) +
                                     nvl(inf.vl_seguro, 0) + nvl(inf.vl_outro, 0) +
@@ -37757,7 +37770,9 @@ procedure pkb_gera_arq_gia_sp is
                                         and imp.tipoimp_id = ti.id
                                         and ti.cd in (2, 3, 7))) -
                                           nvl(inf.vl_desc, 0)
-                            when c.tipooperacao_id in (select t.id from tipo_operacao t where t.cd = 3) then
+                            when (c.tipooperacao_id in (select t.id from tipo_operacao t where t.cd = 3)
+                                    or nf.dm_fin_nfe = 4 --NF-e normal NF-e complementar --#74544
+                                    ) then
                                    ((nvl(inf.vl_item_bruto, 0) +
                                      nvl(inf.vl_frete, 0) + nvl(inf.vl_seguro, 0) +
                                      nvl(inf.vl_outro, 0) +
@@ -37822,7 +37837,7 @@ procedure pkb_gera_arq_gia_sp is
                and tc.cd               = '1' -- GIA-SP
                and inf.cfop_id         = c.id
               -- and pk_csf_gia.fkg_dipam_22_pessoa_juridica( dg.cd, nf.empresa_id, nf.pessoa_id ) = 1
-              -- Para não considerar os registros relacionados à tabela inf_valor_agreg. 
+              -- Para não considerar os registros relacionados à tabela inf_valor_agreg.
                and not exists (select 1
                                  from inf_valor_agreg iva, item i
                                 where iva.item_id    = i.id
@@ -37858,7 +37873,11 @@ procedure pkb_gera_arq_gia_sp is
                           end
                          else
                           case
-                            when nvl(pdg.perc_rateio_item, 0) = 0 and c.tipooperacao_id not in (select t.id from tipo_operacao t where t.cd = 3) then
+                            when (nvl(pdg.perc_rateio_item, 0) = 0 
+                                  and (c.tipooperacao_id not in (select t.id from tipo_operacao t where t.cd = 3)
+                                      and nf.dm_fin_nfe in (1,2) --NF-e normal NF-e complementar --#74544
+                                      )
+                                  ) then  
                                    (nvl(inf.vl_item_bruto, 0) +
                                     nvl(inf.vl_frete, 0) +
                                     nvl(inf.vl_seguro, 0) + nvl(inf.vl_outro, 0) +
@@ -37868,7 +37887,9 @@ procedure pkb_gera_arq_gia_sp is
                                         and imp.tipoimp_id = ti.id
                                         and ti.cd in (2, 3, 7))) -
                                           nvl(inf.vl_desc, 0)
-                            when c.tipooperacao_id not in (select t.id from tipo_operacao t where t.cd = 3) then
+                            when (c.tipooperacao_id not in (select t.id from tipo_operacao t where t.cd = 3)
+                                  and nf.dm_fin_nfe in (1,2) --NF-e normal NF-e complementar --#74544
+                                  ) then 
                                    ((nvl(inf.vl_item_bruto, 0) +
                                      nvl(inf.vl_frete, 0) + nvl(inf.vl_seguro, 0) +
                                      nvl(inf.vl_outro, 0) +
@@ -37899,7 +37920,11 @@ procedure pkb_gera_arq_gia_sp is
                           end
                          else
                           case
-                            when nvl(pdg.perc_rateio_item, 0) = 0 and c.tipooperacao_id in (select t.id from tipo_operacao t where t.cd = 3) then
+                            when (nvl(pdg.perc_rateio_item, 0) = 0 
+                                  and (c.tipooperacao_id in (select t.id from tipo_operacao t where t.cd = 3)
+                                    or nf.dm_fin_nfe = 4 --NF-e normal NF-e complementar --#74544
+                                    )
+                                  ) then
                                    (nvl(inf.vl_item_bruto, 0) +
                                     nvl(inf.vl_frete, 0) +
                                     nvl(inf.vl_seguro, 0) + nvl(inf.vl_outro, 0) +
@@ -37909,7 +37934,9 @@ procedure pkb_gera_arq_gia_sp is
                                         and imp.tipoimp_id = ti.id
                                         and ti.cd in (2, 3, 7))) -
                                           nvl(inf.vl_desc, 0)
-                            when c.tipooperacao_id in (select t.id from tipo_operacao t where t.cd = 3) then
+                            when (c.tipooperacao_id in (select t.id from tipo_operacao t where t.cd = 3)
+                                    or nf.dm_fin_nfe = 4 --NF-e normal NF-e complementar --#74544
+                                    ) then
                                    ((nvl(inf.vl_item_bruto, 0) +
                                      nvl(inf.vl_frete, 0) + nvl(inf.vl_seguro, 0) +
                                      nvl(inf.vl_outro, 0) +
@@ -37923,7 +37950,7 @@ procedure pkb_gera_arq_gia_sp is
                             else
                              0
                           end
-                             end) valor 
+                             end) valor
               from nota_fiscal         nf,
                    nota_fiscal_dest    nfd,
                    mod_fiscal          mf,
@@ -37974,7 +38001,7 @@ procedure pkb_gera_arq_gia_sp is
                and tc.cd               = '1' -- GIA-SP
                and inf.cfop_id         = c.id
               -- and pk_csf_gia.fkg_dipam_22_pessoa_juridica( dg.cd, nf.empresa_id, nf.pessoa_id ) = 1
-               -- Para não considerar os registros relacionados à tabela inf_valor_agreg. 
+               -- Para não considerar os registros relacionados à tabela inf_valor_agreg.
                and not exists (select 1
                                  from inf_valor_agreg iva, item i
                                 where iva.item_id    = i.id
@@ -37984,9 +38011,9 @@ procedure pkb_gera_arq_gia_sp is
                       dg.cd,
                       ct.cd,
                       decode(nf.dm_ind_emit, 0, ct1.cd, ct.cd))
-     where pk_csf_gia.fkg_dipam_22_pessoa_juridica( coddip_empresa, empresa_id, pessoa_id ) = 1 
+     where pk_csf_gia.fkg_dipam_22_pessoa_juridica( coddip_empresa, empresa_id, pessoa_id ) = 1
      group by coddip_empresa, municipio_empresa
-     order by coddip_empresa, municipio_empresa;  
+     order by coddip_empresa, municipio_empresa; 
   --
   /* Para considerar somente os registros relacionados à tabela inf_valor_agreg. */
   cursor c_cr_30_nf_via is
@@ -38327,6 +38354,29 @@ procedure pkb_gera_arq_gia_sp is
       --
       i := nvl(vt_tab_cr05.first, 0);
       --
+      -- Verifica se parâmetro geral de sistema está habilita, caso esteja insere o CodDIP 3.1
+      -- Executar sempre que o parâmetro SOMA_22_EM_31 estiver habilitado #73913
+      -- Recupera valor do parametro para a empresa. #73913
+      begin
+         select prm.vlr_param
+           into vv_vlr_parametro
+           from csf_own.param_geral_sistema prm
+          where prm.empresa_id =  gt_row_abertura_gia.empresa_id
+            and prm.modulo_id = (select id
+                                   from csf_own.modulo_sistema
+                                  where UPPER(cod_modulo) = UPPER('OBRIG_ESTADUAL'))
+            and prm.grupo_id  = (select id
+                                   from csf_own.grupo_sistema
+                                  where UPPER(cod_grupo) = UPPER('DIPAM')
+                                    and modulo_id = (select id
+                                                       from csf_own.modulo_sistema
+                                                      where UPPER(cod_modulo) = UPPER('OBRIG_ESTADUAL')))
+            and UPPER(prm.param_name) = UPPER('SOMA_22_EM_31');
+      exception
+        when others then
+          vv_vlr_parametro := null;
+      end;
+      --
       loop
         --
         vn_fase := 2.2;
@@ -38336,6 +38386,18 @@ procedure pkb_gera_arq_gia_sp is
         end if;
         --
         vn_fase := 2.3;
+        --
+        -- Verifica se o parametro esta habilitado para a empresa, para validação o parametro precisa ser '1'. #73913
+        if (upper(nvl(vv_vlr_parametro, 'N')) = 'S') then
+            --
+            vn_fase := 12.31;
+            --
+            -- Caso o registro 3.1 inserir + 1 no contador
+            vt_tab_cr05(i).Q30 := nvl(vt_tab_cr05(i).Q30, 0) + 1;
+            --
+        end if;
+        --
+        vn_fase := 2.32;
         --
         gl_conteudo := vt_tab_cr05(i).cr;
         gl_conteudo := gl_conteudo || vt_tab_cr05(i).IE;
@@ -38878,7 +38940,25 @@ procedure pkb_gera_arq_gia_sp is
               j := vt_bi_tab_cr30(i).next(j);
             end if;
             --
-          end loop; -- fim CR30
+          end loop; 
+          --
+          vn_fase := 12.6;
+          --
+          -- Verifica se o parametro esta habilitado para a empresa, para validação o parametro precisa ser '1'. #73913
+          if (upper(nvl(vv_vlr_parametro, 'N')) = 'S') then	
+              --
+              gl_conteudo := vt_bi_tab_cr30(i)(j).cr;
+              gl_conteudo := gl_conteudo || '31';
+              gl_conteudo := gl_conteudo || '00000';
+              gl_conteudo := gl_conteudo || lpad(nvl(vn_vl_coddip_31, 0), 15, '0');
+              --
+              vn_fase := 12.7;
+              --
+              pkb_armaz_estr_arq_gia(ev_tipocodarq_cd  => gv_tipocodarq_cd,
+                                     ev_registrogia_cd => 'CR30',
+                                     el_conteudo       => gl_conteudo);
+              --
+          end if; -- fim CR30
           --
         end if;
         --
@@ -41111,6 +41191,11 @@ begin
       --
       vt_tab_cr05(1).Q30 := nvl(vt_tab_cr05(1).Q30, 0) + 1;
       --
+	  -- Verificação do coddip, caso seja 2.2 adiciona o valor a variável vl_vl_coddip_31  -- #73913
+        if (replace(rec.coddip_empresa, '.', '') = '22') then
+          vn_vl_coddip_31 := nvl(vn_vl_coddip_31, 0) + (nvl(vn_valor_mun, 0) * 100);
+        end if;
+      -- 
     <<pula_25>>
     null;
     --   
@@ -41309,6 +41394,9 @@ procedure pkb_gera_arq_gia_to is
    vn_VlrContabil_d_s        varchar2(14); --number := 0;
    vn_BaseDeCalc_d_e         varchar2(14); --number := 0;
    vn_VlrContabil_d_e        varchar2(14); --number := 0;
+   --
+   vn_loggenerico_id         log_generico.id%type;
+   vn_erro_registro          number := 0;
    --
    -- TYPES --------------------------------------------------------------------------------------------------
    --
@@ -43282,7 +43370,72 @@ begin
     --
     exit;
     --
-  end loop;
+  end loop; -- c_conveio
+  --
+  if (gv_num_tare is null and gv_dt_vencimento is not null) then
+    --
+    vn_erro_registro := vn_erro_registro + 1;
+    --
+    gv_mensagem := 'Na tela empresa, aba dados empresa, na opção forma de tributação, o campo data final ' || to_date(gv_dt_vencimento, 'DD/MM/YYYY') || ' encontra-se preenchido, porém, o campo convênio não foi informado. É necessário que seja informado o convênio. Erro na pk_gera_arq_gia.pkb_gera_arq_gia_sc - fase (' || vn_fase || ')';
+    gv_resumo   := 'Na tela empresa, aba dados empresa, na opção forma de tributação, o campo data final ' || to_date(gv_dt_vencimento, 'DD/MM/YYYY') || ' encontra-se preenchido, porém, o campo convênio não foi informado. É necessário que seja informado o convênio.';
+    --
+    pk_log_generico.pkb_log_generico(sn_loggenerico_id => vn_loggenerico_id,
+                                     ev_mensagem       => gv_mensagem,
+                                     ev_resumo         => gv_resumo,
+                                     en_tipo_log       => erro_de_sistema,
+                                     en_referencia_id  => gn_referencia_id,
+                                     ev_obj_referencia => gv_obj_referencia,
+                                     en_empresa_id     => gt_row_abertura_gia.empresa_id,
+                                     en_dm_impressa    => 1);
+    --
+  end if;
+  --
+  if (gv_num_tare is not null and gv_dt_vencimento is null) then
+    --
+    vn_erro_registro := vn_erro_registro + 1;
+    --
+    gv_mensagem := 'Na tela empresa, aba dados empresa, na opção forma de tributação, o campo convênio ' || gv_num_tare || ' encontra-se preenchido, porém, o campo data final não foi informado. É necessário que seja informado a data final. Erro na pk_gera_arq_gia.pkb_gera_arq_gia_sc - fase (' || vn_fase || ')';
+    gv_resumo   := 'Na tela empresa, aba dados empresa, na opção forma de tributação, o campo convênio ' || gv_num_tare || ' encontra-se preenchido, porém, o campo data final não foi informado. É necessário que seja informado a data final.';
+    --
+    pk_log_generico.pkb_log_generico(sn_loggenerico_id => vn_loggenerico_id,
+                                     ev_mensagem       => gv_mensagem,
+                                     ev_resumo         => gv_resumo,
+                                     en_tipo_log       => erro_de_sistema,
+                                     en_referencia_id  => gn_referencia_id,
+                                     ev_obj_referencia => gv_obj_referencia,
+                                     en_empresa_id     => gt_row_abertura_gia.empresa_id,
+                                     en_dm_impressa    => 1);
+    --
+  end if;
+  --
+  if (gv_dt_vencimento is not null and gv_dt_vencimento <= gt_row_abertura_gia.dt_fin) then
+    --
+    vn_erro_registro := vn_erro_registro + 1;
+    --
+    gv_mensagem := 'Na tela empresa, aba dados empresa, na opção forma de tributação, a data final do convênio ' || gv_num_tare || ' encontra-se com o período vencido. Erro na pk_gera_arq_gia.pkb_gera_arq_gia_sc - fase (' || vn_fase || ')';
+    gv_resumo   := 'Na tela empresa, aba dados empresa, na opção forma de tributação, a data final do convênio ' || gv_num_tare || ' encontra-se com o período vencido.';
+    --
+    pk_log_generico.pkb_log_generico(sn_loggenerico_id => vn_loggenerico_id,
+                                     ev_mensagem       => gv_mensagem,
+                                     ev_resumo         => gv_resumo,
+                                     en_tipo_log       => erro_de_sistema,
+                                     en_referencia_id  => gn_referencia_id,
+                                     ev_obj_referencia => gv_obj_referencia,
+                                     en_empresa_id     => gt_row_abertura_gia.empresa_id,
+                                     en_dm_impressa    => 1);
+    --
+  end if;
+  --
+  -- Verifica se foi apresentado algum erro
+  if vn_erro_registro > 0 then
+    --
+    gn_dm_situacao := 4; -- Erro de Validação
+    --
+  else
+    --
+    gn_dm_situacao := 2; -- Validado
+    --
+  end if;
   --
   gv_tipocodarq_cd := '25'; -- 16 - GIA-TO (Novo Sequencia)
   --
@@ -44241,16 +44394,19 @@ begin
   --
   vn_fase := 34;
   --
-  -- Segmento J - Informações sobre TARE
-  vt_tab_segm_J(1).Segmento       := 'J';
-  vt_tab_segm_J(1).InscriEstadual := vv_Inscricao_Estadual;
-  vt_tab_segm_J(1).PeriodoRef     := to_char(gt_row_abertura_gia.dt_ini, 'mmyyyy');
-  vt_tab_segm_J(1).Retificacao    := gt_row_abertura_gia.dm_tipo_gia;
-  vt_tab_segm_J(1).NumeroTare     := rpad(nvl(gv_num_tare, ' '), 20, ' ');    -- #74670
-  vt_tab_segm_J(1).DtVencimTare   := rpad(nvl(gv_dt_vencimento, ' '), 8, ' ');
-  --
-  vn_qtd_linhas := vn_qtd_linhas + 1;
-  --
+  if (gv_num_tare is not null and gv_dt_vencimento is not null) then
+    --
+    -- Segmento J - Informações sobre TARE
+    vt_tab_segm_J(1).Segmento       := 'J';
+    vt_tab_segm_J(1).InscriEstadual := vv_Inscricao_Estadual;
+    vt_tab_segm_J(1).PeriodoRef     := to_char(gt_row_abertura_gia.dt_ini, 'mmyyyy');
+    vt_tab_segm_J(1).Retificacao    := gt_row_abertura_gia.dm_tipo_gia;
+    vt_tab_segm_J(1).NumeroTare     := rpad(nvl(gv_num_tare, ' '), 20, ' '); -- #74670
+    vt_tab_segm_J(1).DtVencimTare   := rpad(nvl(gv_dt_vencimento, ' '), 8, ' ');
+    --
+    vn_qtd_linhas := vn_qtd_linhas + 1;
+    --
+  end if;
   --
   vn_fase := 35;
   --
@@ -45710,7 +45866,6 @@ begin
         vn_fase := 29;
         --
         for rec in c_conveio loop
-          --
           exit when c_conveio%notfound or(c_conveio%notfound) is null;
           --
           vn_fase := 30;
@@ -45732,8 +45887,10 @@ begin
             -- Verifica se não foi informado data final (Data de Vencimento)
             if rec.dt_fin is null then
               --
-              vn_fase   := 32;
-              gv_resumo := 'Data final do convênio ' || rec.convenio || ' não informada!';
+              vn_fase := 32;
+              --
+              gv_mensagem := 'Na tela empresa, aba dados empresa, na opção forma de tributação, o campo convênio encontra-se preenchido ' || rec.convenio || ', porém, o campo data final não foi informado. É necessário que seja informado a data final. Erro na pk_gera_arq_gia.pkb_validar - fase (' || vn_fase || ')';
+              gv_resumo   := 'Na tela empresa, aba dados empresa, na opção forma de tributação, o campo convênio encontra-se preenchido ' || rec.convenio || ', porém, o campo data final não foi informado. É necessário que seja informado a data final.';
               --
               pk_log_generico.pkb_log_generico(sn_loggenerico_id => vn_loggenerico_id,
                                                ev_mensagem       => gv_mensagem,
@@ -45755,8 +45912,10 @@ begin
             -- Verifica se a data final encontra-se venciada
             if rec.dt_fin <= gt_row_abertura_gia.dt_fin then
               --
-              vn_fase   := 33;
-              gv_resumo := 'Data final do convênio ' || rec.convenio || ' encontra-se com o período vencido!';
+              vn_fase := 33;
+              --
+              gv_mensagem := 'Na tela empresa, aba dados empresa, na opção forma de tributação, a data final do convênio ' || rec.convenio || ' encontra-se com o período vencido. Erro na pk_gera_arq_gia.pkb_validar - fase (' || vn_fase || ')';
+              gv_resumo   := 'Na tela empresa, aba dados empresa, na opção forma de tributação, a data final do convênio ' || rec.convenio || ' encontra-se com o período vencido.';
               --
               pk_log_generico.pkb_log_generico(sn_loggenerico_id => vn_loggenerico_id,
                                                ev_mensagem       => gv_mensagem,

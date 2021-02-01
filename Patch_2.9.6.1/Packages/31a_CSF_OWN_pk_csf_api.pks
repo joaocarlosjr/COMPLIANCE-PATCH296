@@ -10,6 +10,23 @@ create or replace package csf_own.pk_csf_api is
 -- Rotina Alterada - PKB_INTEGR_NOTA_FISCAL_FISCO - Incluida verificação se o "DM_TIPO" da tabela NfInfor_ADIC form 1-Fisco as
 --                   informações do documento de arrecadação referenciado (nota_fiscal_fisco) são obrigatórias.
 --
+-- Em 26/01/2021   - Wendel Albino - 2.9.6-1 release 296
+-- Redmine #75222  - Desprocessamento Notas Fiscais Mercantil novas tabelas referentes aos registro C180 e C185 
+-- Rotina Alterada - PKB_EXCLUIR_DADOS_NF -> incluidas tabelas NF_INF_COMPL_OPER_SAI_ST e NF_INF_COMPL_OPER_ENT_ST 
+--
+-- Em 26/01/2021   - Allan Magrini - 2.9.5-4 / 2.9.6-1 / 2.9.7
+-- Redmine #75161  - Difal não calculado 
+-- Rotina Alterada - PKB_CALC_ICMS_INTER_CF => Na Fase 6.1 foi incluido o tipo de operação 9 no select do vn_considera_tp_oper
+--
+-- Em 22/01/2021   - Allan Magrini - 2.9.5-4 / 2.9.6-1 / 2.9.7
+-- Redmine #75247  - Notas fiscais assumiram erro de validação indevidamente
+-- Rotina alterada - PKB_VALIDA_CFOP_POR_IND_OPER, retirado no if o nvl do campo vn_dm_ind_oper na fase 4 e 5
+--
+-- Em 14/01/2021   - Allan Magrini - 2.9.5-4 / 2.9.6-1 / 2.9.7
+-- Redmine #75209: - Ajuste de Caracteres especiais integração emissão
+-- Rotina Alterada - PKB_INTEGR_ITEM_NOTA_FISCAL fase 45, alterado est_row_Item_Nota_Fiscal.infAdProd => fkg_limpa_acento2 para fkg_converte com parametros (string, 0, 1, 2, 1, 1, 1)
+--                   PKB_INTEGR_NFINFOR_ADIC fase 8, alterado est_row_NFInfor_Adic.conteudo fkg_limpa_acento2 para fkg_converte com parametros (string, 0, 1, 2, 1, 1, 1)
+-- 
 -- Em 07/01/2021   - Luis Marques - 2.9.5-4 / 2.9.6-1 / 2.9.7
 -- Redmine #74199  - Alterar regra de validação para notas de importação de legado
 -- Rotina Alterada - PKB_INTEGR_NOTA_FISCAL, PKB_INTEGR_NOTA_FISCAL_FF - Incluida variável global "GN_DM_LEGADO" para se utilizado 
@@ -37,6 +54,7 @@ create or replace package csf_own.pk_csf_api is
 -- Em 21/12/2020   - João Carlos - 2.9.4-6 / 2.9.5-3 / 2.9.6
 -- Redmine #73027  - Desenvolvido rotina para inserir o valor de cofins majorada de acordo com a parametrização do sistema.
 -- Rotina Alterada - PKB_AJUSTA_TOTAL_NF -> Inserida rotina para calcular valor cofins majorado de acordo com o parâmetro
+--                 - Alteração da condição imp.dm_tipo = 1 para imp.dm_tipo = 0
 --
 -- Em 21/12/2020 - Eduardo Linden - 2.9.4-5 / 2.9.5-2 / 2.9.6
 -- Redmine #72729 - NF-e de emissão própria autorizada indevidamente (CERRADÃO)

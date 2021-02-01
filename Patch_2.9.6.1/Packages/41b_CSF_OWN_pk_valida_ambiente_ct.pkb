@@ -7410,7 +7410,6 @@ begin
             -- então atualiza o dm_st_proc para 1-Aguardando Envio
             vn_fase := 99.3;
             --
-                  -- Favor pensar muito antes de mexer aqui!
                   if rec.dm_legado = 1 then --Legado Autorizado
                      vn_dm_st_proc := 4;
                   elsif rec.dm_legado = 2 then --Legado Denegado
@@ -7421,7 +7420,7 @@ begin
                         vn_dm_st_proc := 8;
                   else
                      --
-                     if rec.dm_st_proc in (4, 6, 7, 8) then
+               if rec.dm_st_proc in (4, 5, 6, 7, 8) then
                         vn_dm_st_proc := rec.dm_st_proc;
                      else
                         vn_dm_st_proc := 1;
@@ -8158,9 +8157,93 @@ exception
       raise_application_error (-20101, pk_csf_api_ct.gv_mensagem_log);
       --
 end pkb_ler_evento_cte;
-
--------------------------------------------------------------------------------------------------------
-
+--
+-- ====================================================================================================================== --
+-- Processo de Conhecimento Transporte CCE
+procedure pkb_ler_conhec_transp_cce ( en_multorg_id in mult_org.id%type )
+is
+   --
+   vn_fase                number := 0;
+   vn_conhectranspcce_id  conhec_transp_cce.id%type;
+   vt_log_generico        dbms_sql.number_table;
+   vv_tipoeventosefaz_cd  tipo_evento_sefaz.cd%type;
+   --
+   cursor c_cce ( en_multorg_id in mult_org.id%type ) is
+   select ct.*
+     from conhec_transp_cce ct
+        , conhec_transp     c
+        , empresa           em
+    where c.id                = ct.conhectransp_id
+      and c.empresa_id        = em.id
+      and em.multorg_id       = en_multorg_id
+      and ct.dm_st_proc       = 0
+    order by 1;
+   --
+begin
+   --
+   vn_fase := 1;
+   --
+   for rec_cce in c_cce ( en_multorg_id => en_multorg_id )
+   loop
+      --
+      exit when c_cce%notfound or (c_cce%notfound) is null;
+      --
+      vn_fase := 2;
+      --
+      vt_log_generico.delete;
+      --
+      vn_fase := 2.1;
+      --
+      pk_csf_api_ct.gt_row_conhec_transp_cce := null;
+      --
+      vn_fase := 2.2;
+      --
+      vn_conhectranspcce_id := rec_cce.id;
+      --
+      vn_fase := 2.3;
+      --
+      pk_csf_api_ct.gt_row_conhec_transp_cce := rec_cce;
+      --
+      vn_fase := 2.4;
+      --
+      vv_tipoeventosefaz_cd := pk_csf.fkg_tipoeventosefaz_cd( en_tipoeventosefaz_id => rec_cce.tipoeventosefaz_id );
+      --
+      vn_fase := 99;
+      --
+      pk_csf_api_ct.pkb_integr_conhec_transp_cce ( est_log_generico          => vt_log_generico
+                                                 , est_row_conhec_transp_cce => pk_csf_api_ct.gt_row_conhec_transp_cce
+                                                 , ev_tipoeventosefaz_cd     => vv_tipoeventosefaz_cd
+                                                 );
+      --
+   end loop;
+   --
+exception
+   when others then
+      --
+      pk_csf_api_ct.gv_mensagem_log := 'Erro na pkb_ler_conhec_transp_cce fase(' || vn_fase || '): ' || sqlerrm;
+      --
+      declare
+         vn_loggenerico_id  log_generico_ct.id%TYPE;
+      begin
+         --
+         pk_csf_api_ct.pkb_log_generico_ct ( sn_loggenerico_id  => vn_loggenerico_id
+                                           , ev_mensagem        => pk_csf_api_ct.gv_cabec_log
+                                           , ev_resumo          => pk_csf_api_ct.gv_mensagem_log
+                                           , en_tipo_log        => pk_csf_api_ct.ERRO_DE_SISTEMA
+                                           , en_referencia_id   => vn_conhectranspcce_id
+                                           , ev_obj_referencia  => 'CONHEC_TRANSP_CCE'
+                                           );
+         --
+      exception
+         when others then
+            null;
+      end;
+      --
+      raise_application_error (-20101, pk_csf_api_ct.gv_mensagem_log);
+      --
+end pkb_ler_conhec_transp_cce;
+--
+-- =================================================================================================================== --
 --| Procedimento que inicia a validação de Conhecimentos de Transportes
 procedure pkb_integracao
 is
@@ -8183,71 +8266,62 @@ begin
       --
       exit when c_mo%notfound or (c_mo%notfound) is null;
       --
-      vn_fase := 1.1;
-      --
+      vn_fase := 2;
       -- seta o tipo de integração que será feito
       -- 0 - Somente valida os dados e registra o Log de ocorrência
       -- 1 - valida os dados e registra o Log de ocorrência e insere a informação
       -- Todos os procedimentos de integração fazem referência a ele
       pk_csf_api_ct.pkb_seta_tipo_integr ( en_tipo_integr => 0 );
       --
-      vn_fase := 1.1;
-      --
+      vn_fase := 3;
       pk_csf_api_ct.pkb_seta_obj_ref ( ev_objeto => 'CONHEC_TRANSP' );
       --
-      vn_fase := 2;
-      --
+      vn_fase := 4;
       -- inicia a leitura para validação dos dados do CT-e
       pkb_ler_ct_integrados ( en_multorg_id => rec_mo.id );
       --
-      vn_fase := 3;
-      --
+      vn_fase := 5;
       pk_csf_api_ct.pkb_gera_lote_cte ( en_multorg_id => rec_mo.id );
       --
-      vn_fase := 4;
+      vn_fase := 6;
       -- Inicia a leitura do Conhec. Transp. Cancelados para validação
       pkb_ler_Conhec_Transp_Canc ( en_multorg_id => rec_mo.id );
       --
-      vn_fase := 5;
+      vn_fase := 7;
       -- Inicia a leitura das Inutilizações "Não Validadas"
       pk_csf_api_ct.pkb_consit_inutilizacao ( en_multorg_id => rec_mo.id );
       --
-      vn_fase := 6;
+      vn_fase := 8;
       -- Processo de atualização da inutilização
       pk_csf_api_ct.pkb_atual_cte_inut ( en_multorg_id => rec_mo.id );
       --
-      vn_fase := 7;
-      --
+      vn_fase := 9;
       -- Processo de Evento de CTe
       pkb_ler_evento_cte ( en_multorg_id => rec_mo.id );
       --
-      vn_fase := 8;
-      -- Reenvia lote com erro no envio ao Sefaz
-      --pk_csf_api_ct.pkb_reenvia_lote_cte;
+      vn_fase := 10;
+      -- Processo de Conhecimento Transporte CCE
+      pkb_ler_conhec_transp_cce ( en_multorg_id => rec_mo.id );
       --
-      vn_fase := 8.1;
-      --
+      vn_fase := 11;
       pk_csf_api_ct.pkb_ajusta_lote_cte ( en_multorg_id => rec_mo.id );
       --
-      vn_fase := 9;
+      vn_fase := 12;
       -- Relaciona a Consulta da Situação da CTe com a CTe em si
       pk_csf_api_ct.pkb_relac_cte_cons_sit ( en_multorg_id => rec_mo.id );
       --
-      vn_fase := 9.1;
-      --
+      vn_fase := 13;
       pk_csf_api_ct.PKB_CONS_CTE_TERC ( en_multorg_id => rec_mo.id );
       --
-      vn_fase := 9.2;
-      --
+      vn_fase := 14;
       -- Atualiza Situação do Conhecimento de Transporte
       pk_csf_api_ct.pkb_atual_sit_docto ( en_multorg_id => rec_mo.id );
       --
-      vn_fase := 10;
+      vn_fase := 15;
       -- Finaliza o log genérico para a integração dos Conhecimentos de Transportes no CSF
       pk_csf_api_ct.pkb_finaliza_log_generico_ct;
       --
-      vn_fase := 11;
-      --
+      vn_fase := 16;
       pk_csf_api_ct.pkb_seta_tipo_integr ( en_tipo_integr => null );
       --
    end loop;
@@ -8274,17 +8348,16 @@ exception
       raise_application_error (-20101, pk_csf_api_ct.gv_mensagem_log);
       --
 end pkb_integracao;
-
--------------------------------------------------------------------------------------------------------
-
+--
+-- =================================================================================================================== --
 --| Procedimento que inicia a Validação de Conhecimento de Transporte Emissão através do Mult-Org.
 --| Esse processo estará sendo executado por JOB SCHEDULER, especifícamente para Ambiente Amazon.
 --| A rotina deverá executar o mesmo procedimento da rotina pkb_integracao, porém com a identificação da mult-org.
 procedure pkb_integracao_mo ( en_multorg_id in mult_org.id%type )
 is
-
+   --
    vn_fase number := 0;
-
+   --
 begin
    --
    vn_fase := 1;
@@ -8295,59 +8368,55 @@ begin
    -- Todos os procedimentos de integração fazem referência a ele
    pk_csf_api_ct.pkb_seta_tipo_integr ( en_tipo_integr => 0 );
    --
-   vn_fase := 1.1;
-   --
+   vn_fase := 2;
    pk_csf_api_ct.pkb_seta_obj_ref ( ev_objeto => 'CONHEC_TRANSP' );
    --
-   vn_fase := 2;
-   --
+   vn_fase := 3;
    -- inicia a leitura para validação dos dados do CT-e
    pkb_ler_ct_integrados ( en_multorg_id => en_multorg_id );
    --
-   vn_fase := 3;
-   --
+   vn_fase := 4;
    pk_csf_api_ct.pkb_gera_lote_cte ( en_multorg_id => en_multorg_id );
    --
-   vn_fase := 4;
+   vn_fase := 5;
    -- Inicia a leitura do Conhec. Transp. Cancelados para validação
    pkb_ler_conhec_transp_canc ( en_multorg_id => en_multorg_id );
    --
-   vn_fase := 5;
+   vn_fase := 6;
    -- Inicia a leitura das Inutilizações "Não Validadas"
    pk_csf_api_ct.pkb_consit_inutilizacao ( en_multorg_id => en_multorg_id );
    --
-   vn_fase := 6;
+   vn_fase := 7;
    -- Processo de atualização da inutilização
    pk_csf_api_ct.pkb_atual_cte_inut ( en_multorg_id => en_multorg_id );
    --
-   vn_fase := 7;
-   --
+   vn_fase := 8;
    -- Processo de Evento de CTe
    pkb_ler_evento_cte ( en_multorg_id => en_multorg_id );
    --
-   vn_fase := 8;
+   vn_fase := 9;
+   -- Processo de Conhecimento Transporte CCE
+   pkb_ler_conhec_transp_cce ( en_multorg_id => en_multorg_id );
    --
+   vn_fase := 10;
    pk_csf_api_ct.pkb_ajusta_lote_cte ( en_multorg_id => en_multorg_id );
    --
-   vn_fase := 9;
+   vn_fase := 11;
    -- Relaciona a Consulta da Situação da CTe com a CTe em si
    pk_csf_api_ct.pkb_relac_cte_cons_sit ( en_multorg_id => en_multorg_id );
    --
-   vn_fase := 9.1;
-   --
+   vn_fase := 12;
    pk_csf_api_ct.PKB_CONS_CTE_TERC ( en_multorg_id => en_multorg_id );
    --
-   vn_fase := 9.2;
-   --
+   vn_fase := 13;
    -- Atualiza Situação do Conhecimento de Transporte
    pk_csf_api_ct.pkb_atual_sit_docto ( en_multorg_id => en_multorg_id );
    --
-   vn_fase := 10;
+   vn_fase := 14;
    -- Finaliza o log genérico para a integração dos Conhecimentos de Transportes no CSF
    pk_csf_api_ct.pkb_finaliza_log_generico_ct;
    --
-   vn_fase := 11;
-   --
+   vn_fase := 15;
    pk_csf_api_ct.pkb_seta_tipo_integr ( en_tipo_integr => null );
    --
 exception
@@ -8372,11 +8441,207 @@ exception
       raise_application_error (-20101, pk_csf_api_ct.gv_mensagem_log);
       --
 end pkb_integracao_mo;
-
-------------------------------------------------------------------------------------------------------
-
--- Procedimento para recuperar dados dos Conhecimento de Transporte de Emissão Propria a serem validados de origem da Integração por Web-Service
+--
+-- =================================================================================================================================
+-- Procedimento faz a validação das Inutilizações de Conhecimentos de Transporte, solicitadas por Webservice
+procedure pkb_vld_ict ( en_inutilizaconhectransp_id  in      inutiliza_conhec_transp.id%type
+                      , sn_erro                      in out  number         -- 0-Não; 1-Sim
+                      , en_loteintws_id              in      lote_int_ws.id%type
+                      ) is
+   --
+   vn_fase               number := 0;
+   vn_qtde               number := 0;
+   --
+   vv_cod_mod                 mod_fiscal.cod_mod%type;
+   vt_inutiliza_conhec_transp inutiliza_conhec_transp%rowtype;
+   vt_log_generico_ct         dbms_sql.number_table;
+   --
+begin
+   --
+   vn_fase := 1;
+   --
+   vt_inutiliza_conhec_transp   := null;
+   vt_log_generico_ct.delete;
+   pk_csf_api.gv_obj_referencia := 'INUTILIZA_CONHEC_TRANSP';
+   pk_csf_api.gn_referencia_id  := en_inutilizaconhectransp_id;
+   --
+   begin
+      --
+      select * 
+        into vt_inutiliza_conhec_transp
+        from inutiliza_conhec_transp
+       where id = en_inutilizaconhectransp_id;
+      --
+   exception
+      when others then
+         vt_inutiliza_conhec_transp := null;
+   end;
+   --
+   vn_fase := 1.1;
+   --
+   vv_cod_mod := pk_csf.fkg_cod_mod_id ( en_modfiscal_id => vt_inutiliza_conhec_transp.modfiscal_id );
+   --
+   vn_fase := 1.2;
+   --
+   pk_csf_api_ct.pkb_integr_inutilizact ( est_log_generico     => vt_log_generico_ct
+                                        , est_row_Inutiliza_Ct => vt_inutiliza_conhec_transp
+                                        , ev_cod_mod           => vv_cod_mod
+                                        );
+   --
+   vn_fase := 2;
+   --
+   begin
+      --
+      -- 3 - Erro ao enviar Inutilização a SEFAZ
+      -- 4 - Erro ao obter o retorno da SEFAZ
+      -- 6 - Erro de validação
+      select count(1)
+        into vn_qtde
+        from inutiliza_conhec_transp
+       where id           = en_inutilizaconhectransp_id
+         and dm_situacao in (3, 4, 6);
+      --
+   exception
+      when others then
+         vn_qtde := 0;
+   end;
+   --
+   vn_fase := 3;
+   --
+   if nvl(vn_qtde,0) > 0 then
+      sn_erro := 1;
+   end if;
+   --
+exception
+   when others then
+      --
+      pk_csf_api_ct.gv_mensagem_log := 'Erro na pkb_vld_ict fase(' || vn_fase || '): ' || sqlerrm;
+      --
+      declare
+         vn_loggenerico_id  log_generico_ct.id%TYPE;
+      begin
+         --
+         pk_csf_api_ct.pkb_log_generico_ct ( sn_loggenerico_id  => vn_loggenerico_id
+                                           , ev_mensagem        => pk_csf_api_ct.gv_cabec_log
+                                           , ev_resumo          => pk_csf_api_ct.gv_mensagem_log
+                                           , en_tipo_log        => pk_csf_api_ct.ERRO_DE_SISTEMA
+                                           , en_referencia_id   => en_inutilizaconhectransp_id
+                                           , ev_obj_referencia  => 'INUTILIZA_NOTA_FISCAL' );
+         --
+      exception
+         when others then
+            null;
+      end;
+      --
+end pkb_vld_ict;
+--
+-- =================================================================================================================================
+-- Procedimento faz a leitura das Cartas de Correções das Notas Fiscais
+procedure pkb_vld_conhec_transp_cce( en_conhectranspcce_id in     conhec_transp_cce.id%type
+                                   , sn_erro               in out number         -- 0-Não; 1-Sim
+                                   , en_loteintws_id       in     lote_int_ws.id%type
+                                   )
+is
+   --
+   vn_fase               number := 0;
+   vt_log_generico_ct    dbms_sql.number_table;
+   vv_tipoeventosefaz_cd tipo_evento_sefaz.cd%type;
+   vn_conhectranspcce_id conhec_transp_cce.id%type;
+   --
+   cursor c_cce is
+   select cce.*
+     from conhec_transp_cce cce
+    where cce.id = en_conhectranspcce_id
+    order by cce.id;
+   --
+begin
+   --
+   vn_fase := 1;
+   --
+   for r_cce in c_cce
+   loop
+      --
+      exit when c_cce%notfound or (c_cce%notfound) is null;
+      --
+      vn_fase := 2;
+      --
+      vt_log_generico_ct.delete;
+      --
+      -- seta o tipo de integração que será feito
+      -- 0 - Válida e Atualiza os dados
+      -- 1 - Válida os dados e registra o Log de ocorrência e insere a informação
+      -- Todos os procedimentos de integração fazem referência a ele
+      --
+      pk_csf_api_ct.pkb_seta_tipo_integr ( en_tipo_integr => 0 );
+      --
+      vn_fase := 3;
+      --
+      pk_csf_api_ct.pkb_seta_obj_ref ( ev_objeto => 'CONHEC_TRANSP_CCE' );
+      --
+      vn_fase := 4;
+      --
+      pk_csf_api_ct.pkb_seta_referencia_id ( en_id => r_cce.id );
+      --
+      vn_fase := 5;
+      --
+      pk_csf_api_ct.gt_row_conhec_transp_cce := r_cce;
+      --
+      vn_fase := 6;
+      --
+      vv_tipoeventosefaz_cd := pk_csf.fkg_tipoeventosefaz_cd( pk_csf_api_ct.gt_row_conhec_transp_cce.tipoeventosefaz_id);
+      --
+      pk_csf_api_ct.pkb_integr_conhec_transp_cce( est_log_generico          => vt_log_generico_ct
+                                                , est_row_conhec_transp_cce => pk_csf_api_ct.gt_row_conhec_transp_cce
+                                                , ev_tipoeventosefaz_cd     => vv_tipoeventosefaz_cd
+                                                );
+      --
+      vn_fase := 7;
+      --
+      if nvl(vt_log_generico_ct.count,0) > 0 then
+         --
+         vn_fase := 8;
+         --
+         sn_erro := 1; -- Sim contém erros
+         --
+      end if;
+      --
+      vn_fase := 9;
+      --
+      commit;
+      --
+   end loop;
+   --
+exception
+   when others then
+      --
+      pk_csf_api_ct.gv_mensagem_log := 'Erro na pk_valida_ambiente_ct.pkb_vld_conhec_transp_cce fase(' || vn_fase || '): ' || sqlerrm;
+      --
+      declare
+         vn_loggenerico_id  log_generico_ct.id%TYPE;
+      begin
+         --
+         pk_csf_api_ct.pkb_log_generico_ct ( sn_loggenerico_id   => vn_loggenerico_id
+                                           , ev_mensagem         => pk_csf_api_ct.gv_cabec_log
+                                           , ev_resumo           => pk_csf_api_ct.gv_mensagem_log
+                                           , en_tipo_log         => pk_csf_api_ct.ERRO_DE_SISTEMA
+                                           , en_referencia_id    => en_conhectranspcce_id
+                                           , ev_obj_referencia   => 'CONHEC_TRANSP_CCE'
+				           );
+         --
+      exception
+         when others then
+            null;
+      end;
+      --
+      raise_application_error (-20101, pk_csf_api_ct.gv_mensagem_log);
+      --
+end pkb_vld_conhec_transp_cce;
+--
+-- =================================================================================================================================
+-- Procedimento para recuperar dados dos Conhecimento de Transporte de Emissão Propria a serem validados de origem da Integração por
+-- Web-Service
 procedure pkb_ler_ct_int_ws ( en_loteintws_id      in      lote_int_ws.id%type
+                            , en_tipoobjintegr_id  in      tipo_obj_integr.id%type
                             , ev_tipoobjintegr_cd  in      tipo_obj_integr.cd%type
                             , sn_erro              in out  number         -- 0-Não; 1-Sim
                             , sn_aguardar          out     number         -- 0-Não; 1-Sim
@@ -8385,6 +8650,7 @@ is
    --
    vn_fase number;
    vn_qtde               number := 0;
+   vn_qtde_pend    number;
    --
    cursor c_ct is
    select r.*
@@ -8394,10 +8660,29 @@ is
       and ct.id               = r.conhectransp_id
       and ct.dm_ind_emit      = 0 -- Emissão Propria
       and ct.dm_arm_cte_terc  = 0 -- Não é de armazenamento fiscal
-      --
       and ct.dm_legado        = 0 -- recuperar ct-e que não seja legado. O legado será recuperado na pk_csf_api_d100
-      --	  
     order by r.conhectransp_id;
+   --
+   --
+   cursor c_ict is
+   select r.inutilizaconhectransp_id
+        , ict.dm_situacao
+     from r_loteintws_ict         r
+        , inutiliza_conhec_transp ict
+    where r.loteintws_id      = en_loteintws_id
+      and ict.id              = r.inutilizaconhectransp_id
+    order by r.inutilizaconhectransp_id;
+   --
+   -- Carta de Correção
+   cursor c_cce is
+   select rl.conhectransp_id
+        , cc.id conhectranspcce_id
+     from r_loteintws_ct    rl
+        , conhec_transp_cce cc
+    where cc.conhectransp_id = rl.conhectransp_id
+      and rl.loteintws_id    = en_loteintws_id
+      and cc.dm_st_proc     in (0,4) -- 0-Não validado, 4-Erro de validação -- Não considerar: 1-Validado, 2-Aguardando Envio, 3-Processado ou 5-Rejeitada
+    order by rl.conhectransp_id;
    --
 begin
    --
@@ -8407,52 +8692,143 @@ begin
       --
       vn_fase := 2;
       --
-      for rec in c_ct loop
-         exit when c_ct%notfound or (c_ct%notfound) is null;
+      -- 1 - Emissão Própria de Conhecimento de Transporte
+      -- 3 - Cancelamento de Emissão Própria de Conhec. de Transporte
+      if ev_tipoobjintegr_cd in ('1', '3') then
+          --
+          for rec in c_ct loop
+             exit when c_ct%notfound or (c_ct%notfound) is null;
+             --
+             vn_fase := 2.1;
+             --
+             if ev_tipoobjintegr_cd = '1' then -- Emissão Própria de Conhecimento de Transporte
+                --
+                    vn_fase := 3;
+                    --
+                pkb_ler_Conhec_Transp ( en_conhectransp_id => rec.conhectransp_id
+                                      , en_loteintws_id    => en_loteintws_id );
+                --
+             elsif ev_tipoobjintegr_cd = '3' then -- Cancelamento de Emissão Própria de Conhec. de Transporte
+                --
+                    vn_fase := 4;
+                --
+                pkb_ler_Conhec_Transp_Canc ( en_loteintws_id => en_loteintws_id ) ;
+                --
+             end if;
+             --
+             begin
+                --
+                select count(1)
+                  into vn_qtde
+                  from conhec_transp
+                 where id = rec.conhectransp_id
+                   and dm_st_proc = 10;
+                --
+             exception
+                when others then
+                   vn_qtde := 0;
+             end;
+             --
+                 vn_fase := 4.1;
+             --
+             if nvl(vn_qtde,0) > 0 then
+                sn_erro := 1;
+             end if;
+             --
+          end loop;
+          --
+      elsif ev_tipoobjintegr_cd = '4' then -- Inutilização de Emissão Própria de Conhec. de Transporte
          --
-         vn_fase := 2.1;
+         vn_fase := 5;
          --
-         if ev_tipoobjintegr_cd = '1' then -- Emissão Própria de Conhecimento de Transporte
+         for rec_ict in c_ict loop
+            exit when c_ict%notfound or (c_ict%notfound) is null;
             --
-            vn_fase := 2.11;
-            pkb_ler_Conhec_Transp ( en_conhectransp_id => rec.conhectransp_id
-                                  , en_loteintws_id    => en_loteintws_id );
+            vn_fase := 5.1;
             --
-         elsif ev_tipoobjintegr_cd = '3' then -- Cancelamento de Emissão Própria de Conhec. de Transporte
+            if rec_ict.dm_situacao = 5 then -- 5-Não validada
+               --
+               vn_fase := 5.2;
+               -- chama procedimento de validação
+               pkb_vld_ict ( en_inutilizaconhectransp_id => rec_ict.inutilizaconhectransp_id
+                           , sn_erro                     => sn_erro
+                           , en_loteintws_id             => en_loteintws_id
+                           );
+               --
+            end if;
             --
-            vn_fase := 2.12;
+            commit;
             --
-            pkb_ler_Conhec_Transp_Canc ( en_loteintws_id => en_loteintws_id ) ;
+            vn_fase := 5.3;
+            -- verifica se há CT Pendentes
+            begin
+               select count(1)
+                 into vn_qtde_pend
+                 from r_loteintws_ict          r
+                    , inutiliza_conhec_transp  ict
+                where r.loteintws_id      = en_loteintws_id
+                  and ict.id              = r.inutilizaconhectransp_id
+                  and ict.dm_situacao     in (0, 1, 5);
+            exception
+               when others then
+                  vn_qtde_pend := 0;
+            end;
             --
-         else
+            vn_fase := 5.4;
             --
-            vn_fase := 2.19;
+            if nvl(vn_qtde_pend,0) > 0 and sn_erro = 0 then -- 1979
+               sn_aguardar := 1; -- Sim ainda está sendo processado - Em Processamento - aguardar
+            else
+               sn_aguardar := 0; -- Não tem mais nada para ser processado - Processado ou Processado com Erro - Status final do lote
+            end if;
             --
-         end if;
+         end loop;
          --
-         begin
+      elsif ev_tipoobjintegr_cd = '5' then -- Carta de Correção Emissão Própria de Conhec. de Transporte
+         --
+         vn_fase := 6;
+         --
+         for rec_cce in c_cce loop
+            exit when c_cce%notfound or (c_cce%notfound) is null;
             --
-            select count(1)
-              into vn_qtde
-              from conhec_transp
-             where id = rec.conhectransp_id
-               and dm_st_proc = 10;
+            vn_fase := 6.1;
             --
-         exception
-            when others then
-               vn_qtde := 0;
-         end;
+            pkb_vld_conhec_transp_cce( en_conhectranspcce_id => rec_cce.conhectranspcce_id
+                                     , sn_erro               => sn_erro
+                                     , en_loteintws_id       => en_loteintws_id
+                                     );
+            --
+            commit;
+            --
+            vn_fase := 6.2;
+            -- verifica se há CCE Pendentes
+            begin
+               select count(1) qtd
+                 into vn_qtde_pend
+                 from r_loteintws_ct rl
+                    , conhec_transp_cce cc
+                where rl.loteintws_id    = en_loteintws_id
+                  and cc.conhectransp_id = rl.conhectransp_id
+                  and cc.dm_st_proc      = 4; -- 4-Erro validação
+            exception
+               when others then
+                  vn_qtde_pend := 0;
+            end;
+            --
+            vn_fase := 6.3;
+            --
+            if nvl(vn_qtde_pend,0) > 0 and sn_erro = 0 then
+               sn_aguardar := 1; -- Sim ainda está sendo processado - Em Processamento - aguardar
+            else
+               sn_aguardar := 0; -- Não tem mais nada para ser processado - Processado ou Processado com Erro - Status final do lote
+            end if;
+            --
+         end loop;
          --
-         vn_fase := 3;
-         --
-         if nvl(vn_qtde,0) > 0 then
-            sn_erro := 1;
-         end if;
-         --
-      end loop;
+      end if;
       --
-   end if;
-   --
+    end if;
+    --
 exception
    when others then
       --
@@ -8476,9 +8852,8 @@ exception
       end;
       --
 end pkb_ler_ct_int_ws;
-
--------------------------------------------------------------------------------------------------------
-
+--
+-- =================================================================================================================================
 -- Procedimento de validação de dados de Conhecimento de Transporte Emissão Própria, oriundos de Integração por Web-Service
 procedure pkb_int_ws ( en_loteintws_id      in     lote_int_ws.id%type
                      , en_tipoobjintegr_id  in     tipo_obj_integr.id%type
@@ -8507,6 +8882,7 @@ begin
       vn_fase := 2.1;
       --
       pkb_ler_ct_int_ws ( en_loteintws_id      => en_loteintws_id
+                        , en_tipoobjintegr_id  => en_tipoobjintegr_id
                         , ev_tipoobjintegr_cd  => vv_tipoobjintegr_cd
                         , sn_erro              => sn_erro
                         , sn_aguardar          => sn_aguardar

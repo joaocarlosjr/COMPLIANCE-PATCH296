@@ -7836,7 +7836,7 @@ procedure pkb_gera_arq_cid_3304557 is
        and nf.id          = ncs.notafiscal_id(+)
        and nf.id          = inf.notafiscal_id
        and inf.id         = ics.itemnf_id(+)
-       and nvl(nf.dm_arm_nfe_terc, 0) = 0 -- #73514
+       and nvl(nf.dm_arm_nfe_terc, 0) = 0 -- #73514 
      order by nf.id;
   --
 begin
@@ -15811,7 +15811,8 @@ end pkb_gera_arq_cid_2921005;
 ---------------------------------------------------------------------------------------------------------------------
 procedure pkb_gera_arq_cid_4205407 is
   --
-  vn_fase number;
+  vn_fase    number;
+  vn_records number := 0;
   --
   cursor c_cont is
     select replace(replace(nvl(jc.im, ' '), '.', ''), '-', '') CMCdoContribuinte,
@@ -15912,7 +15913,6 @@ procedure pkb_gera_arq_cid_4205407 is
        and jp.pessoa_id   = pp.id
        and pp.cidade_id   = c.id
        and c.estado_id    = es.id
-       and pp.cidade_id   = gn_cidade_id
        and nvl(nf.dm_arm_nfe_terc, 0) = 0 -- #73514
      group by pp.cidade_id,
               jp.im,
@@ -15933,8 +15933,7 @@ procedure pkb_gera_arq_cid_4205407 is
     select nvl(pk_csf.fkg_cnpj_ou_cpf_empresa(en_empresa_id => e.id), ' ') CNPJdoContribuinte,
            replace(replace(nvl(jc.im, ' '), '.', ''), '-', '') CMCdoContribuinte,
            case
-             when pp.cidade_id =
-                  (select c.id from cidade c where c.ibge_cidade = 4205407) then
+             when pp.cidade_id = (select c.id from cidade c where c.ibge_cidade = 4205407) then
               replace(replace(nvl(jp.im, ' '), '.', ''), '-', '')
              else
               ' '
@@ -15945,10 +15944,25 @@ procedure pkb_gera_arq_cid_4205407 is
            nvl(ics.cnae, 0) CNAE,
            to_char(nf.dt_emiss, 'ddmmyyyy') DataEmissao,
            max(nvl(nft.vl_total_nf, 0)) ValorContabil,
-           sum(nvl(ii.vl_base_calc, 0)) BasedeCalculo,
+           case
+             when ii.dm_tipo = 0 and sum(ii.vl_base_calc) > 0 then
+              sum(nvl(ii.vl_base_calc, 0))
+             else
+              sum(nvl(ii.vl_base_calc, 0))
+           end BasedeCalculo,
            nvl(na.conteudo, ' ') Obs,
-           nvl(ct.cod_trib_municipio, 0) CFPS,
-           nvl(ncs.dm_nat_oper, 0) CST,
+           case
+             when pp.cidade_id = (select c.id from cidade c where c.ibge_cidade = 4205407) then
+              nvl(ct.cod_trib_municipio, 0)
+             else
+              ' '
+           end CFPS,
+           case
+             when pp.cidade_id = (select c.id from cidade c where c.ibge_cidade = 4205407) then
+              csc.cod_st
+             else
+              ' '
+           end CST,
            nvl(ii.aliq_apli, 0) Aliquota,
            sum(nvl(ii.vl_imp_trib, 0)) ValordoISS
       from nota_fiscal        nf,
@@ -15965,7 +15979,8 @@ procedure pkb_gera_arq_cid_4205407 is
            juridica           jc,
            pessoa             pp,
            juridica           jp,
-           cod_trib_municipio ct
+           cod_trib_municipio ct,
+           cod_st_cidade      csc
      where nf.empresa_id        = gn_empresa_id
        and nf.dm_ind_emit       = gn_dm_ind_emit
        and nf.dm_st_proc        = 4 -- Autorizada
@@ -15980,6 +15995,7 @@ procedure pkb_gera_arq_cid_4205407 is
        and inf.id               = ii.itemnf_id
        and ti.id                = ii.tipoimp_id
        and ti.cd                = '6' -- ISS
+       and nf.modfiscal_id      = mf.id
        and ((mf.cod_mod = '99') or (mf.cod_mod = '55' and inf.cd_lista_serv is not null))
        and na.notafiscal_id(+)  = nf.id
        and ncs.notafiscal_id(+) = nf.id
@@ -15991,7 +16007,7 @@ procedure pkb_gera_arq_cid_4205407 is
        and jp.pessoa_id         = pp.id
        and ics.itemnf_id        = inf.id
        and ct.id(+)             = ics.codtribmunicipio_id
-       and pp.cidade_id         = gn_cidade_id
+       and ii.codstcidade_id    = csc.id(+)
        and nvl(nf.dm_arm_nfe_terc, 0) = 0 -- #73514
      group by jc.im,
               pp.cidade_id,
@@ -16005,7 +16021,10 @@ procedure pkb_gera_arq_cid_4205407 is
               ct.cod_trib_municipio,
               ncs.dm_nat_oper,
               ii.aliq_apli,
-              e.id;
+              e.id,
+              ii.dm_tipo,
+              csc.cod_st
+     order by nf.nro_nf;
   --
 begin
   --
@@ -16013,6 +16032,9 @@ begin
   --
   -- Header ou Cabeçalho
   gl_conteudo := 'H'; -- Tipo do Registro
+  gl_conteudo := gl_conteudo || '3.00.0001'; -- Versão SefinNet 
+  --
+  vn_records := vn_records + 1;
   --
   -- Armazena a estrutura do arquivo
   pkb_armaz_estrarqnfscidade(el_conteudo => gl_conteudo);
@@ -16028,21 +16050,23 @@ begin
     gl_conteudo := 'C'; -- Tipo do Registro
     gl_conteudo := gl_conteudo || lpad(rec.CMCdoContribuinte, 7, 0); -- CMC 
     gl_conteudo := gl_conteudo || lpad(rec.CNPJdoContribuinte, 14, 0); -- CNPJ 
-    gl_conteudo := gl_conteudo || lpad(rec.RazaoContribuinte, 80, ' '); -- Razão
+    gl_conteudo := gl_conteudo || rpad(rec.RazaoContribuinte, 80, ' '); -- Razão
     gl_conteudo := gl_conteudo || rpad(rec.NomeContribuinte, 50, ' '); -- Nome 
-    gl_conteudo := gl_conteudo || lpad(rec.InscricaoEstadualContribuinte, 20, ' '); -- Inscrição Estadual 
+    gl_conteudo := gl_conteudo || rpad(rec.InscricaoEstadualContribuinte, 20, ' '); -- Inscrição Estadual 
     gl_conteudo := gl_conteudo || rpad(rec.JuntaComercial, 20, ' '); -- Junta Comercial
-    gl_conteudo := gl_conteudo || lpad(rec.EnderecoContribuinte, 80, ' '); -- Endereço
-    gl_conteudo := gl_conteudo || lpad(rec.NumeroContribuinte, 10, ' '); -- Número
-    gl_conteudo := gl_conteudo || lpad(rec.ComplementoContribuinte, 30, ' '); -- Complemento 
-    gl_conteudo := gl_conteudo || lpad(rec.BairroContribuinte, 50, ' '); -- Bairro
-    gl_conteudo := gl_conteudo || lpad(rec.CidadeContribuinte, 50, ' '); -- Cidade
-    gl_conteudo := gl_conteudo || lpad(rec.UFContribuinte, 2, ' '); -- UF
-    gl_conteudo := gl_conteudo || lpad(rec.CEPContribuinte, 8, ' '); -- CEP
-    gl_conteudo := gl_conteudo || lpad(rec.DDDContribuinte, 2, ' '); -- DDD
-    gl_conteudo := gl_conteudo || lpad(rec.FoneContribuinte, 8, ' '); -- Fone
-    gl_conteudo := gl_conteudo || lpad(rec.FaxContribuinte, 8, ' '); -- Fax
-    gl_conteudo := gl_conteudo || lpad(rec.EmailContribuinte, 80, ' '); -- Email
+    gl_conteudo := gl_conteudo || rpad(rec.EnderecoContribuinte, 80, ' '); -- Endereço
+    gl_conteudo := gl_conteudo || rpad(rec.NumeroContribuinte, 10, ' '); -- Número
+    gl_conteudo := gl_conteudo || rpad(rec.ComplementoContribuinte, 30, ' '); -- Complemento 
+    gl_conteudo := gl_conteudo || rpad(rec.BairroContribuinte, 50, ' '); -- Bairro
+    gl_conteudo := gl_conteudo || rpad(rec.CidadeContribuinte, 50, ' '); -- Cidade
+    gl_conteudo := gl_conteudo || rpad(rec.UFContribuinte, 2, ' '); -- UF
+    gl_conteudo := gl_conteudo || rpad(rec.CEPContribuinte, 8, ' '); -- CEP
+    gl_conteudo := gl_conteudo || rpad(rec.DDDContribuinte, 2, ' '); -- DDD
+    gl_conteudo := gl_conteudo || rpad(rec.FoneContribuinte, 8, ' '); -- Fone
+    gl_conteudo := gl_conteudo || rpad(rec.FaxContribuinte, 8, ' '); -- Fax
+    gl_conteudo := gl_conteudo || rpad(rec.EmailContribuinte, 80, ' '); -- Email
+    --
+    vn_records := vn_records + 1;
     --
     vn_fase := 2.2;
     --
@@ -16064,18 +16088,20 @@ begin
     gl_conteudo := 'P'; -- Tipo do Registro
     gl_conteudo := gl_conteudo || lpad(rec.CMCdoPrestador, 7, 0); -- CMC 
     gl_conteudo := gl_conteudo || lpad(rec.CNPJdoPrestador, 14, ' '); -- CNPJ 
-    gl_conteudo := gl_conteudo || lpad(rec.RazaoPrestador, 80, ' '); -- Razão
+    gl_conteudo := gl_conteudo || rpad(rec.RazaoPrestador, 80, ' '); -- Razão
     gl_conteudo := gl_conteudo || rpad(rec.NomePrestador, 50, ' '); -- Nome 
-    gl_conteudo := gl_conteudo || lpad(rec.EnderecoPrestador, 80, ' '); -- Endereço
-    gl_conteudo := gl_conteudo || lpad(rec.NumeroPrestador, 10, ' '); -- Número
-    gl_conteudo := gl_conteudo || lpad(rec.ComplementoPrestador, 30, ' '); -- Complemento 
-    gl_conteudo := gl_conteudo || lpad(rec.BairroPrestador, 50, ' '); -- Bairro
+    gl_conteudo := gl_conteudo || rpad(rec.EnderecoPrestador, 80, ' '); -- Endereço
+    gl_conteudo := gl_conteudo || rpad(rec.NumeroPrestador, 10, ' '); -- Número
+    gl_conteudo := gl_conteudo || rpad(rec.ComplementoPrestador, 30, ' '); -- Complemento 
+    gl_conteudo := gl_conteudo || rpad(rec.BairroPrestador, 50, ' '); -- Bairro
     gl_conteudo := gl_conteudo || lpad(rec.CEPPrestador, 8, 0); -- CEP
-    gl_conteudo := gl_conteudo || lpad(rec.CidadePrestador, 50, ' '); -- Cidade
-    gl_conteudo := gl_conteudo || lpad(rec.UFPrestador, 2, ' '); -- UF
-    gl_conteudo := gl_conteudo || lpad(substr(rec.DDDPrestador, 1, 2), 2, ' '); -- DDD
-    gl_conteudo := gl_conteudo || lpad(substr(rec.FonePrestador, 3, 8), 8, ' '); -- Fone
-    gl_conteudo := gl_conteudo || lpad(rec.GraficaPrestador, 8, ' '); -- Gráfica
+    gl_conteudo := gl_conteudo || rpad(rec.CidadePrestador, 50, ' '); -- Cidade
+    gl_conteudo := gl_conteudo || rpad(rec.UFPrestador, 2, ' '); -- UF
+    gl_conteudo := gl_conteudo || rpad(rec.DDDPrestador, 2, ' '); -- DDD
+    gl_conteudo := gl_conteudo || rpad(rec.FonePrestador, 8, ' '); -- Fone
+    gl_conteudo := gl_conteudo || lpad(rec.GraficaPrestador, 1, ' '); -- Gráfica
+    --
+    vn_records := vn_records + 1;
     --
     vn_fase := 3.2;
     --
@@ -16111,6 +16137,8 @@ begin
     gl_conteudo := gl_conteudo || lpad((nvl(rec.Aliquota, 0) * 100), 18, 0); -- Alíquota
     gl_conteudo := gl_conteudo || lpad((nvl(rec.ValordoISS, 0) * 100), 18, 0); -- Valor do ISS
     --
+    vn_records := vn_records + 1;
+    --
     vn_fase := 4.2;
     --
     -- Armazena a estrutura do arquivo
@@ -16124,6 +16152,7 @@ begin
   --
   -- Trailer ou fim de arquivo
   gl_conteudo := 'L'; -- Tipo do Registro
+  gl_conteudo := gl_conteudo || lpad((vn_records + 1), 10, 0); -- Total de Linhas 
   --
   -- Armazena a estrutura do arquivo
   pkb_armaz_estrarqnfscidade(el_conteudo => gl_conteudo);

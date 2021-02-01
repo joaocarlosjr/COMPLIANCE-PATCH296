@@ -4,7 +4,7 @@ create or replace package csf_own.pk_arq_nfs_cidade is
 -- Especificação da package de Geração de Arquivo de Nota Fiscal de Serviços Tomados por cidade
 -----------------------------------------------------------------------------------------------
 --   
--- Em 15/12/2020 - Renan Alves     
+-- Em 15/12/2020 - Renan Alves       
 -- Redmine #74327 - Obrigação Serviços Tomados - RJ
 -- Foi alterado o do campo valor do ISS, caso a variável vn_vl_imp_iss_ret seja maior que zero,
 -- o valor do ISS, sairá com o valor vn_vl_imp_iss_ret, caso contrário utiliza o valor vn_vl_imp_trib

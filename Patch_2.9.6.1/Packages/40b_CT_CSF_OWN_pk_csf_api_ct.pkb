@@ -412,7 +412,6 @@ begin
           --
           vn_fase := 1.1;
           --
-		  
           -- Verifica se a chamada da rotina de exclusão tb exclui o vínculo com o lote de integração
           if nvl(en_excl_rloteintwsct,0) = 1 then -- 0-Não / 1-Sim
              --
@@ -1100,6 +1099,10 @@ begin
            where conhectransp_id = en_conhectransp_id;
           --
           vn_fase := 109;
+          delete from conhec_transp_cce
+           where conhectransp_id = en_conhectransp_id;
+          --
+          vn_fase := 200;
           --
           -- Os dados de consulta da Cte na Sefaz não são excluidos, somente retirada a referência conhectransp_id
           --
@@ -1115,7 +1118,7 @@ begin
           --
           gn_ind_exclu := 1; -- Indica que o CT foi excluído (0-Não / 1-Sim)
           --
-          vn_fase := 110;
+          vn_fase := 210;
           -- Essa rotina irá excluir o CT das tabelas de conversão 
           pk_entr_cte_terceiro.pkb_desfazer_copia_cte ( en_conhectransp_id_dest => en_conhectransp_id );
           --
@@ -2409,6 +2412,327 @@ exception
       end;
       --
 end pkb_integr_evento_cte;
+--
+-- ====================================================================================================== --
+-- Integra dados do Conhecimento Transporte CCE
+procedure pkb_integr_conhec_transp_cce ( est_log_generico          in out nocopy  dbms_sql.number_table
+                                       , est_row_conhec_transp_cce in out nocopy  conhec_transp_cce%rowtype
+                                       , ev_tipoeventosefaz_cd     in             tipo_evento_sefaz.cd%type
+                                       ) is
+   --
+   vn_fase                number := 0;
+   vn_loggenerico_id      Log_Generico_ct.id%TYPE;
+   vn_nro_seq             evento_cte.nro_seq%type;
+   vv_nro_chave_cte       conhec_transp.nro_chave_cte%type;
+   vv_tipoeventosefaz_cd  tipo_evento_sefaz.cd%type;
+   --
+begin
+   --
+   vn_fase := 1;
+   --
+   gv_mensagem_log := null;
+   --
+   if nvl(est_row_conhec_transp_cce.conhectransp_id,0) = 0 and
+      nvl(est_log_generico.count,0)                    = 0 then
+      --
+      vn_fase := 1.2;
+      --
+      gv_mensagem_log := 'Não informado o Conhec. Transp. para a Carta de Correção.';
+      --
+      vn_loggenerico_id := null;
+      --
+      pkb_log_generico_ct ( sn_loggenerico_id  => vn_loggenerico_id
+                          , ev_mensagem        => gv_cabec_log || gv_cabec_log_item
+                          , ev_resumo          => gv_mensagem_log
+                          , en_tipo_log        => ERRO_DE_SISTEMA
+                          , en_referencia_id   => gn_referencia_id
+                          , ev_obj_referencia  => gv_obj_referencia );
+      --
+      -- Armazena o "loggenerico_id" na memória
+      pkb_gt_log_generico_ct ( en_loggenerico    => vn_loggenerico_id
+                             , est_log_generico  => est_log_generico );
+      --
+   end if;
+   --
+   vn_fase := 2;
+   --
+   if nvl(est_row_conhec_transp_cce.dm_st_integra, -1) not in (0, 2, 7, 8, 9) then
+      --
+      vn_fase := 2.1;
+      --
+      gv_mensagem_log := '"Situação de Integração" (' || est_row_conhec_transp_cce.dm_st_integra || ') esta inválido.';
+      --
+      vn_loggenerico_id := null;
+      --
+      pkb_log_generico_ct ( sn_loggenerico_id  => vn_loggenerico_id
+                          , ev_mensagem        => gv_cabec_log || gv_cabec_log_item
+                          , ev_resumo          => gv_mensagem_log
+                          , en_tipo_log        => ERRO_DE_VALIDACAO
+                          , en_referencia_id   => gn_referencia_id
+                          , ev_obj_referencia  => gv_obj_referencia );
+      --
+      -- Armazena o "loggenerico_id" na memória
+      pkb_gt_log_generico_ct ( en_loggenerico    => vn_loggenerico_id
+                             , est_log_generico  => est_log_generico );
+      --
+   end if;
+   --
+   vn_fase := 3;
+   --
+   est_row_conhec_transp_cce.tipoeventosefaz_id := pk_csf.fkg_tipoeventosefaz_id( ev_cd => trim(ev_tipoeventosefaz_cd) );
+   --
+   vn_fase := 3.1;
+   --
+   if nvl(est_row_conhec_transp_cce.tipoeventosefaz_id,0) < 0 then
+      --
+      gv_mensagem_log := '"Tipo de Evento da Sefaz" (' || ev_tipoeventosefaz_cd || ') esta inválido.';
+      --
+      vn_loggenerico_id := null;
+      --
+      pkb_log_generico_ct ( sn_loggenerico_id  => vn_loggenerico_id
+                          , ev_mensagem        => gv_cabec_log || gv_cabec_log_item
+                          , ev_resumo          => gv_mensagem_log
+                          , en_tipo_log        => ERRO_DE_VALIDACAO
+                          , en_referencia_id   => gn_referencia_id
+                          , ev_obj_referencia  => gv_obj_referencia );
+      --
+      -- Armazena o "loggenerico_id" na memória
+      pkb_gt_log_generico_ct ( en_loggenerico    => vn_loggenerico_id
+                             , est_log_generico  => est_log_generico );
+      --
+   end if;
+   --
+   vn_fase := 4;
+   --
+   if nvl(est_row_conhec_transp_cce.dm_st_proc, -1) not in (0, 1, 2, 3, 4, 5) then
+      --
+      vn_fase := 4.1;
+      --
+      gv_mensagem_log := '"Situação de Processo" (' || est_row_conhec_transp_cce.dm_st_proc || ') esta inválido.';
+      --
+      vn_loggenerico_id := null;
+      --
+      pkb_log_generico_ct ( sn_loggenerico_id  => vn_loggenerico_id
+                          , ev_mensagem        => gv_cabec_log || gv_cabec_log_item
+                          , ev_resumo          => gv_mensagem_log
+                          , en_tipo_log        => ERRO_DE_VALIDACAO
+                          , en_referencia_id   => gn_referencia_id
+                          , ev_obj_referencia  => gv_obj_referencia );
+      --
+      -- Armazena o "loggenerico_id" na memória
+      pkb_gt_log_generico_ct ( en_loggenerico    => vn_loggenerico_id
+                             , est_log_generico  => est_log_generico );
+      --
+   end if;
+   --
+   vn_fase := 5;
+   -- recupera o ultimo número de sequencia
+   begin
+      --
+      select nvl(max(nro_seq),0) + 1
+        into vn_nro_seq
+        from evento_cte
+       where conhectransp_id     = est_row_conhec_transp_cce.conhectransp_id
+         and tipoeventosefaz_id  = est_row_conhec_transp_cce.tipoeventosefaz_id
+         and dm_st_proc = 3;
+      --
+   exception
+      when others then
+         vn_nro_seq := 1;
+   end;
+   --
+   if ev_tipoeventosefaz_cd = '110111'
+      and nvl(vn_nro_seq,0) > 1
+      then
+      --
+      return;
+      --
+   end if;
+   --
+   --est_row_conhec_transp_cce.nro_seq := vn_nro_seq;
+   --
+   vn_fase := 6;
+   --Identificador da TAG a ser assinada, a regra de formação do Id é: "ID" + tpEvento+ chave do CT-e+ nSeqEvento
+   --
+   vv_nro_chave_cte := trim(pk_csf.fkg_chave_ct ( en_conhectransp_id => est_row_conhec_transp_cce.conhectransp_id ));
+   --
+   vn_fase := 6.1;
+   --
+   est_row_conhec_transp_cce.id_tag_chave := 'ID' || trim(ev_tipoeventosefaz_cd) || vv_nro_chave_cte || lpad(vn_nro_seq, 2, '0');
+   --
+   vn_fase := 6.2;
+   --
+   if length(est_row_conhec_transp_cce.id_tag_chave) <> 54 then
+      --
+      gv_mensagem_log := '"Identificador da TAG" (' || est_row_conhec_transp_cce.id_tag_chave || ') esta inválido.';
+      --
+      vn_loggenerico_id := null;
+      --
+      pkb_log_generico_ct ( sn_loggenerico_id  => vn_loggenerico_id
+                          , ev_mensagem        => gv_cabec_log || gv_cabec_log_item
+                          , ev_resumo          => gv_mensagem_log
+                          , en_tipo_log        => ERRO_DE_VALIDACAO
+                          , en_referencia_id   => gn_referencia_id
+                          , ev_obj_referencia  => gv_obj_referencia );
+      --
+      -- Armazena o "loggenerico_id" na memória
+      pkb_gt_log_generico_ct ( en_loggenerico    => vn_loggenerico_id
+                             , est_log_generico  => est_log_generico );
+      --
+   end if;
+   --
+   vn_fase := 7;
+   --
+   if nvl(est_log_generico.count,0) > 0 then
+      --
+      est_row_conhec_transp_cce.dm_st_proc := 4; -- Erro de validação
+      --
+   else
+      --
+      est_row_conhec_transp_cce.dm_st_proc := 1; -- Validado
+      --
+   end if;
+   --
+   vn_fase := 99;
+   --
+   if est_row_conhec_transp_cce.id                           is null               and
+      nvl(est_row_conhec_transp_cce.conhectransp_id,0)        > 0                  and
+      nvl(est_row_conhec_transp_cce.dm_st_integra,-1)        in (0, 2, 7, 8, 9)    and
+      nvl(est_row_conhec_transp_cce.dm_st_proc, -1)          in (0, 1, 2, 3, 4, 5) and
+      est_row_conhec_transp_cce.dt_hr_evento                 is not null           and
+      est_row_conhec_transp_cce.correcao                     is not null           and
+      nvl(est_row_conhec_transp_cce.dm_download_xml_sic, -1) in (0, 1)             then
+      --
+      vn_fase := 99.1;
+      --
+      if nvl(gn_tipo_integr,0) = 1 then
+         --
+         vn_fase := 99.2;
+         --
+         select conhectranspcce_seq.nextval
+           into est_row_conhec_transp_cce.id
+           from dual;
+         --
+         insert into conhec_transp_cce ( id
+                                       , conhectransp_id
+                                       , dm_st_integra
+                                       , dm_st_proc
+                                       , id_tag_chave
+                                       , dt_hr_evento
+                                       , tipoeventosefaz_id
+                                       , correcao
+                                       , versao_leiaute
+                                       , versao_evento
+                                       , versao_cce
+                                       , versao_aplic
+                                       , cod_msg_cab
+                                       , motivo_resp_cab
+                                       , msgwebserv_id_cab
+                                       , cod_msg
+                                       , motivo_resp
+                                       , msgwebserv_id
+                                       , dt_hr_reg_evento
+                                       , nro_protocolo
+                                       , usuario_id
+                                       , xml_envio
+                                       , xml_retorno
+                                       , xml_proc
+                                       , dm_download_xml_sic
+                                       )
+                                values ( est_row_conhec_transp_cce.id
+                                       , est_row_conhec_transp_cce.conhectransp_id
+                                       , est_row_conhec_transp_cce.dm_st_integra
+                                       , est_row_conhec_transp_cce.dm_st_proc
+                                       , est_row_conhec_transp_cce.id_tag_chave
+                                       , est_row_conhec_transp_cce.dt_hr_evento
+                                       , est_row_conhec_transp_cce.tipoeventosefaz_id
+                                       , est_row_conhec_transp_cce.correcao
+                                       , est_row_conhec_transp_cce.versao_leiaute
+                                       , est_row_conhec_transp_cce.versao_evento
+                                       , est_row_conhec_transp_cce.versao_cce
+                                       , est_row_conhec_transp_cce.versao_aplic
+                                       , est_row_conhec_transp_cce.cod_msg_cab
+                                       , est_row_conhec_transp_cce.motivo_resp_cab
+                                       , est_row_conhec_transp_cce.msgwebserv_id_cab
+                                       , est_row_conhec_transp_cce.cod_msg
+                                       , est_row_conhec_transp_cce.motivo_resp
+                                       , est_row_conhec_transp_cce.msgwebserv_id
+                                       , est_row_conhec_transp_cce.dt_hr_reg_evento
+                                       , est_row_conhec_transp_cce.nro_protocolo
+                                       , est_row_conhec_transp_cce.usuario_id
+                                       , est_row_conhec_transp_cce.xml_envio
+                                       , est_row_conhec_transp_cce.xml_retorno
+                                       , est_row_conhec_transp_cce.xml_proc
+                                       , est_row_conhec_transp_cce.dm_download_xml_sic
+                                       );
+         --
+      end if;
+      --
+   else
+         --
+         vn_fase := 99.3;
+         --
+         update conhec_transp_cce
+            set conhectransp_id	   =	est_row_conhec_transp_cce.conhectransp_id
+              ,	dm_st_integra	   =	est_row_conhec_transp_cce.dm_st_integra
+              ,	dm_st_proc	   =	est_row_conhec_transp_cce.dm_st_proc
+              ,	id_tag_chave	   =	est_row_conhec_transp_cce.id_tag_chave
+              ,	dt_hr_evento	   =	est_row_conhec_transp_cce.dt_hr_evento
+              ,	tipoeventosefaz_id =	est_row_conhec_transp_cce.tipoeventosefaz_id
+              ,	correcao	   =	est_row_conhec_transp_cce.correcao
+              ,	versao_leiaute	   =	est_row_conhec_transp_cce.versao_leiaute
+              ,	versao_evento	   =	est_row_conhec_transp_cce.versao_evento
+              ,	versao_cce	   =	est_row_conhec_transp_cce.versao_cce
+              ,	versao_aplic	   =	est_row_conhec_transp_cce.versao_aplic
+              ,	cod_msg_cab	   =	est_row_conhec_transp_cce.cod_msg_cab
+              ,	motivo_resp_cab	   =	est_row_conhec_transp_cce.motivo_resp_cab
+              ,	msgwebserv_id_cab  =	est_row_conhec_transp_cce.msgwebserv_id_cab
+              ,	cod_msg	           =	est_row_conhec_transp_cce.cod_msg
+              ,	motivo_resp	   =	est_row_conhec_transp_cce.motivo_resp
+              ,	msgwebserv_id	   =	est_row_conhec_transp_cce.msgwebserv_id
+              ,	dt_hr_reg_evento   =	est_row_conhec_transp_cce.dt_hr_reg_evento
+              ,	nro_protocolo	   =	est_row_conhec_transp_cce.nro_protocolo
+              ,	usuario_id	   =	est_row_conhec_transp_cce.usuario_id
+              ,	xml_envio	   =	est_row_conhec_transp_cce.xml_envio
+              ,	xml_retorno	   =	est_row_conhec_transp_cce.xml_retorno
+              ,	xml_proc	   =	est_row_conhec_transp_cce.xml_proc
+              ,	dm_download_xml_sic =	est_row_conhec_transp_cce.dm_download_xml_sic
+          where id = est_row_conhec_transp_cce.id;
+         --
+      --
+   end if;
+   --
+   commit;
+   --
+   <<sair_integr>>
+   null;
+   --
+exception
+   when others then
+      --
+      gv_mensagem_log := 'Erro na pkb_integr_conhec_transp_cce fase(' || vn_fase || '): ' || sqlerrm;
+      --
+      declare
+         vn_loggenerico_id  Log_Generico_ct.id%TYPE;
+      begin
+         --
+         pkb_log_generico_ct ( sn_loggenerico_id  => vn_loggenerico_id
+                             , ev_mensagem        => gv_cabec_log || gv_cabec_log_item
+                             , ev_resumo          => gv_mensagem_log
+                             , en_tipo_log        => ERRO_DE_SISTEMA
+                             , en_referencia_id   => gn_referencia_id
+                             , ev_obj_referencia  => gv_obj_referencia );
+         --
+         -- Armazena o "loggenerico_id" na memória
+         pkb_gt_log_generico_ct ( en_loggenerico    => vn_loggenerico_id
+                                , est_log_generico  => est_log_generico );
+         --
+      exception
+         when others then
+            null;
+      end;
+      --
+end pkb_integr_conhec_transp_cce;
 --
 -- ====================================================================================================== --
 -- Integra as informações de Eventos do CTe EPEC
@@ -28553,7 +28877,7 @@ begin
    --
    if est_row_conhec_transp.dt_hr_emissao is not null then
       --
-      gv_cabec_log := gv_cabec_log || 'Data de emissão: ' || to_char(est_row_conhec_transp.dt_hr_emissao, 'dd/mm/yyyy');
+      gv_cabec_log := gv_cabec_log || 'Data de emissão: ' || to_char(est_row_conhec_transp.dt_hr_emissao, 'dd/mm/rrrr');
       --
       gv_cabec_log := gv_cabec_log || chr(10);
       --
@@ -34434,7 +34758,7 @@ begin
    --
    if vd_dt_hr_emissao is not null then
       --
-      gv_cabec_log := gv_cabec_log || 'Data de emissão: ' || to_char(vd_dt_hr_emissao, 'dd/mm/yyyy');
+      gv_cabec_log := gv_cabec_log || 'Data de emissão: ' || to_char(vd_dt_hr_emissao, 'dd/mm/rrrr');
       --
       gv_cabec_log := gv_cabec_log || chr(10);
       --
@@ -40302,7 +40626,7 @@ is
    vn_loggenerico_id  log_generico_ct.id%type;
    --
    cursor c_conhec_transp is
-   select to_date(ct.DT_HR_EMISSAO, 'dd/mm/yyyy') dt_hr_emissao, md.cod_mod
+   select to_date(ct.DT_HR_EMISSAO, 'dd/mm/rrrr') dt_hr_emissao, md.cod_mod
      from CONHEC_TRANSP ct, MOD_FISCAL md
     where 1 = 1
       and ct.id = en_conhectransp_id
@@ -40352,7 +40676,7 @@ begin
 exception
    when others then
       --
-      gv_mensagem_log := 'Erro na pkb_csf_api_ct fase('||vn_fase||'): '||sqlerrm;
+      gv_mensagem_log := 'Erro na pkb_csf_api_ct.pkb_valida_ct_d100 fase('||vn_fase||'): '||sqlerrm;
       --
       declare
          vn_loggenerico_id  log_generico_ct.id%type;
@@ -40938,7 +41262,7 @@ BEGIN
 EXCEPTION
    when others then
       raise_application_error(-20101, 'Problemas em pk_csf_api_ct.fkg_valida_ct (fase = '||vn_fase||' empresa_id = '||en_empresa_id||' período de '||
-                                      to_char(ed_dt_ini,'dd/mm/yyyy')||' até '||to_char(ed_dt_fin,'dd/mm/yyyy')||' objeto = '||ev_obj_referencia||
+                                      to_char(ed_dt_ini,'dd/mm/rrrr')||' até '||to_char(ed_dt_fin,'dd/mm/rrrr')||' objeto = '||ev_obj_referencia||
                                       ' referencia_id = '||en_referencia_id||'). Erro = '||sqlerrm);
 END FKG_VALIDA_CT;
 

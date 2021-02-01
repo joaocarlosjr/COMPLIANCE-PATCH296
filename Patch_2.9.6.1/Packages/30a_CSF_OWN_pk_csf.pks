@@ -28,11 +28,6 @@ create or replace package csf_own.pk_csf is
 -- Adicionado en_ret_chr10 para validação de chr10 de notas de serviço vindo da pk_csf_api_nfs, demais conversões não terão alterações
 -- Rotina Alterada: fkg_converte
 --
--- Em 12/02/20120 - Marcos Ferreira
--- Redmine #64831: Criação de procedure para criação de sequence e inclusão na seq_tab
--- Rotina: pkb_cria_sequence
--- Alterações: Criação de procedure para criação da sequence e inclusão na seq_tab
---
 -- Em 07/02/2020 - Allan Magrini
 -- Redmine #60926 - Falha na chamada da pk_csf.fkg_empresa_id_cpf_cnpj (ACECO)
 -- Alteração: Incluido dm_situacao = 1 da tabela empresa para retornar somente empresa ativa
@@ -3864,12 +3859,6 @@ function fkg_plcnatpecpc_plc_id ( en_natrecpc_id  in nat_rec_pc.id%TYPE)
 function fkg_codstcidade_Id (ev_cod_st    in  cod_st_cidade.cod_st%TYPE,
                              en_cidade_id in  cod_st_cidade.cidade_id%TYPE)
                              return cod_st_cidade.id%type;
--------------------------------------------------------------------------------------------------------
---| Procedure para criação de sequence e inclusão na seq_tab
---
-procedure pkb_cria_sequence (ev_sequence_name varchar2,
-                             ev_table_name    varchar2);
-
 -------------------------------------------------------------------------------------------------------
 --| Procedure para criação de domínio
 --
