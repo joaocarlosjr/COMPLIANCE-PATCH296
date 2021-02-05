@@ -55,6 +55,55 @@ END;
 -------------------------------------------------------------------------------------------------------------------------------
 Prompt FIM - Redmine #75477 -  Criação de Job Scheduler JOB_CORRIGIR_NF_CT
 -------------------------------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------------------------------
+Prompt INI Redmine #75193 - Adicionar campo EMPRESA_FORMA_TRIB.PERC_RED_IR
+-------------------------------------------------------------------------------------------------------------------------------
+ 
+declare
+  vn_qtde    number;
+begin
+  begin
+     select count(1)
+       into vn_qtde 
+       from all_tab_columns a
+      where a.OWNER = 'CSF_OWN'  
+        and a.TABLE_NAME = 'EMPRESA_FORMA_TRIB'
+        and a.COLUMN_NAME = 'PERC_RED_IR'; 
+   exception
+      when others then
+         vn_qtde := 0;
+   end;	
+   --   
+   if vn_qtde = 0 then
+      -- Add/modify columns    
+      BEGIN
+         EXECUTE IMMEDIATE 'alter table CSF_OWN.EMPRESA_FORMA_TRIB add perc_red_ir number(5,2)';
+      EXCEPTION
+         WHEN OTHERS THEN
+            RAISE_APPLICATION_ERROR ( -20101, 'Erro ao incluir coluna "perc_red_ir" em EMPRESA_FORMA_TRIB - '||SQLERRM );
+      END;
+      -- 
+      -- Add comments to the table   
+      BEGIN
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.EMPRESA_FORMA_TRIB.perc_red_ir is ''Percentual de Redução de IR para atividades incentivadas''';
+      EXCEPTION
+         WHEN OTHERS THEN
+            RAISE_APPLICATION_ERROR ( -20101, 'Erro ao alterar comentario de EMPRESA_FORMA_TRIB - '||SQLERRM );
+      END;	  
+      -- 
+   end if;
+   --  
+   commit;
+   --   
+end;
+/
+
+--------------------------------------------------------------------------------------------------------------------------------------
+Prompt FIM Redmine #75193 - Adicionar campo EMPRESA_FORMA_TRIB.PERC_RED_IR
+-------------------------------------------------------------------------------------------------------------------------------
+
+
 ----------------------------------------------------------------------------------------
 Prompt FIM Patch 2.9.6.2 - Alteracoes no CSF_OWN
 ------------------------------------------------------------------------------------------
