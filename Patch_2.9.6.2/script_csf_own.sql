@@ -851,6 +851,135 @@ end;
 Prompt FIM Redmine Redmine #73063 - Alterações para emissão de conhecimento de transporte.
 --------------------------------------------------------------------------------------------------------------------------------------
 
+-------------------------------------------------------------------------------------------------------------------------------
+Prompt INI Redmine #74444 - Pontos de correção no processo de Apuração do IRPJ e CSLL
+-------------------------------------------------------------------------------------------------------------------------------
+declare
+   vn_modulo_id number := 0;
+   vn_grupo_id number := 0;
+   vn_param_id number := 0;
+   vn_usuario_id number := null;
+begin
+
+-- MODULO DO SISTEMA --
+   begin
+      select ms.id
+        into vn_modulo_id
+        from CSF_OWN.MODULO_SISTEMA ms
+       where ms.cod_modulo = 'CONTABIL';
+   exception
+      when no_data_found then
+         vn_modulo_id := 0;
+      when others then
+         goto SAIR_SCRIPT;
+   end;
+   --
+   if vn_modulo_id = 0 then
+      --
+      insert into CSF_OWN.MODULO_SISTEMA
+      values(CSF_OWN.MODULOSISTEMA_SEQ.NEXTVAL, 'CONTABIL', 'Obrigações Contábeis ECD e ECF', 'Módulo com parametros referentes as obrigações contabeis ECD E ECF (Sped Contábil e Sped ECF)')
+      returning id into vn_modulo_id;
+      --
+   end if;
+   --
+   -- GRUPO DO SISTEMA --
+   begin
+      select gs.id
+        into vn_grupo_id
+        from CSF_OWN.GRUPO_SISTEMA gs
+       where gs.modulo_id = vn_modulo_id
+         and gs.cod_grupo = 'ECF';
+   exception
+      when no_data_found then
+         vn_grupo_id := 0;
+      when others then
+         goto SAIR_SCRIPT;
+   end;
+   --
+   if vn_grupo_id = 0 then
+      --
+      insert into CSF_OWN.GRUPO_SISTEMA
+      values(CSF_OWN.GRUPOSISTEMA_SEQ.NextVal, vn_modulo_id, 'ECF', 'PARAMETROS UTILIZADOS NA ECF', 'GRUPO COM INFORMAÇÕES DE PARAMETROS UTILIZADOS NA ECF')
+      returning id into vn_grupo_id;
+      --
+   end if;
+   --
+   -- PARAMETRO DO SISTEMA --
+   for x in (select * from CSF_OWN.EMPRESA m where m.dm_situacao = 1)
+   loop
+      begin
+         select pgs.id
+           into vn_param_id
+           from CSF_OWN.PARAM_GERAL_SISTEMA pgs  -- UK: MULTORG_ID, EMPRESA_ID, MODULO_ID, GRUPO_ID, PARAM_NAME
+          where pgs.Empresa_Id = x.Id
+            and pgs.modulo_id  = vn_modulo_id
+            and pgs.grupo_id   = vn_grupo_id
+            and pgs.param_name = 'APUR_IR_CSLL_PARC_MENSAL';
+      exception
+         when no_data_found then
+            vn_param_id := 0;
+         when others then
+            goto SAIR_SCRIPT;
+      end;
+      --
+      --
+      if vn_param_id = 0 then
+         --
+         -- Busca o usuário respondável pelo Mult_org
+         begin
+            select id
+              into vn_usuario_id
+              from CSF_OWN.NEO_USUARIO nu
+             where upper(nu.login) = 'ADMIN';
+         exception
+            when no_data_found then
+               begin
+                  select min(id)
+                    into vn_usuario_id
+                    from CSF_OWN.NEO_USUARIO nu
+                   where nu.Multorg_Id = x.MULTORG_ID;
+               exception
+                  when others then
+                     goto SAIR_SCRIPT;
+               end;
+         end;
+         --
+         insert into CSF_OWN.PARAM_GERAL_SISTEMA( id
+                                                , multorg_id
+                                                , empresa_id
+                                                , modulo_id
+                                                , grupo_id
+                                                , param_name
+                                                , dsc_param
+                                                , vlr_param
+                                                , usuario_id_alt
+                                                , dt_alteracao )
+         values( CSF_OWN.PARAMGERALSISTEMA_SEQ.NextVal
+               , X.MULTORG_ID
+               , X.ID
+               , vn_modulo_id
+               , vn_grupo_id
+               , 'APUR_IR_CSLL_PARC_MENSAL'
+               , 'Realiza apuração parcial do IR e CSLL somente do mês e não acumulado.  Valores possíveis: N = Padrão / S = Recupera os dados de forma parcial'
+               , 'N'
+               , vn_usuario_id
+               , sysdate);
+         --
+      end if;
+      --
+   end loop;
+   --
+   commit;
+   --
+   <<SAIR_SCRIPT>>
+   rollback;
+end;
+/
+--------------------------------------------------------------------------------------------------------------------------------------
+Prompt FIM Redmine #74444 - Pontos de correção no processo de Apuração do IRPJ e CSLL
+-------------------------------------------------------------------------------------------------------------------------------
+
+
 ----------------------------------------------------------------------------------------
 Prompt FIM Patch 2.9.6.2 - Alteracoes no CSF_OWN
 ------------------------------------------------------------------------------------------
