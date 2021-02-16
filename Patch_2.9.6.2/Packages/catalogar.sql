@@ -4,6 +4,13 @@ prompt Catalogar Packages
 
 prompt -----------------------------------------------------------------------------------
 
+prompt 54a_pk_gera_arq_ecd
+@@54a_pk_gera_arq_ecd.pks
+show err
+prompt 54b_pk_gera_arq_ecd
+@@54b_pk_gera_arq_ecd.pkb
+show err
+
 prompt 148a_pk_csf_api_ddo.pks
 @@148a_pk_csf_api_ddo.pks
 show err
