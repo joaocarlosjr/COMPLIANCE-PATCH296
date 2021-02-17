@@ -3,6 +3,11 @@ create or replace package csf_own.pk_gera_arq_efd is
 -------------------------------------------------------------------------------------------------------
 -- Especificação do pacote de procedimentos de criação do arquivo do sped fiscal
 --
+-- Em 12/02/2021   - Luis Marques - 2.9.6-2 / 2.9.7
+-- Redmine #76110  - Verificar restante dos CNPJ's
+-- Rotina Alterada - pkb_monta_reg_1400 - Ajuste nas leituras de Notas retirando valor fixo de empresa para que todas as
+--                 - empresas sejam geradas para o registro 1400.  
+--
 -- Em 10/02/2021   - Luis Marques - 2.9.6-2 / 2.9.7
 -- Redmine #76013  - Verificar valores entre GIA X SPED
 -- Rotina Alterada - pkb_monta_reg_1400 - Ajuste nas leituras de Notas e conhecimentos para que os valoers fiquem iguais abaixo

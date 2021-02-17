@@ -26186,7 +26186,7 @@ is
                             tipo_cod_arq         tc,
                             cfop                 c
                       where gn_origem_dado_pessoa = 1 -- Dados da nota_fiscal_dest
-                        and nf.empresa_id       = 2
+                        and nf.empresa_id       = gt_row_abertura_efd.empresa_id
                         and nf.dm_arm_nfe_terc  = 0
                         and nf.dm_st_proc       = 4 -- Autorizada
                         and ((nf.dm_ind_emit = 1 and to_date(nvl(nf.dt_sai_ent, nf.dt_emiss), 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
