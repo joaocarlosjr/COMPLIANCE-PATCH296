@@ -3,6 +3,11 @@ create or replace package csf_own.pk_gera_arq_efd is
 -------------------------------------------------------------------------------------------------------
 -- Especificação do pacote de procedimentos de criação do arquivo do sped fiscal
 --
+-- Em 10/02/2021   - Luis Marques - 2.9.6-2 / 2.9.7
+-- Redmine #76013  - Verificar valores entre GIA X SPED
+-- Rotina Alterada - pkb_monta_reg_1400 - Ajuste nas leituras de Notas e conhecimentos para que os valoers fiquem iguais abaixo
+--                 - DIPAM CR-30 SP.  
+--
 -- Em 21/01/2021   - Luis Marques - 2.9.6-2 / 2.9.7
 -- Redmine #75408  - Ajustes na geração do registro 1400.
 -- Rotina Alterada - pkb_monta_reg_1400 - Ajuste na leitura de conhecimento de transporte para ficar igual a GIA 30 -SP

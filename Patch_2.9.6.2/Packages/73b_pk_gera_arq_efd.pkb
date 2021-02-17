@@ -25857,15 +25857,15 @@ is
       and c.id           = iva.cidade_id
     group by c.ibge_cidade
         , iva.item_id, c.estado_id;*/
-       select mun
+    select cod_dipam
           ,item_id
+          ,mun          
           ,valor
-          ,cod_dipam
           ,estado_id
-      from ( select a.mun
+      from ( select a.cod_dipam
                   , a.item_id
+                  , a.mun                  
                   , sum(a.valor) valor
-                  , a.cod_dipam
                   , a.estado_id
                from ( select c.ibge_cidade    mun
                            , iva.item_id      item_id
@@ -25889,209 +25889,356 @@ is
                        , a.cod_dipam
                        , a.estado_id
               union -- Origem_dado_pessoa (Padrão) - Cadastro Pessoal
-             select case
-                      when trim(dg.cd) = '2.5' then
-                       ci.ibge_cidade
-                      else
-                       decode(nf.dm_ind_emit, 0, cid.ibge_cidade, ci.ibge_cidade)
-                    end municipio_empresa,
-                    --decode(nf.dm_ind_emit, 0, cid.ibge_cidade, ci.ibge_cidade) mun,
-                    inf.item_id item_id,
-                    sum(case
-                          when trim(dg.cd) = '2.5' then
-                           case
-                             when es.sigla_estado = 'SP' then
-                              case
-                                when et.sigla_estado = 'SP' then
-                                 inf.vl_item_bruto
-                                else
-                                 1
-                              end
-                             else
-                              0
-                           end
-                          else
-                           case
-                             when nvl(pdg.perc_rateio_item, 0) = 0 then
-                              nvl(inf.vl_item_bruto, 0)
-                             else
-                              nvl(inf.vl_item_bruto, 0) * nvl(pdg.perc_rateio_item, 0) / 100
-                           end
-                        end) valor,
-                    case 
-                      when pk_csf_efd.fkg_recup_cod_ipm_item(nf.empresa_id, INF.ITEM_ID, es.id) is null and trim(dg.cd) = '2.2' then 
-					    'SPDIPAM22' 
-                      else
-                        pk_csf_efd.fkg_recup_cod_ipm_item(nf.empresa_id, INF.ITEM_ID, es.id) 
-                    end cod_dipam,
-                    --(pk_csf_efd.fkg_recup_cod_ipm_item(nf.empresa_id, INF.ITEM_ID, es.id)) cod_dipam,
-                    es.id estado_id
-               from TMP_NOTA_FISCAL       nf,
-                    mod_fiscal            mf,
-                    TMP_ITEM_NOTA_FISCAL  inf,
-                    param_dipamgia        pdg,
-                    dipam_gia             dg,
-                    pessoa                p,
-                    cidade                cid,
-                    estado                es,
-                    cidade_tipo_cod_arq   ct1,
-                    tipo_cod_arq          tc1,
-                    empresa               em,
-                    pessoa                ps,
-                    cidade                ci,
-                    estado                et,
-                    cidade_tipo_cod_arq   ct,
-                    tipo_cod_arq          tc
-              where gn_origem_dado_pessoa = 0 -- Dados da pessoa da nota_fiscal cadastro (Padrão)
-                and nf.empresa_id      = gt_row_abertura_efd.empresa_id
-                and nf.dm_arm_nfe_terc = 0
-                and nf.dm_st_proc      = 4 -- Autorizada
-                and ((nf.dm_ind_emit = 1 and trunc(nvl(nf.dt_sai_ent,nf.dt_emiss)) between trunc(gt_row_abertura_efd.dt_ini) and trunc(gt_row_abertura_efd.dt_fim) )
-                    or
-                   (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 1 and trunc(nf.dt_emiss) between trunc(gt_row_abertura_efd.dt_ini) and trunc(gt_row_abertura_efd.dt_fim) )
-                    or
-                   (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 0 and trunc(nf.dt_emiss) between trunc(gt_row_abertura_efd.dt_ini) and trunc(gt_row_abertura_efd.dt_fim) )
-                    or
-                   (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 1 and trunc(nvl(nf.dt_sai_ent,nf.dt_emiss)) between trunc(gt_row_abertura_efd.dt_ini) and trunc(gt_row_abertura_efd.dt_fim) ))
-                and mf.id             = nf.modfiscal_id
-                and mf.cod_mod        in ('01', '1B', '04', '55', '65')
-                and inf.notafiscal_id = nf.id
-                and pdg.empresa_id    = nf.empresa_id
-                and pdg.cfop_id       = inf.cfop_id
-                and (pdg.item_id = inf.item_id or pdg.ncm_id in (select n.id from ncm n where n.cod_ncm = inf.cod_ncm))
-                and dg.id             = pdg.dipamgia_id
-                and p.id              = nf.pessoa_id
-                and cid.id            = p.cidade_id
-                and es.id             = cid.estado_id
-                and ct1.cidade_id     = cid.id
-                and tc1.id            = ct1.tipocodarq_id
-                and tc1.cd            = '1' -- GIA-SP
-                and em.id             = nf.empresa_id
-                and ps.id             = em.pessoa_id
-                and ci.id             = ps.cidade_id
-                and et.id             = ci.estado_id
-                and ct.cidade_id      = ci.id
-                and tc.id             = ct.tipocodarq_id
-                and tc.cd             = '1' -- GIA-SP
-                /* Para não considerar os registros relacionados à tabela inf_valor_agreg. */
-                and not exists (select 1
-                                  from inf_valor_agreg iva,
-                                       item i
-                                 where iva.item_id    = i.id
-                                   and i.id           = inf.item_id
-                                   and iva.dm_st_proc = 1)
-              group by dg.cd,
-                       ci.ibge_cidade,
-                       --decode(nf.dm_ind_emit, 0, ct1.cd, ct.cd),
-                       decode(nf.dm_ind_emit, 0, cid.ibge_cidade, ci.ibge_cidade),
-                       inf.item_id,
-                       nf.empresa_id,
-                       es.id
-             union -- Origem_dado_pessoa - Documento Fiscal
-             select case
-                      when trim(dg.cd) = '2.5' then
-                       ci.ibge_cidade
-                      else
-                       decode(nf.dm_ind_emit, 0, cid.ibge_cidade, ci.ibge_cidade)
-                    end municipio_empresa,
-                    --decode(nf.dm_ind_emit, 0, cid.ibge_cidade, ci.ibge_cidade) mun,
-                    inf.item_id item_id,
-                    sum(case
-                          when trim(dg.cd) = '2.5' then
-                           case
-                             when es.sigla_estado = 'SP' then
-                              case
-                                when et.sigla_estado = 'SP' then
-                                 inf.vl_item_bruto
-                                else
-                                 1
-                              end
-                             else
-                              0
-                           end
-                          else
-                           case
-                             when nvl(pdg.perc_rateio_item, 0) = 0 then
-                              nvl(inf.vl_item_bruto, 0)
-                             else
-                              nvl(inf.vl_item_bruto, 0) * nvl(pdg.perc_rateio_item, 0) / 100
-                           end
-                        end) valor,
-                    case 
-                      when pk_csf_efd.fkg_recup_cod_ipm_item(nf.empresa_id, INF.ITEM_ID, es.id) is null and trim(dg.cd) = '2.2' then 
-					    'SPDIPAM22' 
-                      else
-                        pk_csf_efd.fkg_recup_cod_ipm_item(nf.empresa_id, INF.ITEM_ID, es.id) 
-                    end cod_dipam,
-                    --(pk_csf_efd.fkg_recup_cod_ipm_item(nf.empresa_id, INF.ITEM_ID, es.id)) cod_dipam,
-                    es.id estado_id
-               from TMP_NOTA_FISCAL       nf,
-                    nota_fiscal_dest      nfd,
-                    mod_fiscal            mf,
-                    TMP_ITEM_NOTA_FISCAL  inf,
-                    param_dipamgia        pdg,
-                    dipam_gia             dg,
-                    cidade                cid,
-                    estado                es,
-                    cidade_tipo_cod_arq   ct1,
-                    tipo_cod_arq          tc1,
-                    empresa               em,
-                    pessoa                ps,
-                    cidade                ci,
-                    estado                et,
-                    cidade_tipo_cod_arq   ct,
-                    tipo_cod_arq          tc
-              where gn_origem_dado_pessoa = 1 -- Dados da pessoa da nota_fiscal Documento Fiscal
-                and nf.empresa_id      = gt_row_abertura_efd.empresa_id
-                and nf.dm_arm_nfe_terc = 0
-                and nf.dm_st_proc      = 4 -- Autorizada
-                and ((nf.dm_ind_emit = 1 and trunc(nvl(nf.dt_sai_ent,nf.dt_emiss)) between trunc(gt_row_abertura_efd.dt_ini) and trunc(gt_row_abertura_efd.dt_fim) )
-                    or
-                   (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 1 and trunc(nf.dt_emiss) between trunc(gt_row_abertura_efd.dt_ini) and trunc(gt_row_abertura_efd.dt_fim) )
-                    or
-                   (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 0 and trunc(nf.dt_emiss) between trunc(gt_row_abertura_efd.dt_ini) and trunc(gt_row_abertura_efd.dt_fim) )
-                    or
-                   (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 1 and trunc(nvl(nf.dt_sai_ent,nf.dt_emiss)) between trunc(gt_row_abertura_efd.dt_ini) and trunc(gt_row_abertura_efd.dt_fim) ))
-                and mf.id             = nf.modfiscal_id
-                and mf.cod_mod        in ('01', '1B', '04', '55', '65')
-                and inf.notafiscal_id = nf.id
-                and pdg.empresa_id    = nf.empresa_id
-                and pdg.cfop_id       = inf.cfop_id
-                and (pdg.item_id = inf.item_id or pdg.ncm_id in (select n.id from ncm n where n.cod_ncm = inf.cod_ncm))
-                and dg.id             = pdg.dipamgia_id
-                and nfd.notafiscal_id = nf.id
-                and cid.ibge_cidade   = nfd.cidade_ibge
-                and es.id             = cid.estado_id
-                and ct1.cidade_id     = cid.id
-                and tc1.id            = ct1.tipocodarq_id
-                and tc1.cd            = '1' -- GIA-SP
-                and em.id             = nf.empresa_id
-                and ps.id             = em.pessoa_id
-                and ci.id             = ps.cidade_id
-                and et.id             = ci.estado_id
-                and ct.cidade_id      = ci.id
-                and tc.id             = ct.tipocodarq_id
-                and tc.cd             = '1' -- GIA-SP
-                /* Para não considerar os registros relacionados à tabela inf_valor_agreg. */
-                and not exists (select 1
-                                  from inf_valor_agreg iva,
-                                       item i
-                                 where iva.item_id    = i.id
-                                   and i.id           = inf.item_id
-                                   and iva.dm_st_proc = 1)
-              group by dg.cd,
-                       ci.ibge_cidade,
-                       --decode(nf.dm_ind_emit, 0, ct1.cd, ct.cd),
-                       decode(nf.dm_ind_emit, 0, cid.ibge_cidade, ci.ibge_cidade),
-                       inf.item_id,
-                       nf.empresa_id,
-                       es.id
+              select case 
+                       when coddip_empresa = '2.2' then
+                         'SPDIPAM22' 
+                       else
+                         null
+                     end cod_dipam  
+                   , item_id		   
+                   , municipio_empresa
+                   , round(sum(valor),2) valor
+                   , estado_id
+               from (select nf.empresa_id, nf.pessoa_id,
+                            dg.cd coddip_empresa,
+                            null item_id,
+                            case
+                              when trim(dg.cd) = '2.5' then
+                                ci.ibge_cidade
+                               else
+                                decode(nf.dm_ind_emit, 0, cid.ibge_cidade, ci.ibge_cidade)
+                            end municipio_empresa,                   
+                            sum(case
+                                  when trim(dg.cd) = '2.5' then
+                                   case
+                                     when es.sigla_estado = 'SP' then
+                                      case
+                                        when et.sigla_estado = 'SP' then
+                                         inf.vl_item_bruto
+                                        else
+                                         1
+                                      end
+                                     else
+                                      0
+                                   end
+                                  else
+                                   case
+                                     when (nvl(pdg.perc_rateio_item, 0) = 0 
+                                           and (c.tipooperacao_id not in (select t.id from tipo_operacao t where t.cd = 3)
+                                               and nf.dm_fin_nfe in (1,2) --NF-e normal NF-e complementar --#74544
+                                               )
+                                           ) then
+                                            (nvl(inf.vl_item_bruto, 0) +
+                                             nvl(inf.vl_frete, 0) +
+                                             nvl(inf.vl_seguro, 0) + nvl(inf.vl_outro, 0) +
+                                             (select nvl(sum(nvl(imp.vl_imp_trib, 0)), 0)
+                                                from imp_itemnf imp, tipo_imposto ti
+                                               where imp.itemnf_id = inf.id
+                                                 and imp.tipoimp_id = ti.id
+                                                 and ti.cd in (2, 3, 7))) -
+                                                   nvl(inf.vl_desc, 0)
+                                     when (c.tipooperacao_id not in (select t.id from tipo_operacao t where t.cd = 3)
+                                           and nf.dm_fin_nfe in (1,2) --NF-e normal NF-e complementar --#74544
+                                           ) then 
+                                            ((nvl(inf.vl_item_bruto, 0) +
+                                              nvl(inf.vl_frete, 0) + nvl(inf.vl_seguro, 0) +
+                                              nvl(inf.vl_outro, 0) +
+                                              (select nvl(sum(nvl(imp.vl_imp_trib, 0)), 0)
+                                                 from imp_itemnf imp, tipo_imposto ti
+                                                where imp.itemnf_id = inf.id
+                                                  and imp.tipoimp_id = ti.id
+                                                  and ti.cd in (2, 3, 7))) -
+                                              nvl(inf.vl_desc, 0)) *
+                                                    nvl(pdg.perc_rateio_item, 0) / 100
+                                     else
+                                      0
+                                   end
+                                end)
+                            -
+                            sum(case
+                                  when trim(dg.cd) = '2.5' then
+                                   case
+                                     when es.sigla_estado = 'SP' then
+                                      case
+                                        when et.sigla_estado = 'SP' then
+                                         inf.vl_item_bruto
+                                        else
+                                         1
+                                      end
+                                     else
+                                      0
+                                   end
+                                  else
+                                   case
+                                     when (nvl(pdg.perc_rateio_item, 0) = 0 
+                                           and (c.tipooperacao_id in (select t.id from tipo_operacao t where t.cd = 3)
+                                             or nf.dm_fin_nfe = 4 --NF-e normal NF-e complementar --#74544
+                                             )
+                                           ) then
+                                            (nvl(inf.vl_item_bruto, 0) +
+                                             nvl(inf.vl_frete, 0) +
+                                             nvl(inf.vl_seguro, 0) + nvl(inf.vl_outro, 0) +
+                                             (select nvl(sum(nvl(imp.vl_imp_trib, 0)), 0)
+                                                from imp_itemnf imp, tipo_imposto ti
+                                               where imp.itemnf_id = inf.id
+                                                 and imp.tipoimp_id = ti.id
+                                                 and ti.cd in (2, 3, 7))) -
+                                                   nvl(inf.vl_desc, 0)
+                                              when (c.tipooperacao_id in (select t.id from tipo_operacao t where t.cd = 3)
+                                             or nf.dm_fin_nfe = 4 --NF-e normal NF-e complementar --#74544
+                                             ) then
+                                            ((nvl(inf.vl_item_bruto, 0) +
+                                              nvl(inf.vl_frete, 0) + nvl(inf.vl_seguro, 0) +
+                                              nvl(inf.vl_outro, 0) +
+                                              (select nvl(sum(nvl(imp.vl_imp_trib, 0)), 0)
+                                                 from imp_itemnf imp, tipo_imposto ti
+                                                where imp.itemnf_id = inf.id
+                                                  and imp.tipoimp_id = ti.id
+                                                  and ti.cd in (2, 3, 7))) -
+                                              nvl(inf.vl_desc, 0)) *
+                                                    nvl(pdg.perc_rateio_item, 0) / 100
+                                     else
+                                      0
+                                   end
+                                 end) valor,
+                                 es.id estado_id
+                       from TMP_NOTA_FISCAL      nf,
+                            mod_fiscal           mf,
+                            TMP_ITEM_NOTA_FISCAL inf,
+                            param_dipamgia       pdg,
+                            dipam_gia            dg,
+                            pessoa               p,
+                            cidade               cid,
+                            estado               es,
+                            cidade_tipo_cod_arq  ct1,
+                            tipo_cod_arq         tc1,
+                            empresa              em,
+                            pessoa               ps,
+                            cidade               ci,
+                            estado               et,
+                            cidade_tipo_cod_arq  ct,
+                            tipo_cod_arq         tc,
+                            cfop                 c
+                      where gn_origem_dado_pessoa = 0 -- Dados da pessoa da nota_fiscal cadastro (Padrão)
+                        and nf.empresa_id       = gt_row_abertura_efd.empresa_id
+                        and nf.dm_arm_nfe_terc  = 0
+                        and nf.dm_st_proc       = 4 -- Autorizada
+                        and ((nf.dm_ind_emit = 1 and to_date(nvl(nf.dt_sai_ent, nf.dt_emiss), 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
+                              or
+                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 1 and to_date(nf.dt_emiss, 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
+                              or
+                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 0 and to_date(nf.dt_emiss, 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
+                              or
+                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 1 and to_date(nvl(nf.dt_sai_ent, nf.dt_emiss), 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim))
+                        and mf.id               = nf.modfiscal_id
+                        and mf.cod_mod          in ('01', '1B', '04', '55', '65')
+                        and inf.notafiscal_id   = nf.id
+                        and pdg.empresa_id      = nf.empresa_id
+                        and pdg.cfop_id         = inf.cfop_id
+                        and (pdg.item_id = inf.item_id or pdg.ncm_id in (select n.id from ncm n where n.cod_ncm = inf.cod_ncm))
+                        and dg.id               = pdg.dipamgia_id
+                        and p.id                = nf.pessoa_id
+                        and cid.id              = p.cidade_id
+                        and es.id               = cid.estado_id
+                        and ct1.cidade_id       = cid.id
+                        and tc1.id              = ct1.tipocodarq_id
+                        and tc1.cd              = '1' -- GIA-SP
+                        and em.id               = nf.empresa_id
+                        and ps.id               = em.pessoa_id
+                        and ci.id               = ps.cidade_id
+                        and et.id               = ci.estado_id
+                        and ct.cidade_id        = ci.id
+                        and tc.id               = ct.tipocodarq_id
+                        and tc.cd               = '1' -- GIA-SP
+                        and inf.cfop_id         = c.id
+                        -- Para não considerar os registros relacionados à tabela inf_valor_agreg.
+                        and not exists (select 1
+                                          from inf_valor_agreg iva, item i
+                                         where iva.item_id    = i.id
+                                           and i.id           = inf.item_id
+                                           and iva.dm_st_proc = 1)
+                      group by nf.empresa_id, nf.pessoa_id,
+                               dg.cd,
+                               ci.ibge_cidade,
+                               decode(nf.dm_ind_emit, 0, cid.ibge_cidade, ci.ibge_cidade),
+                               es.id
+                     --
+                     UNION  -- Origem_dado_pessoa - Documento Fiscal
+                     --
+                     select nf.empresa_id, nf.pessoa_id,
+                            dg.cd coddip_empresa,
+                            null item_id,
+                            case
+                              when trim(dg.cd) = '2.5' then
+                                ci.ibge_cidade
+                               else
+                                decode(nf.dm_ind_emit, 0, cid.ibge_cidade, ci.ibge_cidade)
+                            end municipio_empresa,                   
+                            sum(case
+                                  when trim(dg.cd) = '2.5' then
+                                   case
+                                     when es.sigla_estado = 'SP' then
+                                      case
+                                        when et.sigla_estado = 'SP' then
+                                         inf.vl_item_bruto
+                                        else
+                                         1
+                                      end
+                                     else
+                                      0
+                                   end
+                                  else
+                                   case
+                                     when (nvl(pdg.perc_rateio_item, 0) = 0 
+                                           and (c.tipooperacao_id not in (select t.id from tipo_operacao t where t.cd = 3)
+                                               and nf.dm_fin_nfe in (1,2) --NF-e normal NF-e complementar --#74544
+                                               )
+                                           ) then  
+                                            (nvl(inf.vl_item_bruto, 0) +
+                                             nvl(inf.vl_frete, 0) +
+                                             nvl(inf.vl_seguro, 0) + nvl(inf.vl_outro, 0) +
+                                             (select nvl(sum(nvl(imp.vl_imp_trib, 0)), 0)
+                                                from imp_itemnf imp, tipo_imposto ti
+                                               where imp.itemnf_id = inf.id
+                                                 and imp.tipoimp_id = ti.id
+                                                 and ti.cd in (2, 3, 7))) -
+                                                   nvl(inf.vl_desc, 0)
+                                     when (c.tipooperacao_id not in (select t.id from tipo_operacao t where t.cd = 3)
+                                           and nf.dm_fin_nfe in (1,2) --NF-e normal NF-e complementar --#74544
+                                           ) then 
+                                            ((nvl(inf.vl_item_bruto, 0) +
+                                              nvl(inf.vl_frete, 0) + nvl(inf.vl_seguro, 0) +
+                                              nvl(inf.vl_outro, 0) +
+                                              (select nvl(sum(nvl(imp.vl_imp_trib, 0)), 0)
+                                                 from imp_itemnf imp, tipo_imposto ti
+                                                where imp.itemnf_id = inf.id
+                                                  and imp.tipoimp_id = ti.id
+                                                  and ti.cd in (2, 3, 7))) -
+                                              nvl(inf.vl_desc, 0)) *
+                                                    nvl(pdg.perc_rateio_item, 0) / 100
+                                     else
+                                      0
+                                   end
+                                end)
+                            -
+                            sum(case
+                                  when trim(dg.cd) = '2.5' then
+                                   case
+                                     when es.sigla_estado = 'SP' then
+                                      case
+                                        when et.sigla_estado = 'SP' then
+                                         inf.vl_item_bruto
+                                        else
+                                         1
+                                      end
+                                     else
+                                      0
+                                   end
+                                  else
+                                   case
+                                     when (nvl(pdg.perc_rateio_item, 0) = 0 
+                                           and (c.tipooperacao_id in (select t.id from tipo_operacao t where t.cd = 3)
+                                             or nf.dm_fin_nfe = 4 --NF-e normal NF-e complementar --#74544
+                                             )
+                                           ) then
+                                            (nvl(inf.vl_item_bruto, 0) +
+                                             nvl(inf.vl_frete, 0) +
+                                             nvl(inf.vl_seguro, 0) + nvl(inf.vl_outro, 0) +
+                                             (select nvl(sum(nvl(imp.vl_imp_trib, 0)), 0)
+                                                from imp_itemnf imp, tipo_imposto ti
+                                               where imp.itemnf_id = inf.id
+                                                 and imp.tipoimp_id = ti.id
+                                                 and ti.cd in (2, 3, 7))) -
+                                                   nvl(inf.vl_desc, 0)
+                                     when (c.tipooperacao_id in (select t.id from tipo_operacao t where t.cd = 3)
+                                             or nf.dm_fin_nfe = 4 --NF-e normal NF-e complementar --#74544
+                                             ) then
+                                            ((nvl(inf.vl_item_bruto, 0) +
+                                              nvl(inf.vl_frete, 0) + nvl(inf.vl_seguro, 0) +
+                                              nvl(inf.vl_outro, 0) +
+                                              (select nvl(sum(nvl(imp.vl_imp_trib, 0)), 0)
+                                                 from imp_itemnf imp, tipo_imposto ti
+                                                where imp.itemnf_id = inf.id
+                                                  and imp.tipoimp_id = ti.id
+                                                  and ti.cd in (2, 3, 7))) -
+                                              nvl(inf.vl_desc, 0)) *
+                                                    nvl(pdg.perc_rateio_item, 0) / 100
+                                     else
+                                      0
+                                   end
+                                      end) valor,
+                            es.id estado_id                         
+                       from TMP_NOTA_FISCAL      nf,
+                            nota_fiscal_dest     nfd,
+                            mod_fiscal           mf,
+                            TMP_ITEM_NOTA_FISCAL inf,
+                            param_dipamgia       pdg,
+                            dipam_gia            dg,
+                            cidade               cid,
+                            estado               es,
+                            cidade_tipo_cod_arq  ct1,
+                            tipo_cod_arq         tc1,
+                            empresa              em,
+                            pessoa               ps,
+                            cidade               ci,
+                            estado               et,
+                            cidade_tipo_cod_arq  ct,
+                            tipo_cod_arq         tc,
+                            cfop                 c
+                      where gn_origem_dado_pessoa = 1 -- Dados da nota_fiscal_dest
+                        and nf.empresa_id       = 2
+                        and nf.dm_arm_nfe_terc  = 0
+                        and nf.dm_st_proc       = 4 -- Autorizada
+                        and ((nf.dm_ind_emit = 1 and to_date(nvl(nf.dt_sai_ent, nf.dt_emiss), 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
+                              or
+                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 1 and to_date(nf.dt_emiss, 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
+                              or
+                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 0 and to_date(nf.dt_emiss, 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
+                              or
+                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 1 and to_date(nvl(nf.dt_sai_ent, nf.dt_emiss), 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim))
+                        and mf.id               = nf.modfiscal_id
+                        and mf.cod_mod          in ('01', '1B', '04', '55', '65')
+                        and inf.notafiscal_id   = nf.id
+                        and pdg.empresa_id      = nf.empresa_id
+                        and pdg.cfop_id         = inf.cfop_id
+                        and (pdg.item_id = inf.item_id or pdg.ncm_id in (select n.id from ncm n where n.cod_ncm = inf.cod_ncm))
+                        and dg.id               = pdg.dipamgia_id
+                        and nfd.notafiscal_id   = nf.id
+                        and cid.ibge_cidade     = nfd.cidade_ibge
+                        and es.id               = cid.estado_id
+                        and ct1.cidade_id       = cid.id
+                        and tc1.id              = ct1.tipocodarq_id
+                        and tc1.cd              = '1' -- GIA-SP
+                        and em.id               = nf.empresa_id
+                        and ps.id               = em.pessoa_id
+                        and ci.id               = ps.cidade_id
+                        and et.id               = ci.estado_id
+                        and ct.cidade_id        = ci.id
+                        and tc.id               = ct.tipocodarq_id
+                        and tc.cd               = '1' -- GIA-SP
+                        and inf.cfop_id         = c.id
+                        -- Para não considerar os registros relacionados à tabela inf_valor_agreg.
+                        and not exists (select 1
+                                          from inf_valor_agreg iva, item i
+                                         where iva.item_id    = i.id
+                                           and i.id           = inf.item_id
+                                           and iva.dm_st_proc = 1)
+                      group by nf.empresa_id, nf.pessoa_id,
+                               dg.cd,
+                               ci.ibge_cidade,
+                               decode(nf.dm_ind_emit, 0, cid.ibge_cidade, ci.ibge_cidade),
+                               es.id
+                    )
+              where pk_csf_gia.fkg_dipam_22_pessoa_juridica( coddip_empresa, empresa_id, pessoa_id ) = 1
+              group by coddip_empresa, municipio_empresa, estado_id, item_id
+             --
              union
              -- Conhecimento de Transporte
              -- cursor c_cr_30_ct is   /*GIA SP*/
-             select c.ibge_cidade  mun,
+             select 'SPDIPAM23' cod_dipam,
                     null item_id,
-                     sum(  case
+                    c.ibge_cidade  mun,
+                    sum(  case
                               when ct.dm_ind_emit = 0 and
                                   (
                                      ( cfop.cd between 5351 and 5399 ) or
@@ -26108,7 +26255,6 @@ is
                               then ctv.vl_prest_serv else 0
                            end
                         )/*vlr_part_2*/ valor,
-                    'SPDIPAM23' cod_dipam,
                     null estado_id
                 --
                 from TMP_CONHEC_TRANSP         ct,
@@ -26137,13 +26283,13 @@ is
                and ct.dm_st_proc           = 4 --#55532
                --
                and ct.empresa_id           = gt_row_abertura_efd.empresa_id
-               and ((ct.dm_ind_emit = 1 and trunc(nvl(ct.dt_sai_ent,ct.dt_hr_emissao)) between trunc(gt_row_abertura_efd.dt_ini) and trunc(gt_row_abertura_efd.dt_fim) )
+               and ((ct.dm_ind_emit = 1 and to_date(nvl(ct.dt_sai_ent,ct.dt_hr_emissao), 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim )
                      or
-                    (ct.dm_ind_emit = 0 and ct.dm_ind_oper = 1 and trunc(ct.dt_hr_emissao) between trunc(gt_row_abertura_efd.dt_ini) and trunc(gt_row_abertura_efd.dt_fim) )
+                    (ct.dm_ind_emit = 0 and ct.dm_ind_oper = 1 and to_date(ct.dt_hr_emissao, 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim )
                      or
-                    (ct.dm_ind_emit = 0 and ct.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 0 and trunc(ct.dt_hr_emissao) between trunc(gt_row_abertura_efd.dt_ini) and trunc(gt_row_abertura_efd.dt_fim) )
+                    (ct.dm_ind_emit = 0 and ct.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 0 and to_date(ct.dt_hr_emissao, 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim )
                      or
-                    (ct.dm_ind_emit = 0 and ct.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 1 and trunc(nvl(ct.dt_sai_ent, ct.dt_hr_emissao)) between trunc(gt_row_abertura_efd.dt_ini) and trunc(gt_row_abertura_efd.dt_fim) ) )
+                    (ct.dm_ind_emit = 0 and ct.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 1 and to_date(nvl(ct.dt_sai_ent, ct.dt_hr_emissao), 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim ) )
                --
                and (  -- parte 1
                       ( cfop.cd between 5351 and 5399 ) or
@@ -26156,7 +26302,6 @@ is
           )
        where nvl(valor,0) > 0
        order by mun;
-   --
    --
 begin
    --
