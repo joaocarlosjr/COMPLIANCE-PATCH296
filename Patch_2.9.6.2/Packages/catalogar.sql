@@ -65,6 +65,11 @@ prompt 666b_pk_gera_lucro_expl
 @@666b_pk_gera_lucro_expl.pkb
 show err
 
+prompt 668a_pk_rel_lucro_expl
+@@668a_pk_rel_lucro_expl.pks
+show err
+prompt 668b_pk_rel_lucro_expl
+@@668b_pk_rel_lucro_expl.pkb
 show err
 
 show err
