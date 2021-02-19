@@ -4,6 +4,20 @@ prompt Catalogar Packages
 
 prompt -----------------------------------------------------------------------------------
 
+prompt 40a_CT_CSF_OWN_pk_csf_api_ct
+@@40a_CT_CSF_OWN_pk_csf_api_ct.pks
+show err
+prompt 40b_CT_CSF_OWN_pk_csf_api_ct
+@@40b_CT_CSF_OWN_pk_csf_api_ct.pkb
+show err
+
+prompt 42a_csf_own_pk_integr_view_ct
+@@42a_csf_own_pk_integr_view_ct.pks
+show err
+prompt 42b_csf_own_pk_integr_view_ct
+@@42b_csf_own_pk_integr_view_ct.pkb
+show err
+
 prompt 54a_pk_gera_arq_ecd
 @@54a_pk_gera_arq_ecd.pks
 show err
