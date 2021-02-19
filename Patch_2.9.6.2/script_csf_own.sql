@@ -1098,6 +1098,62 @@ end;
 Prompt FIM Redmine #74016 - Criar DT_EXE_SERV no conhecimento de transporte
 -------------------------------------------------------------------------------------------------------------------------------
 
+-------------------------------------------------------------------------------------------------------------------------------
+Prompt INI Redmine #73922 - Estrutura de tabelas
+-------------------------------------------------------------------------------------------------------------------------------
+
+@@73922_01_Nova_tab_FORMULA_COD_DIN_LUCEXP.sql
+/
+
+@@73922_02_Nova_tab_COD_DIN_LUCR_EXPR.sql
+/
+
+@@73922_03_Nova_tab_ITFORMULA_COD_DIN_LUCEXP.sql
+/
+
+@@73922_04_Nova_tab_PAR_DP_CODDIN_CTA_LUCEXP.sql
+/
+
+@@73922_05_Nova_tab_CRIT_PESQ_SLD_LUCR_EXPL.sql
+/
+
+@@73922_06_Nova_tab_CRIT_PESQ_LCTO_LUCR_EXPL.sql
+/
+
+@@73922_07_Nova_tab_PER_LUCR_EXPL.sql
+/
+
+@@73922_08_Nova_tab_APUR_LUCRO_EXPL.sql
+/
+
+@@73922_09_Nova_tab_MEM_CALC_LUCRO_EXPL.sql
+/
+
+@@73922_10_Nova_tab_PARAM_REC_LUCR_EXPL.sql
+/
+
+@@73922_11_Nova_tab_REC_UNID_LUCR_EXP.sql
+/
+
+@@73922_12_Nova_tab_CALC_LUCRO_EXPL.sql
+/
+
+@@73922_13_Nova_tab_CALC_BENEF_LUCRO_EXPL.sql
+/
+
+@@73922_14_Nova_tab_REL_CALC_LUCR_EXPLR.sql
+/
+
+@@73922_15_Nova_tab_REL_DISTR_ATV_LUCR_EXPLR.sql
+/
+
+@@73922_16_Cria_dominios.sql
+/
+
+--------------------------------------------------------------------------------------------------------------------------------------
+Prompt INI Redmine #73922 - Estrutura de tabelas
+--------------------------------------------------------------------------------------------------------------------------------------
+
 ----------------------------------------------------------------------------------------
 Prompt FIM Patch 2.9.6.2 - Alteracoes no CSF_OWN
 ------------------------------------------------------------------------------------------
