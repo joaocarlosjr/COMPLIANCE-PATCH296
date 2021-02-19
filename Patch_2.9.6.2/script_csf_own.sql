@@ -14,16 +14,15 @@ insert into csf_own.versao_sistema ( ID
 
 commit
 /
-
 -------------------------------------------------------------------------------------------------------------------------------
-Prompt INI - Redmine #75477 -  Criação de Job Scheduler JOB_CORRIGIR_NF_CT
+Prompt INI - Redmine #75477 -  Criaï¿½ï¿½o de Job Scheduler JOB_CORRIGIR_NF_CT
 -------------------------------------------------------------------------------------------------------------------------------
 
 DECLARE 
   vn_cont NUMBER;
 BEGIN
   --
-  -- Verifica se o Job JOB_CORRIGIR_NF_CT já foi criado, caso existir sai da rotina
+  -- Verifica se o Job JOB_CORRIGIR_NF_CT jï¿½ foi criado, caso existir sai da rotina
   BEGIN
     SELECT COUNT(1)
       INTO vn_cont
@@ -53,8 +52,108 @@ EXCEPTION
 END;
 /
 -------------------------------------------------------------------------------------------------------------------------------
-Prompt FIM - Redmine #75477 -  Criação de Job Scheduler JOB_CORRIGIR_NF_CT
+Prompt FIM - Redmine #75477 -  Criaï¿½ï¿½o de Job Scheduler JOB_CORRIGIR_NF_CT
 -------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------
+Prompt INI - Redmine #75898 Criaï¿½ï¿½o de padrï¿½o NFem a adiï¿½ï¿½o de Joinville-SC ao padrï¿½o
+-------------------------------------------------------------------------------------------------------------------------------------------
+--
+--CIDADE  : Joinville - SC
+--IBGE    : 4209102
+--PADRAO  : NFem
+--HABIL   : SIM
+--WS_CANC : SIM
+
+declare 
+   --   
+   -- dm_tp_amb (Tipo de Ambiente 1-Producao; 2-Homologacao)
+   cursor c_dados is
+      select   ( select id from csf_own.cidade where ibge_cidade = '4209102' ) id, dm_situacao,  versao,  dm_tp_amb,  dm_tp_soap,  dm_tp_serv, descr, url_wsdl, dm_upload, dm_ind_emit 
+        from ( --Produï¿½ï¿½o
+			   select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geraï¿½ï¿½o de NFS-e'                               descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepï¿½ï¿½o e Processamento de lote de RPS'        descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situaï¿½ï¿½o de lote de RPS'            descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituiï¿½ï¿½o de NFS-e'                          descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               --Homologaï¿½ï¿½o
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geraï¿½ï¿½o de NFS-e'                               descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepï¿½ï¿½o e Processamento de lote de RPS'        descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situaï¿½ï¿½o de lote de RPS'            descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituiï¿½ï¿½o de NFS-e'                          descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual
+              );
+--   
+begin   
+   --
+      for rec_dados in c_dados loop
+         exit when c_dados%notfound or (c_dados%notfound) is null;
+         --
+         begin  
+            insert into csf_own.cidade_webserv_nfse (  id
+                                                    ,  cidade_id
+                                                    ,  dm_situacao
+                                                    ,  versao
+                                                    ,  dm_tp_amb
+                                                    ,  dm_tp_soap
+                                                    ,  dm_tp_serv
+                                                    ,  descr
+                                                    ,  url_wsdl
+                                                    ,  dm_upload
+                                                    ,  dm_ind_emit  )    
+                                             values (  csf_own.cidadewebservnfse_seq.nextval
+                                                    ,  rec_dados.id
+                                                    ,  rec_dados.dm_situacao
+                                                    ,  rec_dados.versao
+                                                    ,  rec_dados.dm_tp_amb
+                                                    ,  rec_dados.dm_tp_soap
+                                                    ,  rec_dados.dm_tp_serv
+                                                    ,  rec_dados.descr
+                                                    ,  rec_dados.url_wsdl
+                                                    ,  rec_dados.dm_upload
+                                                    ,  rec_dados.dm_ind_emit  ); 
+            --
+            commit;        
+            --
+         exception  
+            when dup_val_on_index then 
+               begin 
+                  update csf_own.cidade_webserv_nfse 
+                     set versao      = rec_dados.versao
+                       , dm_tp_soap  = rec_dados.dm_tp_soap
+                       , descr       = rec_dados.descr
+                       , url_wsdl    = rec_dados.url_wsdl
+                       , dm_upload   = rec_dados.dm_upload
+                   where cidade_id   = rec_dados.id 
+                     and dm_tp_amb   = rec_dados.dm_tp_amb 
+                     and dm_tp_serv  = rec_dados.dm_tp_serv 
+                     and dm_ind_emit = rec_dados.dm_ind_emit; 
+                  --
+                  commit; 
+                  --
+               exception when others then 
+                  raise_application_error(-20101, 'Erro no script Redmine #75898 Atualizaï¿½ï¿½o URL ambiente de homologaï¿½ï¿½o e Produï¿½ï¿½o Joinville - SC' || sqlerrm);
+               end; 
+               --
+         end;
+         -- 
+      --
+      end loop;
+   --
+   commit;
+   --
+exception
+   when others then
+      raise_application_error(-20102, 'Erro no script Redmine #75898 Atualizaï¿½ï¿½o URL ambiente de homologaï¿½ï¿½o e Produï¿½ï¿½o Joinville - SC' || sqlerrm);
 
 -------------------------------------------------------------------------------------------------------------------------------
 Prompt INI Redmine #75193 - Adicionar campo EMPRESA_FORMA_TRIB.PERC_RED_IR
@@ -86,7 +185,7 @@ begin
       -- 
       -- Add comments to the table   
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.EMPRESA_FORMA_TRIB.perc_red_ir is ''Percentual de Redução de IR para atividades incentivadas''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.EMPRESA_FORMA_TRIB.perc_red_ir is ''Percentual de Reduï¿½ï¿½o de IR para atividades incentivadas''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao alterar comentario de EMPRESA_FORMA_TRIB - '||SQLERRM );
@@ -133,7 +232,7 @@ begin
       -- 
       -- Add comments to the table   
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP.dt_exe_serv is ''Data de competência ou em que serviço foi executado''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP.dt_exe_serv is ''Data de competï¿½ncia ou em que serviï¿½o foi executado''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao alterar comentario de CONHEC_TRANSP - '||SQLERRM );
@@ -195,7 +294,7 @@ begin
                                          values( csf_own.objutilintegr_seq.nextval
                                                , (select oi.id from csf_own.obj_util_integr oi where oi.obj_name = 'VW_CSF_CONHEC_TRANSP_FF')
                                                , 'DT_EXE_SERV'
-                                               , 'Data de competência ou em que serviço foi executado'
+                                               , 'Data de competï¿½ncia ou em que serviï¿½o foi executado'
                                                , 0
                                                , 10
                                                , 0
@@ -203,7 +302,7 @@ begin
       exception
          when dup_val_on_index then
             update csf_own.ff_obj_util_integr ff
-               set ff.descr         = 'Data de competência ou em que serviço foi executado'
+               set ff.descr         = 'Data de competï¿½ncia ou em que serviï¿½o foi executado'
                  , ff.dm_tipo_campo = 0
                  , ff.tamanho       = 10
                  , ff.qtde_decimal  = 0
@@ -223,7 +322,7 @@ Prompt FIM Redmine #74016 - Criar DT_EXE_SERV no conhecimento de transporte
 -------------------------------------------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------------------------------------------
-Prompt INI Redmine #73063 - Alterações para emissão de conhecimento de transporte.
+Prompt INI Redmine #73063 - Alteraï¿½ï¿½es para emissï¿½o de conhecimento de transporte.
 -------------------------------------------------------------------------------------------------------------------------------
  
 declare
@@ -271,21 +370,21 @@ begin
       END;	  
       --
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.dm_st_integra is ''Situação de Integração: 0 - Indefinido, 2 - Integrado via arquivo texto (IN), 7 - Integração por view de banco de dados, 8 - Inserida a resposta do CTe para o ERP, 9 - Atualizada a resposta do CTe para o ERP''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.dm_st_integra is ''Situaï¿½ï¿½o de Integraï¿½ï¿½o: 0 - Indefinido, 2 - Integrado via arquivo texto (IN), 7 - Integraï¿½ï¿½o por view de banco de dados, 8 - Inserida a resposta do CTe para o ERP, 9 - Atualizada a resposta do CTe para o ERP''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao criar comentario de CONHEC_TRANSP_CCE - '||SQLERRM );
       END;	  
       --	  
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.dm_st_proc is ''Situação: 0-Não Validado; 1-Validado; 2-Aguardando Envio; 3-Processado; 4-Erro de validação; 5-Rejeitada''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.dm_st_proc is ''Situaï¿½ï¿½o: 0-Nï¿½o Validado; 1-Validado; 2-Aguardando Envio; 3-Processado; 4-Erro de validaï¿½ï¿½o; 5-Rejeitada''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao criar comentario de CONHEC_TRANSP_CCE - '||SQLERRM );
       END;	  
       --
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.id_tag_chave is ''Identificador da TAG a ser assinada, a regra de formação do Id é: ID + tpEvento + chave do CT-e + nSeqEvento''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.id_tag_chave is ''Identificador da TAG a ser assinada, a regra de formaï¿½ï¿½o do Id ï¿½: ID + tpEvento + chave do CT-e + nSeqEvento''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao criar comentario de CONHEC_TRANSP_CCE - '||SQLERRM );
@@ -306,70 +405,70 @@ begin
       END;	  
       --
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.correcao is ''Correção a ser considerada, texto livre. A correção mais recente substitui as anteriores''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.correcao is ''Correï¿½ï¿½o a ser considerada, texto livre. A correï¿½ï¿½o mais recente substitui as anteriores''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao criar comentario de CONHEC_TRANSP_CCE - '||SQLERRM );
       END;	  
       --
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.versao_leiaute is ''Versão do leiaute do evento''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.versao_leiaute is ''Versï¿½o do leiaute do evento''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao criar comentario de CONHEC_TRANSP_CCE - '||SQLERRM );
       END;	  
       --
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.versao_evento is ''Versão do evento''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.versao_evento is ''Versï¿½o do evento''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao criar comentario de CONHEC_TRANSP_CCE - '||SQLERRM );
       END;	  
       --
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.versao_cce is ''Versão da carta de correção''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.versao_cce is ''Versï¿½o da carta de correï¿½ï¿½o''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao criar comentario de CONHEC_TRANSP_CCE - '||SQLERRM );
       END;	  
       --
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.versao_aplic is ''Versão da aplicação que processou o evento''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.versao_aplic is ''Versï¿½o da aplicaï¿½ï¿½o que processou o evento''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao criar comentario de CONHEC_TRANSP_CCE - '||SQLERRM );
       END;	  
       --
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.cod_msg_cab is ''Código do status da resposta Cabeçalho''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.cod_msg_cab is ''Cï¿½digo do status da resposta Cabeï¿½alho''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao criar comentario de CONHEC_TRANSP_CCE - '||SQLERRM );
       END;	  
       --
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.motivo_resp_cab is ''Descrição do status da resposta Cabeçalho''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.motivo_resp_cab is ''Descriï¿½ï¿½o do status da resposta Cabeï¿½alho''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao criar comentario de CONHEC_TRANSP_CCE - '||SQLERRM );
       END;	  
       --
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.msgwebserv_id_cab is ''ID relacionado a tabela MSG_WEB_SERV para cabeçalho do retorno''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.msgwebserv_id_cab is ''ID relacionado a tabela MSG_WEB_SERV para cabeï¿½alho do retorno''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao criar comentario de CONHEC_TRANSP_CCE - '||SQLERRM );
       END;	  
       --
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.cod_msg is ''Código do status da resposta''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.cod_msg is ''Cï¿½digo do status da resposta''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao criar comentario de CONHEC_TRANSP_CCE - '||SQLERRM );
       END;	  
       --
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.motivo_resp is ''Descrição do status da resposta''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.motivo_resp is ''Descriï¿½ï¿½o do status da resposta''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao criar comentario de CONHEC_TRANSP_CCE - '||SQLERRM );
@@ -390,7 +489,7 @@ begin
       END;	  
       --
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.nro_protocolo is ''Número do Protocolo do Evento da CC-e''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.nro_protocolo is ''Nï¿½mero do Protocolo do Evento da CC-e''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao criar comentario de CONHEC_TRANSP_CCE - '||SQLERRM );
@@ -425,7 +524,7 @@ begin
       END;	  
       --
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.dm_download_xml_sic is ''Donwload XML pelo SIC: 0-Não; 1-Sim''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP_CCE.dm_download_xml_sic is ''Donwload XML pelo SIC: 0-Nï¿½o; 1-Sim''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao criar comentario de CONHEC_TRANSP_CCE - '||SQLERRM );
@@ -611,12 +710,12 @@ begin
                                   )
                            values ( 'CONHEC_TRANSP_CCE.DM_ST_INTEGRA'
                                   , '7'
-                                  , 'Integração por view de banco de dados'
+                                  , 'Integraï¿½ï¿½o por view de banco de dados'
                                   , csf_own.dominio_seq.nextval);
    exception
       when others then
          update csf_own.dominio
-            set descr = 'Integração por view de banco de dados'           
+            set descr = 'Integraï¿½ï¿½o por view de banco de dados'           
           where dominio = 'CONHEC_TRANSP_CCE.DM_ST_INTEGRA'
             and vl = '7';
    end;		
@@ -665,12 +764,12 @@ begin
                                   )
                            values ( 'CONHEC_TRANSP_CCE.DM_ST_PROC'
                                   , '0'
-                                  , 'Não Validado'
+                                  , 'Nï¿½o Validado'
                                   , csf_own.dominio_seq.nextval);
    exception
       when others then
          update csf_own.dominio
-            set descr = 'Não Validado'           
+            set descr = 'Nï¿½o Validado'           
           where dominio = 'CONHEC_TRANSP_CCE.DM_ST_PROC'
             and vl = '0';
    end;	
@@ -737,12 +836,12 @@ begin
                                   )
                            values ( 'CONHEC_TRANSP_CCE.DM_ST_PROC'
                                   , '4'
-                                  , 'Erro de validação'
+                                  , 'Erro de validaï¿½ï¿½o'
                                   , csf_own.dominio_seq.nextval);
    exception
       when others then
          update csf_own.dominio
-            set descr = 'Erro de validação'           
+            set descr = 'Erro de validaï¿½ï¿½o'           
           where dominio = 'CONHEC_TRANSP_CCE.DM_ST_PROC'
             and vl = '4';
    end;    
@@ -771,6 +870,337 @@ end;
 /
 
 declare
+vn_count integer;
+--
+begin
+  ---
+  vn_count:=0;
+  ---
+  begin
+    select count(1) into vn_count
+    from  all_constraints 
+    where owner = 'CSF_OWN'
+      and constraint_name = 'CIDADENFSE_DMPADRAO_CK';
+  exception
+    when others then
+      vn_count:=0;
+  end;
+  ---
+  if vn_count = 1 then
+     begin  
+		execute immediate 'alter table CSF_OWN.CIDADE_NFSE drop constraint CIDADENFSE_DMPADRAO_CK';
+		execute immediate 'alter table CSF_OWN.CIDADE_NFSE add constraint CIDADENFSE_DMPADRAO_CK check (dm_padrao in (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45))';
+	 exception 
+		when others then
+			null;
+	 end;
+  elsif  vn_count = 0 then    
+     begin
+		execute immediate 'alter table CSF_OWN.CIDADE_NFSE add constraint CIDADENFSE_DMPADRAO_CK check (dm_padrao in (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45))';
+	 exception 
+		when others then
+			null;
+	 end;
+  end if;
+  --
+  commit;  
+  --
+  begin
+	  insert into CSF_OWN.DOMINIO (  dominio
+								  ,  vl
+								  ,  descr
+								  ,  id  )    
+						   values (  'CIDADE_NFSE.DM_PADRAO'
+								  ,  '45'
+								  ,  'NFem'
+								  ,  CSF_OWN.DOMINIO_SEQ.NEXTVAL  ); 
+	  --
+	  commit;        
+	  --
+  exception  
+      when dup_val_on_index then 
+          begin 
+              update CSF_OWN.DOMINIO 
+                 set vl      = '45'
+               where dominio = 'CIDADE_NFSE.DM_PADRAO'
+                 and descr   = 'NFem'; 
+	  	      --
+              commit; 
+              --
+           exception when others then 
+                raise_application_error(-20101, 'Erro no script Redmine #75898 Adicionar Padrï¿½o para emissï¿½o de NFS-e (NFem)' || sqlerrm);
+             --
+          end;
+  end; 
+end;			
+/
+ 
+declare
+--
+vn_dm_tp_amb1  number  := 0;
+vn_dm_tp_amb2  number  := 0;
+vv_ibge_cidade csf_own.cidade.ibge_cidade%type;
+vv_padrao      csf_own.dominio.descr%type;    
+vv_habil       csf_own.dominio.descr%type;
+vv_ws_canc     csf_own.dominio.descr%type;
+
+--
+Begin
+	-- Popula variï¿½veis
+	vv_ibge_cidade := '4209102';
+	vv_padrao      := 'NFem';     
+	vv_habil       := 'SIM';
+	vv_ws_canc     := 'SIM';
+
+    begin
+      --
+      SELECT count(*)
+        into vn_dm_tp_amb1
+        from csf_own.empresa
+       where dm_tp_amb = 1
+       group by dm_tp_amb;
+      exception when others then
+        vn_dm_tp_amb1 := 0; 
+      --
+    end;
+   --
+    Begin
+      --
+      SELECT count(*)
+        into vn_dm_tp_amb2
+        from csf_own.empresa
+       where dm_tp_amb = 2
+       group by dm_tp_amb;
+      --
+	  exception when others then 
+        vn_dm_tp_amb2 := 0;
+     --
+    end;
+--
+	if vn_dm_tp_amb2 > vn_dm_tp_amb1 then
+	  --
+	  begin
+	    --  
+	    update csf_own.cidade_webserv_nfse
+		   set url_wsdl = 'DESATIVADO AMBIENTE DE PRODUCAO'
+	     where cidade_id in (select id
+							   from csf_own.cidade
+							  where ibge_cidade in (vv_ibge_cidade))
+		   and dm_tp_amb = 1;
+	  exception 
+		 when others then
+		   null;
+	  end;
+	  --  
+	  commit;
+	  --
+	end if;
+--
+	begin
+		--
+		update csf_own.cidade_nfse set dm_padrao    = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_padrao') and upper(descr) = upper(vv_padrao))
+								       , dm_habil   = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_habil') and upper(descr) = upper(vv_habil))
+								       , dm_ws_canc = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_ws_canc') and upper(descr) = upper(vv_ws_canc))
+         where cidade_id = (select distinct id from csf_own.cidade where ibge_cidade in (vv_ibge_cidade));
+		exception when others then
+			raise_application_error(-20103, 'Erro no script Redmine #75898 Atualizaï¿½ï¿½o do Padrï¿½o Joinville - SC' || sqlerrm);
+    end;
+	--
+	commit;
+	--
+--
+end;
+--
+/  
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Prompt FIM - Redmine #75898 Criaï¿½ï¿½o de padrï¿½o NFem a adiï¿½ï¿½o de Joinville-SC ao padrï¿½o
+-------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------
+Prompt INI - Redmine #75749 Sincronizaï¿½ï¿½o dos scripts Padrï¿½o Tinus Goiana - PE
+-------------------------------------------------------------------------------------------------------------------------------------------
+--
+--CIDADE  : Goiana - PE
+--IBGE    : 2606200
+--PADRAO  : Tinus
+--HABIL   : SIM
+--WS_CANC : SIM
+
+declare 
+   --   
+   -- dm_tp_amb (Tipo de Ambiente 1-Producao; 2-Homologacao)
+   cursor c_dados is
+      select   ( select id from csf_own.cidade where ibge_cidade = '2606200' ) id, dm_situacao,  versao,  dm_tp_amb,  dm_tp_soap,  dm_tp_serv, descr, url_wsdl, dm_upload, dm_ind_emit 
+        from ( --Produï¿½ï¿½o
+			   select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geraï¿½ï¿½o de NFS-e'                               descr, 'http://www.tinus.com.br/csp/goiana/WSNFSE.RecepcionarLoteRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepï¿½ï¿½o e Processamento de lote de RPS'        descr, 'http://www.tinus.com.br/csp/goiana/WSNFSE.RecepcionarLoteRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situaï¿½ï¿½o de lote de RPS'            descr, 'http://www.tinus.com.br/csp/goiana/WSNFSE.ConsultarSituacaoLoteRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'http://www.tinus.com.br/csp/goiana/WSNFSE.ConsultarNfsePorRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'http://www.tinus.com.br/csp/goiana/WSNFSE.ConsultarNfse.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'http://www.tinus.com.br/csp/goiana/WSNFSE.CancelarNfse.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituiï¿½ï¿½o de NFS-e'                          descr, 'http://www.tinus.com.br/csp/goiana/WSNFSE.RecepcionarLoteRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'http://www.tinus.com.br/csp/goiana/WSNFSE.RecepcionarLoteRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'http://www.tinus.com.br/csp/goiana/WSNFSE.RecepcionarLoteRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'http://www.tinus.com.br/csp/goiana/WSNFSE.ConsultarLoteRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               --Homologaï¿½ï¿½o
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geraï¿½ï¿½o de NFS-e'                               descr, 'http://www2.tinus.com.br/csp/testegoi/WSNFSE.RecepcionarLoteRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepï¿½ï¿½o e Processamento de lote de RPS'        descr, 'http://www2.tinus.com.br/csp/testegoi/WSNFSE.RecepcionarLoteRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situaï¿½ï¿½o de lote de RPS'            descr, 'http://www2.tinus.com.br/csp/testegoi/WSNFSE.ConsultarSituacaoLoteRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'http://www2.tinus.com.br/csp/testegoi/WSNFSE.ConsultarNfsePorRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'http://www2.tinus.com.br/csp/testegoi/WSNFSE.ConsultarNfse.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'http://www2.tinus.com.br/csp/testegoi/WSNFSE.CancelarNfse.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituiï¿½ï¿½o de NFS-e'                          descr, 'http://www2.tinus.com.br/csp/testegoi/WSNFSE.RecepcionarLoteRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'http://www2.tinus.com.br/csp/testegoi/WSNFSE.RecepcionarLoteRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'http://www2.tinus.com.br/csp/testegoi/WSNFSE.RecepcionarLoteRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'http://www2.tinus.com.br/csp/testegoi/WSNFSE.ConsultarLoteRps.CLS?WSDL=1' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual
+              );
+--   
+begin   
+   --
+      for rec_dados in c_dados loop
+         exit when c_dados%notfound or (c_dados%notfound) is null;
+         --
+         begin  
+            insert into csf_own.cidade_webserv_nfse (  id
+                                                    ,  cidade_id
+                                                    ,  dm_situacao
+                                                    ,  versao
+                                                    ,  dm_tp_amb
+                                                    ,  dm_tp_soap
+                                                    ,  dm_tp_serv
+                                                    ,  descr
+                                                    ,  url_wsdl
+                                                    ,  dm_upload
+                                                    ,  dm_ind_emit  )    
+                                             values (  csf_own.cidadewebservnfse_seq.nextval
+                                                    ,  rec_dados.id
+                                                    ,  rec_dados.dm_situacao
+                                                    ,  rec_dados.versao
+                                                    ,  rec_dados.dm_tp_amb
+                                                    ,  rec_dados.dm_tp_soap
+                                                    ,  rec_dados.dm_tp_serv
+                                                    ,  rec_dados.descr
+                                                    ,  rec_dados.url_wsdl
+                                                    ,  rec_dados.dm_upload
+                                                    ,  rec_dados.dm_ind_emit  ); 
+            --
+            commit;        
+            --
+         exception  
+            when dup_val_on_index then 
+               begin 
+                  update csf_own.cidade_webserv_nfse 
+                     set versao      = rec_dados.versao
+                       , dm_tp_soap  = rec_dados.dm_tp_soap
+                       , descr       = rec_dados.descr
+                       , url_wsdl    = rec_dados.url_wsdl
+                       , dm_upload   = rec_dados.dm_upload
+                   where cidade_id   = rec_dados.id 
+                     and dm_tp_amb   = rec_dados.dm_tp_amb 
+                     and dm_tp_serv  = rec_dados.dm_tp_serv 
+                     and dm_ind_emit = rec_dados.dm_ind_emit; 
+                  --
+                  commit; 
+                  --
+               exception when others then 
+                  raise_application_error(-20101, 'Erro no script Redmine #75749 Atualizaï¿½ï¿½o URL ambiente de homologaï¿½ï¿½o e Produï¿½ï¿½o Goiana - PE' || sqlerrm);
+               end; 
+               --
+         end;
+         -- 
+      --
+      end loop;
+   --
+   commit;
+   --
+exception
+   when others then
+      raise_application_error(-20102, 'Erro no script Redmine #75749 Atualizaï¿½ï¿½o URL ambiente de homologaï¿½ï¿½o e Produï¿½ï¿½o Goiana - PE' || sqlerrm);
+end;
+/
+
+declare
+--
+vn_dm_tp_amb1  number  := 0;
+vn_dm_tp_amb2  number  := 0;
+vv_ibge_cidade csf_own.cidade.ibge_cidade%type;
+vv_padrao      csf_own.dominio.descr%type;    
+vv_habil       csf_own.dominio.descr%type;
+vv_ws_canc     csf_own.dominio.descr%type;
+
+--
+Begin
+	-- Popula variï¿½veis
+	vv_ibge_cidade := '2606200';
+	vv_padrao      := 'Tinus';     
+	vv_habil       := 'SIM';
+	vv_ws_canc     := 'SIM';
+
+    begin
+      --
+      SELECT count(*)
+        into vn_dm_tp_amb1
+        from csf_own.empresa
+       where dm_tp_amb = 1
+       group by dm_tp_amb;
+      exception when others then
+        vn_dm_tp_amb1 := 0; 
+      --
+    end;
+   --
+    Begin
+      --
+      SELECT count(*)
+        into vn_dm_tp_amb2
+        from csf_own.empresa
+       where dm_tp_amb = 2
+       group by dm_tp_amb;
+      --
+	  exception when others then 
+        vn_dm_tp_amb2 := 0;
+     --
+    end;
+--
+	if vn_dm_tp_amb2 > vn_dm_tp_amb1 then
+	  --
+	  begin
+	    --  
+	    update csf_own.cidade_webserv_nfse
+		   set url_wsdl = 'DESATIVADO AMBIENTE DE PRODUCAO'
+	     where cidade_id in (select id
+							   from csf_own.cidade
+							  where ibge_cidade in (vv_ibge_cidade))
+		   and dm_tp_amb = 1;
+	  exception 
+		 when others then
+		   null;
+	  end;
+	  --  
+	  commit;
+	  --
+	end if;
+--
+	begin
+		--
+		update csf_own.cidade_nfse set dm_padrao    = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_padrao') and upper(descr) = upper(vv_padrao))
+								       , dm_habil   = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_habil') and upper(descr) = upper(vv_habil))
+								       , dm_ws_canc = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_ws_canc') and upper(descr) = upper(vv_ws_canc))
+         where cidade_id = (select distinct id from csf_own.cidade where ibge_cidade in (vv_ibge_cidade));
+		exception when others then
+			raise_application_error(-20103, 'Erro no script Redmine #75749 Atualizaï¿½ï¿½o do Padrï¿½o Goiana - PE' || sqlerrm);
+    end;
+	--
+	commit;
+	--
+--
+end;
+--
+/  
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Prompt FIM - Redmine #75749 Sincronizaï¿½ï¿½o dos scripts Padrï¿½o Tinus Goiana - PE
+-------------------------------------------------------------------------------------------------------------------------------------------
+------------- ---------------------------------------------------------------------------
   vn_qtde    number;
 begin
   --
@@ -814,12 +1244,12 @@ begin
                                  values ( tipoobjintegr_seq.nextval
                                         , (select o.id from csf_own.obj_integr o where o.cd = '4')
                                         , '4'
-                                        , 'Inutilização de Emissão Própria de Conhec. de Transporte'
+                                        , 'Inutilizaï¿½ï¿½o de Emissï¿½o Prï¿½pria de Conhec. de Transporte'
                                         );       
    exception
      when others then
        update csf_own.tipo_obj_integr
-          set descr = 'Inutilização de Emissão Própria de Conhec. de Transporte'
+          set descr = 'Inutilizaï¿½ï¿½o de Emissï¿½o Prï¿½pria de Conhec. de Transporte'
         where objintegr_id in (select o.id from csf_own.obj_integr o where o.cd = '4')
           and cd           = '4';       
    end; 
@@ -832,12 +1262,12 @@ begin
                                  values ( tipoobjintegr_seq.nextval
                                         , (select o.id from csf_own.obj_integr o where o.cd = '4')
                                         , '5'
-                                        , 'Carta de Correção Emissão Própria de Conhec. de Transporte'
+                                        , 'Carta de Correï¿½ï¿½o Emissï¿½o Prï¿½pria de Conhec. de Transporte'
                                         );       
    exception
      when others then
        update csf_own.tipo_obj_integr
-          set descr = 'Carta de Correção Emissão Própria de Conhec. de Transporte'
+          set descr = 'Carta de Correï¿½ï¿½o Emissï¿½o Prï¿½pria de Conhec. de Transporte'
         where objintegr_id in (select o.id from csf_own.obj_integr o where o.cd = '4')
           and cd           = '5';       
    end; 
@@ -848,11 +1278,11 @@ end;
 /
 
 --------------------------------------------------------------------------------------------------------------------------------------
-Prompt FIM Redmine Redmine #73063 - Alterações para emissão de conhecimento de transporte.
+Prompt FIM Redmine Redmine #73063 - Alteraï¿½ï¿½es para emissï¿½o de conhecimento de transporte.
 --------------------------------------------------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------------------------------------------
-Prompt INI Redmine #74444 - Pontos de correção no processo de Apuração do IRPJ e CSLL
+Prompt INI Redmine #74444 - Pontos de correï¿½ï¿½o no processo de Apuraï¿½ï¿½o do IRPJ e CSLL
 -------------------------------------------------------------------------------------------------------------------------------
 declare
    vn_modulo_id number := 0;
@@ -877,7 +1307,7 @@ begin
    if vn_modulo_id = 0 then
       --
       insert into CSF_OWN.MODULO_SISTEMA
-      values(CSF_OWN.MODULOSISTEMA_SEQ.NEXTVAL, 'CONTABIL', 'Obrigações Contábeis ECD e ECF', 'Módulo com parametros referentes as obrigações contabeis ECD E ECF (Sped Contábil e Sped ECF)')
+      values(CSF_OWN.MODULOSISTEMA_SEQ.NEXTVAL, 'CONTABIL', 'Obrigaï¿½ï¿½es Contï¿½beis ECD e ECF', 'Mï¿½dulo com parametros referentes as obrigaï¿½ï¿½es contabeis ECD E ECF (Sped Contï¿½bil e Sped ECF)')
       returning id into vn_modulo_id;
       --
    end if;
@@ -899,7 +1329,7 @@ begin
    if vn_grupo_id = 0 then
       --
       insert into CSF_OWN.GRUPO_SISTEMA
-      values(CSF_OWN.GRUPOSISTEMA_SEQ.NextVal, vn_modulo_id, 'ECF', 'PARAMETROS UTILIZADOS NA ECF', 'GRUPO COM INFORMAÇÕES DE PARAMETROS UTILIZADOS NA ECF')
+      values(CSF_OWN.GRUPOSISTEMA_SEQ.NextVal, vn_modulo_id, 'ECF', 'PARAMETROS UTILIZADOS NA ECF', 'GRUPO COM INFORMAï¿½ï¿½ES DE PARAMETROS UTILIZADOS NA ECF')
       returning id into vn_grupo_id;
       --
    end if;
@@ -925,7 +1355,7 @@ begin
       --
       if vn_param_id = 0 then
          --
-         -- Busca o usuário respondável pelo Mult_org
+         -- Busca o usuï¿½rio respondï¿½vel pelo Mult_org
          begin
             select id
               into vn_usuario_id
@@ -960,7 +1390,7 @@ begin
                , vn_modulo_id
                , vn_grupo_id
                , 'APUR_IR_CSLL_PARC_MENSAL'
-               , 'Realiza apuração parcial do IR e CSLL somente do mês e não acumulado.  Valores possíveis: N = Padrão / S = Recupera os dados de forma parcial'
+               , 'Realiza apuraï¿½ï¿½o parcial do IR e CSLL somente do mï¿½s e nï¿½o acumulado.  Valores possï¿½veis: N = Padrï¿½o / S = Recupera os dados de forma parcial'
                , 'N'
                , vn_usuario_id
                , sysdate);
@@ -976,7 +1406,7 @@ begin
 end;
 /
 --------------------------------------------------------------------------------------------------------------------------------------
-Prompt FIM Redmine #74444 - Pontos de correção no processo de Apuração do IRPJ e CSLL
+Prompt FIM Redmine #74444 - Pontos de correï¿½ï¿½o no processo de Apuraï¿½ï¿½o do IRPJ e CSLL
 -------------------------------------------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------------------------------------------
@@ -1009,7 +1439,7 @@ begin
       -- 
       -- Add comments to the table   
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP.dt_exe_serv is ''Data de competência ou em que serviço foi executado''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP.dt_exe_serv is ''Data de competï¿½ncia ou em que serviï¿½o foi executado''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao alterar comentario de CONHEC_TRANSP - '||SQLERRM );
@@ -1071,7 +1501,7 @@ begin
                                          values( csf_own.objutilintegr_seq.nextval
                                                , (select oi.id from csf_own.obj_util_integr oi where oi.obj_name = 'VW_CSF_CONHEC_TRANSP_FF')
                                                , 'DT_EXE_SERV'
-                                               , 'Data de competência ou em que serviço foi executado'
+                                               , 'Data de competï¿½ncia ou em que serviï¿½o foi executado'
                                                , 0
                                                , 10
                                                , 0
@@ -1079,7 +1509,7 @@ begin
       exception
          when dup_val_on_index then
             update csf_own.ff_obj_util_integr ff
-               set ff.descr         = 'Data de competência ou em que serviço foi executado'
+               set ff.descr         = 'Data de competï¿½ncia ou em que serviï¿½o foi executado'
                  , ff.dm_tipo_campo = 0
                  , ff.tamanho       = 10
                  , ff.qtde_decimal  = 0
