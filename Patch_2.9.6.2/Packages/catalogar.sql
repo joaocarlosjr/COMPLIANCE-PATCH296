@@ -38,11 +38,31 @@ prompt 148b_pk_csf_api_ddo.pkb
 @@148b_pk_csf_api_ddo.pkb
 show err
 
+prompt 460a_pk_csf_secf
+@@460a_pk_csf_secf.pks
+show err
+prompt 460b_pk_csf_secfl
+@@460b_pk_csf_secf.pkb
+show err
+
+prompt 467a_pk_calc_apur_lr
+@@467a_pk_calc_apur_lr.pks
+show err
+prompt 467b_pk_calc_apur_lr
+@@467b_pk_calc_apur_lr.pkb
+show err
+
 prompt 610a_pk_rel_apur_irpj_csll_parc
 @@610a_pk_rel_apur_irpj_csll_parc.pks
 show err
 prompt 610b_pk_rel_apur_irpj_csll_parc
 @@610b_pk_rel_apur_irpj_csll_parc.pkb
+
+prompt 666a_pk_gera_lucro_expl
+@@666a_pk_gera_lucro_expl.pks
+show err
+prompt 666b_pk_gera_lucro_expl
+@@666b_pk_gera_lucro_expl.pkb
 show err
 
 prompt 667_PB_CORRIGIR_PESSOA_NF_CT
