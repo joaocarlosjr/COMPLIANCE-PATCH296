@@ -1584,6 +1584,44 @@ Prompt INI Redmine #73922 - Estrutura de tabelas
 Prompt INI Redmine #73922 - Estrutura de tabelas
 --------------------------------------------------------------------------------------------------------------------------------------
 
+-------------------------------------------------------------------------------------------------------------------------------------
+Prompt INI Redmine #76385 - Inclusão da sequence ctdifaliq_seq na seq_tab
+--------------------------------------------------------------------------------------------------------------------------------------
+declare
+  --
+  vv_sql    long;
+  vn_existe number := 0;
+  --
+begin
+   BEGIN
+    SELECT COUNT(1)
+        INTO vn_existe
+      FROM CSF_OWN.SEQ_TAB
+     WHERE UPPER(SEQUENCE_NAME) = UPPER('ctdifaliq_seq');
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      vn_existe := 0;
+    WHEN OTHERS THEN
+      vn_existe := -1;
+  END;
+  --
+  IF NVL(vn_existe, 0) = 0 THEN
+    BEGIN
+         INSERT INTO CSF_OWN.SEQ_TAB (ID, SEQUENCE_NAME, TABLE_NAME)
+          VALUES (CSF_OWN.SEQTAB_SEQ.NEXTVAL, 'ctdifaliq_seq', 'CT_DIF_ALIQ');
+          COMMIT;   
+    EXCEPTION 
+     WHEN OTHERS THEN
+      NULL;
+    END;
+  END IF;
+   --
+end;
+/
+--------------------------------------------------------------------------------------------------------------------------------------
+Prompt FIM Redmine #76385 - Inclusão da sequence ctdifaliq_seq na seq_tab
+-------------------------------------------------------------------------------------------------------------------------------
+
 ----------------------------------------------------------------------------------------
 Prompt FIM Patch 2.9.6.2 - Alteracoes no CSF_OWN
 ------------------------------------------------------------------------------------------
