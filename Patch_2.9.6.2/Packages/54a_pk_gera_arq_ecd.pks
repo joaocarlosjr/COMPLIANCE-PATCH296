@@ -4,6 +4,12 @@ create or replace package csf_own.pk_gera_arq_ecd is
 -- Especificação do pacote de procedimentos de criação do arquivo do sped contábil
 -------------------------------------------------------------------------------------------------------
 --
+-- Em 17/02/2021 - Eduardo Linden
+-- Redmine #76264: Arquivo Sped Contabil - Registro J900 - Bramlls
+-- Alteração do cursor para geração do registro J900
+-- Rotina alterada: pkb_monta_bloco_j900
+-- Liberado para Release 297 e para os patch's 2.9.6.2 e 2.9.5.5.
+--
 -- Em 16/02/2021 - Eduardo Linden
 -- Redmine #76131 - Arquivo Sped Contabil - Registro I030 - Bramlls
 -- Alteração do cursor para geração do registro I030

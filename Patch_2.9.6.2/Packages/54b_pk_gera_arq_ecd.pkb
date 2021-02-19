@@ -4119,7 +4119,9 @@ procedure pkb_monta_bloco_j900 is
            e.qtd_lin
       from encerra_ecd e, 
            tipo_escr_contab tec
-     where e.nat_livro      = to_char(tec.id)
+     where /*e.nat_livro      = to_char(tec.id)*/
+          (e.nat_livro = to_char(tec.id) 
+           or substr(e.nat_livro,1,1) = tec.sigla) 
        and e.aberturaecd_id = gn_aberturaecd_id;
   --
   cursor c_signatario(en_encerraecd_id encerra_ecd.id%type) is
