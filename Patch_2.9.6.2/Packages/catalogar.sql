@@ -57,6 +57,7 @@ prompt 610a_pk_rel_apur_irpj_csll_parc
 show err
 prompt 610b_pk_rel_apur_irpj_csll_parc
 @@610b_pk_rel_apur_irpj_csll_parc.pkb
+show err
 
 prompt 666a_pk_gera_lucro_expl
 @@666a_pk_gera_lucro_expl.pks
