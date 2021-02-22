@@ -1771,7 +1771,234 @@ end;
 --------------------------------------------------------------------------------------------------------------------------------------
 Prompt FIM Redmine #76385 - Inclusão da sequence ctdifaliq_seq na seq_tab
 -------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------
+Prompt Inicio Redmine #75742: Customização ACG.
+---------------------------------------------------------------------------------------------------------
 
+
+declare
+vn_count number;
+begin
+  ---
+  vn_count:=0;
+  --
+  -- valida se ja existe a coluna na tabela PARAM_GERA_INF_PROV_DOC_FISC, senao existir, cria.
+  BEGIN
+    SELECT count(1) 
+        into vn_count
+      FROM ALL_TAB_COLUMNS
+     WHERE UPPER(OWNER)       = UPPER('CSF_OWN')
+       AND UPPER(TABLE_NAME)  = UPPER('PARAM_GERA_INF_PROV_DOC_FISC')
+       AND UPPER(COLUMN_NAME) = UPPER('ORIG');
+    exception
+    when others then
+      vn_count:=0;
+  end;
+  ---
+  if  vn_count = 0 then
+   begin 
+      EXECUTE IMMEDIATE 'ALTER TABLE CSF_OWN.PARAM_GERA_INF_PROV_DOC_FISC ADD ORIG NUMBER(1)';
+      EXECUTE IMMEDIATE 'comment on column CSF_OWN.PARAM_GERA_INF_PROV_DOC_FISC.ORIG  is ''Origem da mercadoria''';
+    exception
+    when others then
+      null;
+  end;
+  --
+ end if;
+ --
+ end;
+/
+
+declare
+vn_count number;
+begin
+  ---
+  vn_count:=0;
+  ---
+  begin
+    select count(1) into vn_count
+    from all_constraints a
+    where a.owner         ='CSF_OWN'
+    and a.table_name      ='PARAM_GERA_INF_PROV_DOC_FISC'
+    and a.constraint_name ='INFPROVDOCFISC_ORIG_CK';
+  exception
+    when others then
+      vn_count:=0;
+  end;
+  ---
+  if  vn_count = 0 then
+   begin
+    execute immediate 'alter table CSF_OWN.PARAM_GERA_INF_PROV_DOC_FISC add constraint INFPROVDOCFISC_ORIG_CK check (ORIG in (0, 1, 2, 3, 4, 5, 6, 7, 8))';
+    exception
+    when others then
+      null;
+   end;
+  end if;
+  ---
+  commit;
+end;
+/
+
+ 
+
+declare
+vn_count number;
+begin
+  ---
+  vn_count:=0;
+  ---
+BEGIN
+  --
+  -- valida se ja existe a coluna na tabela PARAM_GERA_INF_PROV_DOC_FISC, senao existir, cria.
+    SELECT  count(1) 
+        into vn_count
+      FROM ALL_TAB_COLUMNS
+     WHERE UPPER(OWNER)       = UPPER('CSF_OWN')
+       AND UPPER(TABLE_NAME)  = UPPER('PARAM_GERA_REG_SUB_APUR_ICMS')
+       AND UPPER(COLUMN_NAME) = UPPER('ORIG');
+    exception
+    when others then
+      vn_count:=0;
+  end;
+  ---
+  if  vn_count = 0 then
+   begin 
+      EXECUTE IMMEDIATE 'ALTER TABLE CSF_OWN.PARAM_GERA_REG_SUB_APUR_ICMS ADD ORIG NUMBER(1)';
+      EXECUTE IMMEDIATE 'comment on column CSF_OWN.PARAM_GERA_REG_SUB_APUR_ICMS.ORIG  is ''Origem da mercadoria''';
+    exception
+    when others then
+      null;
+  end;
+  --
+  end if;
+  --
+END;
+/
+ 
+ 
+
+declare
+vn_count number;
+begin
+  ---
+  vn_count:=0;
+  ---
+  begin
+    select count(1) into vn_count
+    from all_constraints a
+    where a.owner         ='CSF_OWN'
+    and a.table_name      ='PARAM_GERA_REG_SUB_APUR_ICMS'
+    and a.constraint_name ='REGSUBAPURICMS_ORIG_CK';
+  exception
+    when others then
+      vn_count:=0;
+  end;
+  ---
+  if  vn_count = 0 then
+   begin
+    execute immediate 'alter table CSF_OWN.PARAM_GERA_REG_SUB_APUR_ICMS add constraint REGSUBAPURICMS_ORIG_CK check (ORIG in (0, 1, 2, 3, 4, 5, 6, 7, 8))';
+    exception
+    when others then
+      null;
+   end;
+  end if;
+  ---
+  commit;
+end;
+/ 
+ 
+
+--retirar UK da tabela  
+declare
+  v_existe  number := 0 ;
+begin
+  --
+  begin
+    -- verifica se existe uk
+     select 1
+       into v_existe
+       from all_constraints a
+      where upper(a.OWNER) = upper('CSF_OWN')
+        and upper(a.TABLE_NAME) = upper('PARAM_GERA_REG_SUB_APUR_ICMS')
+        and upper(a.CONSTRAINT_NAME) = upper('PARAMGERRSAI_CFOPCSTPER_UK');
+    --
+  exception
+    when others then
+      v_existe := 0 ;
+  end ;
+  --
+  -- se existir dropa ela
+  if v_existe > 0 then
+    --
+    begin
+      execute immediate 'ALTER TABLE CSF_OWN.PARAM_GERA_REG_SUB_APUR_ICMS DROP CONSTRAINT PARAMGERRSAI_CFOPCSTPER_UK';
+    exception
+     when others then
+       raise_application_error(-20101, 'Erro ao excluir constraint no script 75742 Customização ACG - ' || sqlerrm);
+    end ;
+    --
+  end if;
+  --
+     -- cria novamente com o campo ORI
+    begin
+      execute immediate 'alter table CSF_OWN.PARAM_GERA_REG_SUB_APUR_ICMS
+  add constraint PARAMGERRSAI_CFOPCSTPER_UK unique (EMPRESA_ID, CFOP_ID, CODST_ID, ALIQ_ICMS, ORIG)
+  using index tablespace CSF_DATA';
+    exception
+     when others then
+       raise_application_error(-20101, 'Erro ao excluir constraint no script 75742 Customização ACG - ' || sqlerrm);
+    end ;
+
+end;
+/
+  
+  
+--retirar UK da tabela  
+declare
+  v_existe  number := 0 ;
+begin
+  --
+  begin
+    -- verifica se existe uk
+     select 1
+       into v_existe
+       from all_constraints a
+      where upper(a.OWNER) = upper('CSF_OWN')
+        and upper(a.TABLE_NAME) = upper('PARAM_GERA_INF_PROV_DOC_FISC')
+        and upper(a.CONSTRAINT_NAME) = upper('PARAMGERAIPDF_CFOPCSTPER_UK');
+    --
+  exception
+    when others then
+      v_existe := 0 ;
+  end ;
+  --
+  -- se existir dropa ela
+  if v_existe > 0 then
+    --
+    begin
+      execute immediate 'ALTER TABLE CSF_OWN.PARAM_GERA_INF_PROV_DOC_FISC DROP CONSTRAINT PARAMGERAIPDF_CFOPCSTPER_UK';
+    exception
+     when others then
+       raise_application_error(-20101, 'Erro ao excluir constraint no script 75742 Customização ACG - ' || sqlerrm);
+    end ;
+    --
+  end if;
+    -- cria novamente com o campo ORI
+    begin
+      execute immediate 'alter table CSF_OWN.PARAM_GERA_INF_PROV_DOC_FISC
+  add constraint PARAMGERAIPDF_CFOPCSTPER_UK unique (EMPRESA_ID, CFOP_ID, CODST_ID, ALIQ_ICMS, ORIG)
+  using index tablespace CSF_DATA';
+    exception
+     when others then
+       raise_application_error(-20101, 'Erro ao excluir constraint no script 75742 Customização ACG - ' || sqlerrm);
+    end ;
+  --
+end;
+/
+
+---------------------------------------------------------------------------------------------------------
+Prompt Inicio Redmine #75742: Customização ACG.
+---------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------
 Prompt FIM Patch 2.9.6.2 - Alteracoes no CSF_OWN
 ------------------------------------------------------------------------------------------

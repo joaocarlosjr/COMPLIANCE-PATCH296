@@ -38,6 +38,13 @@ prompt 148b_pk_csf_api_ddo.pkb
 @@148b_pk_csf_api_ddo.pkb
 show err
 
+prompt 420a_pk_subapur_icms
+@@420a_pk_subapur_icms.pks
+show err
+prompt 420b_pk_subapur_icms
+@@420b_pk_subapur_icms.pkb
+show err
+
 prompt 460a_pk_csf_secf
 @@460a_pk_csf_secf.pks
 show err
