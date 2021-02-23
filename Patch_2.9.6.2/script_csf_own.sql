@@ -1619,7 +1619,7 @@ begin
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao incluir coluna "DT_EXE_SERV" em TMP_CONHEC_TRANSP - '||SQLERRM );
       END;
-      -- 
+      --
    end if;
    -- 
    vn_qtde := 0;
@@ -1999,6 +1999,867 @@ end;
 ---------------------------------------------------------------------------------------------------------
 Prompt Inicio Redmine #75742: Customização ACG.
 ---------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------------------------------------
+Prompt INI Redmine  #76109 - Novo processo de integração contabil
+-------------------------------------------------------------------------------------------------------------------------------------
+declare
+   vn_existe number := null;
+begin
+   select count(*)
+     into vn_existe
+     from sys.all_tables
+    where OWNER       = 'CSF_OWN'
+      and TABLE_NAME  = 'TMP_TIPO_CTRL_ARQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create table csf_own.TMP_TIPO_CTRL_ARQ
+                                      (
+                                        ID              NUMBER,
+                                        TP_REGISTRO     NUMBER,
+                                        CD_MULTORG      VARCHAR2(10),
+                                        HASH_MULTORG    VARCHAR2(255),
+                                        EMPRESA_ID      NUMBER,
+                                        NM_OBJ_INT      VARCHAR2(30),
+                                        VERSAO_LAYOUT   NUMBER(4),
+                                        DT_ARQUIVO      DATE,
+                                        IDENT_UNICO_ARQ NUMBER(10),
+                                        NM_MAX_IDENT    NUMBER(10)
+                                      ) tablespace CSF_DATA';
+      --
+      execute immediate 'comment on table  CSF_OWN.TMP_TIPO_CTRL_ARQ                 is ''REGISTRO TIPO CONTROLE DO ARQUIVO''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.ID              is ''ID da tabela TMP_TIPO_CTRL_ARQ''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.TP_REGISTRO     is ''Tipo do registro''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.CD_MULTORG      is ''Código do MultOrg''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.HASH_MULTORG    is ''Hash do MultOrg''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.EMPRESA_ID      is ''ID da Empresa''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.NM_OBJ_INT      is ''Nome do objeto de integração: SALDO; LANCAMENTO; PARTIDA; PLANOCONTA''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.VERSAO_LAYOUT   is ''Versão do layout. Fixo 1''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.DT_ARQUIVO      is ''Data do arquivo. Data em que arquivo foi gerado''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.IDENT_UNICO_ARQ is ''Identificador único do arquivo.ID sequencial único que permite rastrear os arquivos e também saber o estágio da integração''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.NM_MAX_IDENT    is ''Numero máximo do identificador.ID do futuro ultimo arquivo para permitir saber em que momento deve ser iniciada a validação de dados.''';
+      --
+      execute immediate 'create index CSF_OWN.TMP_TIPO_CTRL_ARQ_IDX on CSF_OWN.TMP_TIPO_CTRL_ARQ (ID) tablespace CSF_INDEX';
+      --
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_TIPO_CTRL_ARQ to CSF_WORK';
+      --
+   else
+      --
+      execute immediate 'comment on table  CSF_OWN.TMP_TIPO_CTRL_ARQ                 is ''REGISTRO TIPO CONTROLE DO ARQUIVO''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.ID              is ''ID da tabela TMP_TIPO_CTRL_ARQ''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.TP_REGISTRO     is ''Tipo do registro''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.CD_MULTORG      is ''Código do MultOrg''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.HASH_MULTORG    is ''Hash do MultOrg''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.EMPRESA_ID      is ''ID da Empresa''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.NM_OBJ_INT      is ''Nome do objeto de integração: SALDO; LANCAMENTO; PARTIDA; PLANOCONTA''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.VERSAO_LAYOUT   is ''Versão do layout. Fixo 1''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.DT_ARQUIVO      is ''Data do arquivo. Data em que arquivo foi gerado''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.IDENT_UNICO_ARQ is ''Identificador único do arquivo.ID sequencial único que permite rastrear os arquivos e também saber o estágio da integração''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.NM_MAX_IDENT    is ''Numero máximo do identificador.ID do futuro ultimo arquivo para permitir saber em que momento deve ser iniciada a validação de dados.''';
+      --
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_TIPO_CTRL_ARQ to CSF_WORK';
+      --
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da tabela TMP_TIPO_CTRL_ARQ. Erro: ' || sqlerrm);
+end;
+/
+-- sequence
+declare
+   vn_existe number := null;
+begin
+   select count(*)
+     into vn_existe
+     from sys.all_sequences s
+    where s.SEQUENCE_OWNER = 'CSF_OWN'
+      and s.SEQUENCE_NAME  = 'TMPTPCTRLARQ_SEQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create sequence CSF_OWN.TMPTPCTRLARQ_SEQ minvalue 1 maxvalue 9999999999999999999999999999 start with 1 increment by 1 nocache';
+      execute immediate 'grant select on CSF_OWN.TMPTPCTRLARQ_SEQ to CSF_WORK';
+      --
+   elsif nvl(vn_existe,0) > 0 then
+      --
+      execute immediate 'grant select on CSF_OWN.TMPTPCTRLARQ_SEQ to CSF_WORK';
+      --
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da sequence TMPTPCTRLARQ_SEQ. Erro: ' || sqlerrm);
+end;
+/
+
+declare
+  --
+  vv_sql    long;
+  vn_existe number := 0;
+  --
+begin
+   BEGIN
+        SELECT COUNT(1)
+	INTO vn_existe
+	FROM CSF_OWN.SEQ_TAB
+	WHERE UPPER(SEQUENCE_NAME) = UPPER('TMPTPCTRLARQ_SEQ');
+   EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+        vn_existe := 0;
+	WHEN OTHERS THEN
+	vn_existe := -1;
+    END;
+    --
+    IF NVL(vn_existe, 0) = 0 THEN
+	BEGIN
+         INSERT INTO CSF_OWN.SEQ_TAB (ID, SEQUENCE_NAME, TABLE_NAME)
+          VALUES (CSF_OWN.SEQTAB_SEQ.NEXTVAL, 'TMPTPCTRLARQ_SEQ', 'TMP_TIPO_CTRL_ARQ');
+          COMMIT;
+ 	EXCEPTION
+	 WHEN OTHERS THEN
+	  NULL;
+	END;
+    END IF;
+    --
+end;
+/
+
+declare
+   vn_existe number := null;
+begin
+   select count(*)
+     into vn_existe
+     from sys.all_tables
+    where OWNER       = 'CSF_OWN'
+      and TABLE_NAME  = 'TMP_CAB_SALDO';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create table csf_own.TMP_CAB_SALDO
+                            (
+                              ID                NUMBER,
+                              TMPTIPOCTRLARQ_ID NUMBER,
+                              TP_REGISTRO       NUMBER,
+                              CNPJ_EMPRESA      VARCHAR2(14),
+                              DT_INICIAL        DATE,
+                              DT_FINAL          DATE
+                            ) tablespace CSF_DATA';
+      --
+      execute immediate 'comment on table  csf_own.TMP_CAB_SALDO                   is ''REGISTRO TIPO CABEÇALHO DO SALDO''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.ID                is ''ID da tabela TMP_CAB_SALDO''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.TMPTIPOCTRLARQ_ID is ''ID da tabela TMP_TIPO_CTRL_ARQ''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.TP_REGISTRO       is ''Tipo do registro. Fixo 1.''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.CNPJ_EMPRESA      is ''CNPJ da empresa. CNPJ com 14 dígitos (considerar 0 a esquerda)''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.DT_INICIAL        is ''Data inicial do Saldo''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.DT_FINAL          is ''Data final do saldo''';
+      --
+      execute immediate 'create index CSF_OWN.TMP_CAB_SALDO_IDX1 on CSF_OWN.TMP_CAB_SALDO (ID)                   tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_CAB_SALDO_IDX2 on CSF_OWN.TMP_CAB_SALDO (TMPTIPOCTRLARQ_ID)    tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_CAB_SALDO_IDX3 on CSF_OWN.TMP_CAB_SALDO (DT_INICIAL, DT_FINAL) tablespace CSF_INDEX';
+      --
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_CAB_SALDO to CSF_WORK';
+      --
+   else
+      --
+      execute immediate 'comment on table  csf_own.TMP_CAB_SALDO                   is ''REGISTRO TIPO CABEÇALHO DO SALDO''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.ID                is ''ID da tabela TMP_CAB_SALDO''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.TMPTIPOCTRLARQ_ID is ''ID da tabela TMP_TIPO_CTRL_ARQ''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.TP_REGISTRO       is ''Tipo do registro. Fixo 1.''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.CNPJ_EMPRESA      is ''CNPJ da empresa. CNPJ com 14 dígitos (considerar 0 a esquerda)''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.DT_INICIAL        is ''Data inicial do Saldo''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.DT_FINAL          is ''Data final do saldo''';
+      --
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_CAB_SALDO to CSF_WORK';
+      --
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da tabela TMP_CAB_SALDO. Erro: ' || sqlerrm);
+end;
+/
+
+declare
+   vn_existe number := null;
+begin
+   select count(*)
+     into vn_existe
+     from sys.all_sequences s
+    where s.SEQUENCE_OWNER = 'CSF_OWN'
+      and s.SEQUENCE_NAME  = 'TMPCABSALDO_SEQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create sequence CSF_OWN.TMPCABSALDO_SEQ minvalue 1 maxvalue 9999999999999999999999999999 start with 1 increment by 1 nocache';
+      execute immediate 'grant select on CSF_OWN.TMPCABSALDO_SEQ to CSF_WORK';
+      --
+   elsif nvl(vn_existe,0) > 0 then
+      --
+      execute immediate 'grant select on CSF_OWN.TMPCABSALDO_SEQ to CSF_WORK';
+      --
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da sequence TMPCABSALDO_SEQ. Erro: ' || sqlerrm);
+end;
+/
+
+declare
+  --
+  vv_sql    long;
+  vn_existe number := 0;
+  --
+begin
+   BEGIN
+   SELECT COUNT(1)
+     INTO vn_existe
+     FROM CSF_OWN.SEQ_TAB
+     WHERE UPPER(SEQUENCE_NAME) = UPPER('TMPCABSALDO_SEQ');
+   EXCEPTION
+     WHEN NO_DATA_FOUND THEN
+       vn_existe := 0;
+     WHEN OTHERS THEN
+       vn_existe := -1;
+   END;
+	--
+    IF NVL(vn_existe, 0) = 0 THEN
+     BEGIN
+        INSERT INTO CSF_OWN.SEQ_TAB (ID, SEQUENCE_NAME, TABLE_NAME)
+        VALUES (CSF_OWN.SEQTAB_SEQ.NEXTVAL, 'TMPCABSALDO_SEQ', 'TMP_CAB_SALDO');
+      COMMIT;
+      EXCEPTION
+      WHEN OTHERS THEN
+      NULL;
+    END;
+   END IF;
+   --
+end;
+/
+
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_tables 
+    where OWNER       = 'CSF_OWN'
+      and TABLE_NAME  = 'TMP_TIPO_DET_SALDO';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create table csf_own.TMP_TIPO_DET_SALDO
+                                      (
+                                        ID             NUMBER,
+                                        TMPCABSALDO_ID NUMBER,
+                                        TP_REGISTO     NUMBER,
+                                        COD_CTA        VARCHAR2(255),
+                                        COD_CCUS       VARCHAR2(60),
+                                        VL_SLD_INI     NUMBER(19,2),
+                                        DM_IND_DC_INI  VARCHAR2(1),
+                                        VL_DEB         NUMBER(19,2),
+                                        VL_CRED        NUMBER(19,2),
+                                        VL_SLD_FIN     NUMBER(19,2),
+                                        DM_IND_DC_FIN  VARCHAR2(1)
+                                      )
+                                      tablespace CSF_DATA';
+      --                                                        
+      execute immediate 'comment on table CSF_OWN.TMP_TIPO_DET_SALDO is ''REGISTRO TIPO DETALHE DO SALDO''';
+      -- 
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.ID  is ''ID da tabela TMP_TIPO_DET_SALDO''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.TMPCABSALDO_ID  is ''ID da tabela TMP_CAB_SALDO''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.TP_REGISTO  is ''Tipo do registro. Fixo 5.''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.COD_CTA  is ''Código da Conta contabil''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.COD_CCUS  is ''Código do centro de custos''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_SLD_INI  is ''Valor do Saldo Inicial''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.DM_IND_DC_INI  is ''Indicador de situação do saldo inicial - D ou C. D = Débito / C = Crédito.''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_DEB  is ''Valor do saldo a débito''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_CRED  is ''Valor do saldo a crédito''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_SLD_FIN  is ''Valor do Saldo Final''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.DM_IND_DC_FIN  is ''Indicador de situação do saldo final - D ou C. D = Débito / C = Crédito.''';
+      -- 
+      execute immediate 'create index CSF_OWN.TMP_TIPO_DET_SALDO_IDX1 on CSF_OWN.TMP_TIPO_DET_SALDO (ID)  tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_TIPO_DET_SALDO_IDX2 on CSF_OWN.TMP_TIPO_DET_SALDO (TMPCABSALDO_ID) tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_TIPO_DET_SALDO_IDX3 on CSF_OWN.TMP_TIPO_DET_SALDO (TP_REGISTO, COD_CTA, COD_CCUS) tablespace CSF_INDEX';
+      
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_TIPO_DET_SALDO to CSF_WORK';
+      --    
+   else
+      --
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.ID  is ''ID da tabela TMP_TIPO_DET_SALDO''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.TMPCABSALDO_ID  is ''ID da tabela TMP_CAB_SALDO''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.TP_REGISTO  is ''Tipo do registro. Fixo 5.''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.COD_CTA  is ''Código da Conta contabil''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.COD_CCUS  is ''Código do centro de custos''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_SLD_INI  is ''Valor do Saldo Inicial''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.DM_IND_DC_INI  is ''Indicador de situação do saldo inicial - D ou C. D = Débito / C = Crédito.''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_DEB  is ''Valor do saldo a débito''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_CRED  is ''Valor do saldo a crédito''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_SLD_FIN  is ''Valor do Saldo Final''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.DM_IND_DC_FIN  is ''Indicador de situação do saldo final - D ou C. D = Débito / C = Crédito.''';
+      -- 
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_TIPO_DET_SALDO to CSF_WORK';
+      --    
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da tabela TMP_TIPO_DET_SALDO. Erro: ' || sqlerrm);      
+end;
+/
+-- sequence
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_sequences s
+    where s.SEQUENCE_OWNER = 'CSF_OWN'
+      and s.SEQUENCE_NAME  = 'TMPTPDETSLD_SEQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create sequence CSF_OWN.TMPTPDETSLD_SEQ minvalue 1 maxvalue 9999999999999999999999999999 start with 1 increment by 1 nocache';
+      execute immediate 'grant select on CSF_OWN.TMPTPDETSLD_SEQ to CSF_WORK';      
+      --
+   elsif nvl(vn_existe,0) > 0 then
+      --
+      execute immediate 'grant select on CSF_OWN.TMPTPDETSLD_SEQ to CSF_WORK';      
+      --
+   end if;   
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da sequence TMPTPDETSLD_SEQ. Erro: ' || sqlerrm);      
+end;
+/
+
+declare
+  --
+  vv_sql    long;
+  vn_existe number := 0;
+  --
+begin
+    BEGIN
+      SELECT COUNT(1)
+      INTO vn_existe
+	  FROM CSF_OWN.SEQ_TAB
+	 WHERE UPPER(SEQUENCE_NAME) = UPPER('TMPTPDETSLD_SEQ');
+     EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+	vn_existe := 0;
+      WHEN OTHERS THEN
+	vn_existe := -1;
+    END;
+	--
+    IF NVL(vn_existe, 0) = 0 THEN
+     BEGIN
+      INSERT INTO CSF_OWN.SEQ_TAB (ID, SEQUENCE_NAME, TABLE_NAME)
+      VALUES (CSF_OWN.SEQTAB_SEQ.NEXTVAL, 'TMPTPDETSLD_SEQ', 'TMP_TIPO_DET_SALDO');
+      COMMIT;
+      EXCEPTION
+        WHEN OTHERS THEN
+          NULL;
+     END;
+    END IF;
+   --
+   commit;
+end;
+/
+
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_tables 
+    where OWNER       = 'CSF_OWN'
+      and TABLE_NAME  = 'TMP_CAB_LANCTO';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create table csf_own.TMP_CAB_LANCTO
+                                      (
+                                        ID                NUMBER,
+                                        TMPTIPOCTRLARQ_ID NUMBER,
+                                        TP_REGISTRO       NUMBER,
+                                        CNPJ_EMPRESA      VARCHAR2(14)
+                                       ) tablespace CSF_DATA';
+      --                                                        
+      execute immediate 'comment on table  CSF_OWN.TMP_CAB_LANCTO                   is ''REGISTRO TIPO CABEÇALHO DO LANÇAMENTO''';
+      --       
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.ID                is ''ID da tabela TMP_CAB_LANCTO''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.TMPTIPOCTRLARQ_ID is ''ID da tabela TMP_TIPO_DET_SALDO''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.TP_REGISTRO       is ''Tipo do registro. Fixo 1.''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.CNPJ_EMPRESA      is ''CNPJ da empresa. CNPJ com 14 dígitos (considerar 0 a esquerda).''';      
+      ---      
+      execute immediate 'create index CSF_OWN.TMP_CAB_LANCTO_IDX1 on CSF_OWN.TMP_CAB_LANCTO (ID)                tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_CAB_LANCTO_IDX2 on CSF_OWN.TMP_CAB_LANCTO (TMPTIPOCTRLARQ_ID) tablespace CSF_INDEX';      
+      ---      
+    
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_CAB_LANCTO to CSF_WORK';
+      --    
+   else
+      --
+      execute immediate 'comment on table  CSF_OWN.TMP_CAB_LANCTO                   is ''REGISTRO TIPO CABEÇALHO DO LANÇAMENTO''';
+      --       
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.ID                is ''ID da tabela TMP_CAB_LANCTO''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.TMPTIPOCTRLARQ_ID is ''ID da tabela TMP_TIPO_DET_SALDO''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.TP_REGISTRO       is ''Tipo do registro. Fixo 1.''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.CNPJ_EMPRESA      is ''CNPJ da empresa. CNPJ com 14 dígitos (considerar 0 a esquerda).''';      
+      --- 
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_CAB_LANCTO to CSF_WORK';
+      --    
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da tabela TMP_CAB_LANCTO. Erro: ' || sqlerrm);      
+end;
+/
+-- sequence
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_sequences s
+    where s.SEQUENCE_OWNER = 'CSF_OWN'
+      and s.SEQUENCE_NAME  = 'TMPCABLANCTO_SEQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create sequence CSF_OWN.TMPCABLANCTO_SEQ minvalue 1 maxvalue 9999999999999999999999999999 start with 1 increment by 1 nocache';
+      execute immediate 'grant select on CSF_OWN.TMPCABLANCTO_SEQ to CSF_WORK';      
+      --
+   elsif nvl(vn_existe,0) > 0 then
+      --
+      execute immediate 'grant select on CSF_OWN.TMPCABLANCTO_SEQ to CSF_WORK';      
+      --
+   end if;   
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da sequence TMPCABLANCTO_SEQ. Erro: ' || sqlerrm);      
+end;
+/
+
+declare
+  --
+  vv_sql    long;
+  vn_existe number := 0;
+  --
+begin
+   BEGIN
+     SELECT COUNT(1)
+     INTO vn_existe
+     FROM CSF_OWN.SEQ_TAB
+     WHERE UPPER(SEQUENCE_NAME) = UPPER('TMPCABLANCTO_SEQ');
+   EXCEPTION
+   WHEN NO_DATA_FOUND THEN
+	vn_existe := 0;
+   WHEN OTHERS THEN
+        vn_existe := -1;
+   END;
+	--
+    IF NVL(vn_existe, 0) = 0 THEN
+    BEGIN
+      INSERT INTO CSF_OWN.SEQ_TAB (ID, SEQUENCE_NAME, TABLE_NAME)
+      VALUES (CSF_OWN.SEQTAB_SEQ.NEXTVAL, 'TMPCABLANCTO_SEQ', 'TMP_CAB_LANCTO');
+      COMMIT;
+    EXCEPTION
+    WHEN OTHERS THEN
+     NULL;
+    END;
+    END IF;
+   --
+end;
+/
+
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_tables 
+    where OWNER       = 'CSF_OWN'
+      and TABLE_NAME  = 'TMP_DET_LANCTO';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create table csf_own.TMP_DET_LANCTO
+                              (
+                                ID              NUMBER,
+                                TMPCABLANCTO_ID NUMBER,
+                                TP_REGISTRO     NUMBER,
+                                NUM_LCTO        VARCHAR2(255),
+                                DT_LCTO         DATE,
+                                VL_LCTO         NUMBER(19,2),
+                                DM_IND_LCTO     VARCHAR2(1),
+                                QTDE_PARTIDAS   NUMBER(6)
+                              ) tablespace CSF_DATA';
+      --                                                        
+      execute immediate 'comment on table  CSF_OWN.TMP_DET_LANCTO                   is ''REGISTRO TIPO DETALHE DO LANÇAMENTO''';
+      --
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.ID                is ''ID da tabela TMP_DET_LANCTO''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.TMPCABLANCTO_ID   is ''ID da tabela TMP_CAB_LANCTO''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.TP_REGISTRO       is ''Tipo do registro. Fixo 5.''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.NUM_LCTO          is ''Número do lançamento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.DT_LCTO           is ''Data do Lançamento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.VL_LCTO           is ''Valor do Lançamento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.DM_IND_LCTO       is ''Indicador do tipo de lançamento - N ou E''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.QTDE_PARTIDAS     is ''Quantidade de partidas''';      
+      ---      
+      execute immediate 'create index CSF_OWN.TMP_DET_LANCTO_IDX1 on CSF_OWN.TMP_DET_LANCTO (ID)                                tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_DET_LANCTO_IDX2 on CSF_OWN.TMP_DET_LANCTO (TMPCABLANCTO_ID)                   tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_DET_LANCTO_IDX3 on CSF_OWN.TMP_DET_LANCTO (TP_REGISTRO, DT_LCTO, DM_IND_LCTO) tablespace CSF_INDEX';
+      ---      
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_DET_LANCTO to CSF_WORK';
+      --    
+   else
+      --                                                        
+      execute immediate 'comment on table  CSF_OWN.TMP_DET_LANCTO                   is ''REGISTRO TIPO DETALHE DO LANÇAMENTO''';
+      --
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.ID                is ''ID da tabela TMP_DET_LANCTO''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.TMPCABLANCTO_ID   is ''ID da tabela TMP_CAB_LANCTO''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.TP_REGISTRO       is ''Tipo do registro. Fixo 5.''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.NUM_LCTO          is ''Número do lançamento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.DT_LCTO           is ''Data do Lançamento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.VL_LCTO           is ''Valor do Lançamento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.DM_IND_LCTO       is ''Indicador do tipo de lançamento - N ou E''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.QTDE_PARTIDAS     is ''Quantidade de partidas''';      
+      ---   
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_DET_LANCTO to CSF_WORK';
+      --    
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da tabela TMP_DET_LANCTO. Erro: ' || sqlerrm);      
+end;
+/
+
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_sequences s
+    where s.SEQUENCE_OWNER = 'CSF_OWN'
+      and s.SEQUENCE_NAME  = 'TMPDETLANCTO_SEQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create sequence CSF_OWN.TMPDETLANCTO_SEQ minvalue 1 maxvalue 9999999999999999999999999999 start with 1 increment by 1 nocache';
+      execute immediate 'grant select on CSF_OWN.TMPDETLANCTO_SEQ to CSF_WORK';      
+      --
+   elsif nvl(vn_existe,0) > 0 then
+      --
+      execute immediate 'grant select on CSF_OWN.TMPDETLANCTO_SEQ to CSF_WORK';      
+      --
+   end if;   
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da sequence TMPDETLANCTO_SEQ. Erro: ' || sqlerrm);      
+end;
+/
+
+declare
+  --
+  vv_sql    long;
+  vn_existe number := 0;
+  --
+begin
+   BEGIN
+        SELECT COUNT(1)
+	  INTO vn_existe
+	 FROM CSF_OWN.SEQ_TAB
+	 WHERE UPPER(SEQUENCE_NAME) = UPPER('TMPDETLANCTO_SEQ');
+     EXCEPTION
+     WHEN NO_DATA_FOUND THEN
+	 vn_existe := 0;
+     WHEN OTHERS THEN
+	  vn_existe := -1;
+    END;
+	--
+    IF NVL(vn_existe, 0) = 0 THEN
+     BEGIN
+       INSERT INTO CSF_OWN.SEQ_TAB (ID, SEQUENCE_NAME, TABLE_NAME)
+       VALUES (CSF_OWN.SEQTAB_SEQ.NEXTVAL, 'TMPDETLANCTO_SEQ', 'TMP_DET_LANCTO');
+       COMMIT;
+     EXCEPTION
+       WHEN OTHERS THEN
+	  NULL;
+       END;
+    END IF;
+   --
+end;
+/
+
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_tables 
+    where OWNER       = 'CSF_OWN'
+      and TABLE_NAME  = 'TMP_CAB_PARTIDA';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create table CSF_OWN.TMP_CAB_PARTIDA
+                        (
+                          ID                NUMBER,
+                          TMPTIPOCTRLARQ_ID NUMBER,
+                          TP_REGISTRO       NUMBER,
+                          CNPJ_EMPRESA      VARCHAR2(14),
+                          NUM_LCTO          VARCHAR2(255)
+                        )
+                        tablespace CSF_DATA';
+      ---      
+      execute immediate 'comment on table  CSF_OWN.TMP_CAB_PARTIDA                   is ''REGISTRO TIPO CABEÇALHO DA PARTIDA''';
+      -- 
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.ID                is ''ID da tabela TMP_CAB_PARTIDA''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.TMPTIPOCTRLARQ_ID is ''ID da tabela TMP_TIPO_CTRL_ARQ''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.TP_REGISTRO       is ''Tipo do registro''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.CNPJ_EMPRESA      is ''CNPJ da empresa''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.NUM_LCTO          is ''Numero do Lançamento''';            
+      ---
+      execute immediate 'create index CSF_OWN.TMP_CAB_PARTIDA_IDX1 on CSF_OWN.TMP_CAB_PARTIDA (ID)                tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_CAB_PARTIDA_IDX2 on CSF_OWN.TMP_CAB_PARTIDA (TMPTIPOCTRLARQ_ID) tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_CAB_PARTIDA_IDX3 on CSF_OWN.TMP_CAB_PARTIDA (NUM_LCTO)          tablespace CSF_INDEX';
+      ---
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_CAB_PARTIDA to CSF_WORK';
+      --    
+   else
+      --
+      execute immediate 'comment on table  CSF_OWN.TMP_CAB_PARTIDA                   is ''REGISTRO TIPO CABEÇALHO DA PARTIDA''';
+      -- 
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.ID                is ''ID da tabela TMP_CAB_PARTIDA''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.TMPTIPOCTRLARQ_ID is ''ID da tabela TMP_TIPO_CTRL_ARQ''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.TP_REGISTRO       is ''Tipo do registro''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.CNPJ_EMPRESA      is ''CNPJ da empresa''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.NUM_LCTO          is ''Numero do Lançamento''';      
+      ---   
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_CAB_PARTIDA to CSF_WORK';
+      --    
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da tabela TMP_CAB_PARTIDA. Erro: ' || sqlerrm);      
+end;
+/
+
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_sequences s
+    where s.SEQUENCE_OWNER = 'CSF_OWN'
+      and s.SEQUENCE_NAME  = 'TMPCABPARTIDA_SEQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create sequence CSF_OWN.TMPCABPARTIDA_SEQ minvalue 1 maxvalue 9999999999999999999999999999 start with 1 increment by 1 nocache';
+      execute immediate 'grant select on CSF_OWN.TMPCABPARTIDA_SEQ to CSF_WORK';      
+      --
+   elsif nvl(vn_existe,0) > 0 then
+      --
+      execute immediate 'grant select on CSF_OWN.TMPCABPARTIDA_SEQ to CSF_WORK';      
+      --
+   end if;   
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da sequence TMPCABPARTIDA_SEQ. Erro: ' || sqlerrm);      
+end;
+/
+
+declare
+  --
+  vv_sql    long;
+  vn_existe number := 0;
+  --
+begin
+   BEGIN
+   SELECT COUNT(1)
+      INTO vn_existe
+   FROM CSF_OWN.SEQ_TAB
+   WHERE UPPER(SEQUENCE_NAME) = UPPER('TMPCABPARTIDA_SEQ');
+   EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+     vn_existe := 0;
+   WHEN OTHERS THEN
+     vn_existe := -1;
+   END;
+    --
+    IF NVL(vn_existe, 0) = 0 THEN
+    BEGIN
+      INSERT INTO CSF_OWN.SEQ_TAB (ID, SEQUENCE_NAME, TABLE_NAME)
+      VALUES (CSF_OWN.SEQTAB_SEQ.NEXTVAL, 'TMPCABPARTIDA_SEQ', 'TMP_CAB_PARTIDA');
+      COMMIT;
+     EXCEPTION
+       WHEN OTHERS THEN
+        NULL;
+    END;
+    END IF;
+   --
+end;
+/
+
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_tables 
+    where OWNER       = 'CSF_OWN'
+      and TABLE_NAME  = 'TMP_DET_PARTIDA';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create table csf_own.TMP_DET_PARTIDA
+                                (
+                                  ID               NUMBER,
+                                  TMPCABPARTIDA_ID NUMBER,
+                                  TP_REGISTRO      NUMBER,
+                                  COD_CTA          VARCHAR2(255),
+                                  COD_CCUS         VARCHAR2(60),
+                                  VL_DC            NUMBER(19,2),
+                                  DM_IND_DC        VARCHAR2(1),
+                                  NUM_ARQ          VARCHAR2(255),
+                                  COD_HIST_PAD     VARCHAR2(30),
+                                  COMPL_HIST       VARCHAR2(4000),
+                                  COD_PART         VARCHAR2(60),
+                                  NUM_SEQ_PART     NUMBER(7)
+                                ) tablespace CSF_DATA';
+      ---      
+      execute immediate 'comment on table CSF_OWN.TMP_DET_PARTIDA                   is ''REGISTRO TIPO DETALHE DA PARTIDA''';
+      -- 
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.ID               is ''ID da tabela TMP_DET_PARTIDA''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.TMPCABPARTIDA_ID is ''ID da tabela TMP_CAB_PARTIDA''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.TP_REGISTRO      is ''Tipo do registro''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_CTA          is ''Código da Conta contabil''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_CCUS         is ''Código do centro de custos''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.VL_DC            is ''Valor da partida''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.DM_IND_DC        is ''Indicador de situação da partida - D ou C. D = Débito / C = Crédito''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.NUM_ARQ          is ''Numero ou código de arquivo do documento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_HIST_PAD     is ''Código do histórico padrão''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COMPL_HIST       is ''Complemento do histórico contabil''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_PART         is ''Código do participante''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.NUM_SEQ_PART     is ''Numero sequencial da partida''';               
+      ---
+      execute immediate 'create index CSF_OWN.TMP_DET_PARTIDA_IDX1 on CSF_OWN.TMP_DET_PARTIDA (ID) tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_DET_PARTIDA_IDX2 on CSF_OWN.TMP_DET_PARTIDA (TMPCABPARTIDA_ID) tablespace CSF_INDEX';
+      ---
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_DET_PARTIDA to CSF_WORK';
+      --    
+   else
+      --
+      execute immediate 'comment on table CSF_OWN.TMP_DET_PARTIDA                   is ''REGISTRO TIPO DETALHE DA PARTIDA''';
+      -- 
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.ID               is ''ID da tabela TMP_DET_PARTIDA''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.TMPCABPARTIDA_ID is ''ID da tabela TMP_CAB_PARTIDA''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.TP_REGISTRO      is ''Tipo do registro''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_CTA          is ''Código da Conta contabil''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_CCUS         is ''Código do centro de custos''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.VL_DC            is ''Valor da partida''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.DM_IND_DC        is ''Indicador de situação da partida - D ou C. D = Débito / C = Crédito''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.NUM_ARQ          is ''Numero ou código de arquivo do documento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_HIST_PAD     is ''Código do histórico padrão''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COMPL_HIST       is ''Complemento do histórico contabil''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_PART         is ''Código do participante''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.NUM_SEQ_PART     is ''Numero sequencial da partida''';               
+      ---   
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_DET_PARTIDA to CSF_WORK';
+      --    
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da tabela TMP_DET_PARTIDA. Erro: ' || sqlerrm);      
+end;
+/
+-- sequence
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_sequences s
+    where s.SEQUENCE_OWNER = 'CSF_OWN'
+      and s.SEQUENCE_NAME  = 'TMPDETPARTIDA_SEQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create sequence CSF_OWN.TMPDETPARTIDA_SEQ minvalue 1 maxvalue 9999999999999999999999999999 start with 1 increment by 1 nocache';
+      execute immediate 'grant select on CSF_OWN.TMPDETPARTIDA_SEQ to CSF_WORK';      
+      --
+   elsif nvl(vn_existe,0) > 0 then
+      --
+      execute immediate 'grant select on CSF_OWN.TMPDETPARTIDA_SEQ to CSF_WORK';      
+      --
+   end if;   
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da sequence TMPDETPARTIDA_SEQ. Erro: ' || sqlerrm);      
+end;
+/
+
+declare
+  --
+  vv_sql    long;
+  vn_existe number := 0;
+  --
+begin
+   BEGIN
+     SELECT COUNT(1)
+        INTO vn_existe
+     FROM CSF_OWN.SEQ_TAB
+     WHERE UPPER(SEQUENCE_NAME) = UPPER('TMPDETPARTIDA_SEQ');
+   EXCEPTION
+   WHEN NO_DATA_FOUND THEN
+        vn_existe := 0;
+   WHEN OTHERS THEN
+        vn_existe := -1;
+   END;
+	--
+   IF NVL(vn_existe, 0) = 0 THEN
+   BEGIN
+     INSERT INTO CSF_OWN.SEQ_TAB (ID, SEQUENCE_NAME, TABLE_NAME)
+     VALUES (CSF_OWN.SEQTAB_SEQ.NEXTVAL, 'TMPDETPARTIDA_SEQ', 'TMP_DET_PARTIDA');
+     COMMIT;
+   EXCEPTION
+    WHEN OTHERS THEN
+      NULL;
+   END;
+   END IF;
+   --
+end;
+/
+-------------------------------------------------------------------------------------------------------------------------------------
+Prompt FIM Redmine  #76109 - Novo processo de integração contabil
+-------------------------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------
 Prompt FIM Patch 2.9.6.2 - Alteracoes no CSF_OWN
 ------------------------------------------------------------------------------------------
