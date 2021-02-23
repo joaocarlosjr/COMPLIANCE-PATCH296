@@ -37604,6 +37604,7 @@ procedure pkb_monta_reg_C100 is
   vn_antecipacao_credito_icms number;
   vn_idx_codinf               number := 0;
   vn_dm_ind_ie_dest           nota_fiscal_dest.dm_ind_ie_dest%type;
+  vv_volta_origem_dado_pessoa varchar2(1) := null;    
   --     
   cursor c_nf_inut is
     select mf.cod_mod, 
@@ -39243,7 +39244,7 @@ begin
                   --vt_tri_tab_reg_c113(i)(j)(k).cod_part := pk_csf.fkg_pessoa_cod_part (rec_c113.pessoa_id);
                   vt_tri_tab_reg_c113(i)(j)(k).cod_part   := pk_csf_api_efd.fkb_ret_cnpjcpj_ibge_cod_part(en_pessoa_id          => rec_c113.pessoa_id,
                                                                                                           en_tipo_retorna       => 1, -- 0-PESSOA_ID / 1-COD_PART    
-                                                                                                          en_origem_dado_pessoa => gn_origem_dado_pessoa,
+                                                                                                          en_origem_dado_pessoa => 0, -- Fixo reg C113 - Cadastro pessoa - #76361
                                                                                                           en_notafiscal_id      => rec_c113.notafiscal_id);
                   vt_tri_tab_reg_c113(i)(j)(k).cod_mod    := pk_csf.fkg_cod_mod_id(en_modfiscal_id => rec_c113.modfiscal_id);
                   vt_tri_tab_reg_c113(i)(j)(k).ser        := rec_c113.serie;
@@ -39259,8 +39260,25 @@ begin
                     --
                     vn_fase := 17.17;
                     --
+                    -- Verificando se o parametro está como "DOCUMENTO_FISCAL" colcoar como "CADASTRO_PESSOA" pois conhecimento
+                    -- de transporte deve-se pegar do cadastro de pessoa.		 
+                    if gn_origem_dado_pessoa = 1 then
+                       --
+                       gn_origem_dado_pessoa       := 0;			
+                       vv_volta_origem_dado_pessoa := 'S';
+                       --
+                    end if;
+                    --		 
                     pkb_monta_reg_0150(en_pessoa_id     => rec_c113.pessoa_id,
                                        en_notafiscal_id => rec_c113.notafiscal_id);
+                    --
+                    -- Se foi trocado pois o parametro estava "DOCUMENTO_FISCAL" retornar o parametro conforme estava.		 
+                    if nvl( vv_volta_origem_dado_pessoa, 'N') = 'S' then
+                       --
+                       gn_origem_dado_pessoa       := 1;
+                       vv_volta_origem_dado_pessoa := null;				
+                       --
+                    end if;
                     --
                   end if;
                   --

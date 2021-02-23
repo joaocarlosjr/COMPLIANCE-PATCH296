@@ -3,6 +3,11 @@ create or replace package csf_own.pk_gera_arq_efd is
 -------------------------------------------------------------------------------------------------------
 -- Especificação do pacote de procedimentos de criação do arquivo do sped fiscal
 --
+-- Em 22/02/2021   - Luis Marques - 2.9.5.5 / 2.9.6-2 / 2.9.7
+-- Redmine #76361  - Registro C113 - Participante saindo incorreto / Registro 0150 - nome do participante incorreto
+-- Rotina Alterada - pkb_monta_reg_C100 - Fixado para registro C113 para trazer os dados do cadastro de pessoa ignorando parametro
+--                   ORIGEM_DADO_PESSOA, conforme manual SPED por se tratar de nota referenciada.
+--
 -- Em 19/02/2021   - Luis Marques - 2.9.5.5 / 2.9.6-2 / 2.9.7
 -- Redmine #76194  - Embasamento legal GIA - Valores negativos para o município
 -- Rotina Alterada - pkb_monta_reg_1400 - Colocado verificação para se valores de rateio por municipio forem negativos no caso de 
