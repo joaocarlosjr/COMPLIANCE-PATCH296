@@ -31,11 +31,25 @@ show err
 prompt 73b_pk_gera_arq_efd
 @@73b_pk_gera_arq_efd.pkb
 
+prompt 120a_pk_csf_efd_pc.pks
+@@120a_pk_csf_efd_pc.pks
+show err
+prompt 120b_pk_csf_efd_pc.pkb
+@@120b_pk_csf_efd_pc.pkb
+show err
+
 prompt 148a_pk_csf_api_ddo.pks
 @@148a_pk_csf_api_ddo.pks
 show err
 prompt 148b_pk_csf_api_ddo.pkb
 @@148b_pk_csf_api_ddo.pkb
+show err
+
+prompt 221a_csf_own_pk_csf_api_nfs.pks
+@@221a_csf_own_pk_csf_api_nfs.pks
+show err
+prompt 221b_csf_own_pk_csf_api_nfs.pkb
+@@221b_csf_own_pk_csf_api_nfs.pkb
 show err
 
 prompt 460a_pk_csf_secf

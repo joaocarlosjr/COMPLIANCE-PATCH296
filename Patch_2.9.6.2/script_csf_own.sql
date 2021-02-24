@@ -304,7 +304,6 @@ end;
 -------------------------------------------------------------------------------------------------------------------------------------------
 Prompt FIM - Redmine #75898 Criação de padrão NFem a adição de Joinville-SC ao padrão
 -------------------------------------------------------------------------------------------------------------------------------------------
-
 -------------------------------------------------------------------------------------------------------------------------------
 Prompt INI Redmine #75193 - Adicionar campo EMPRESA_FORMA_TRIB.PERC_RED_IR
 -------------------------------------------------------------------------------------------------------------------------------
@@ -1733,6 +1732,928 @@ Prompt INI Redmine #73922 - Estrutura de tabelas
 --------------------------------------------------------------------------------------------------------------------------------------
 Prompt INI Redmine #73922 - Estrutura de tabelas
 --------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------
+Prompt INI - Redmine #75703 Adicionar cidade Poá ao padrão e-Transparencia
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+--CIDADE  : Poá - SP
+--IBGE    : 3539806
+--PADRAO  : eTransparencia
+--HABIL   : SIM
+--WS_CANC : SIM
+
+declare 
+   --   
+   -- dm_tp_amb (Tipo de Ambiente 1-Producao; 2-Homologacao)
+   cursor c_dados is
+      select   ( select id from csf_own.cidade where ibge_cidade = '3539806' ) id, dm_situacao,  versao,  dm_tp_amb,  dm_tp_soap,  dm_tp_serv, descr, url_wsdl, dm_upload, dm_ind_emit 
+        from ( --Produção
+			   select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geração de NFS-e'                               descr, 'https://nfe.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepção e Processamento de lote de RPS'        descr, 'https://nfe.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situação de lote de RPS'            descr, 'https://nfe.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'https://nfe.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'https://nfe.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'https://nfe.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituição de NFS-e'                          descr, 'https://nfe.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'https://nfe.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'https://nfe.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'https://nfe.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               --Homologação
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geração de NFS-e'                               descr, 'https://nfehomologacao.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepção e Processamento de lote de RPS'        descr, 'https://nfehomologacao.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situação de lote de RPS'            descr, 'https://nfehomologacao.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'https://nfehomologacao.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'https://nfehomologacao.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'https://nfehomologacao.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituição de NFS-e'                          descr, 'https://nfehomologacao.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'https://nfehomologacao.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'https://nfehomologacao.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'https://nfehomologacao.etransparencia.com.br/sp.poa/webservice/aws_nfe.aspx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual
+              );
+--   
+begin   
+   --
+      for rec_dados in c_dados loop
+         exit when c_dados%notfound or (c_dados%notfound) is null;
+         --
+         begin  
+            insert into csf_own.cidade_webserv_nfse (  id
+                                                    ,  cidade_id
+                                                    ,  dm_situacao
+                                                    ,  versao
+                                                    ,  dm_tp_amb
+                                                    ,  dm_tp_soap
+                                                    ,  dm_tp_serv
+                                                    ,  descr
+                                                    ,  url_wsdl
+                                                    ,  dm_upload
+                                                    ,  dm_ind_emit  )    
+                                             values (  csf_own.cidadewebservnfse_seq.nextval
+                                                    ,  rec_dados.id
+                                                    ,  rec_dados.dm_situacao
+                                                    ,  rec_dados.versao
+                                                    ,  rec_dados.dm_tp_amb
+                                                    ,  rec_dados.dm_tp_soap
+                                                    ,  rec_dados.dm_tp_serv
+                                                    ,  rec_dados.descr
+                                                    ,  rec_dados.url_wsdl
+                                                    ,  rec_dados.dm_upload
+                                                    ,  rec_dados.dm_ind_emit  ); 
+            --
+            commit;        
+            --
+         exception  
+            when dup_val_on_index then 
+               begin 
+                  update csf_own.cidade_webserv_nfse 
+                     set versao      = rec_dados.versao
+                       , dm_tp_soap  = rec_dados.dm_tp_soap
+                       , descr       = rec_dados.descr
+                       , url_wsdl    = rec_dados.url_wsdl
+                       , dm_upload   = rec_dados.dm_upload
+                   where cidade_id   = rec_dados.id 
+                     and dm_tp_amb   = rec_dados.dm_tp_amb 
+                     and dm_tp_serv  = rec_dados.dm_tp_serv 
+                     and dm_ind_emit = rec_dados.dm_ind_emit; 
+                  --
+                  commit; 
+                  --
+               exception when others then 
+                  raise_application_error(-20101, 'Erro no script Redmine #75703 Atualização URL ambiente de homologação e Produção Poá - SP' || sqlerrm);
+               end; 
+               --
+         end;
+         -- 
+      --
+      end loop;
+   --
+   commit;
+   --
+exception
+   when others then
+      raise_application_error(-20102, 'Erro no script Redmine #75703 Atualização URL ambiente de homologação e Produção Poá - SP' || sqlerrm);
+end;
+/
+
+declare
+--
+vn_dm_tp_amb1  number  := 0;
+vn_dm_tp_amb2  number  := 0;
+vv_ibge_cidade csf_own.cidade.ibge_cidade%type;
+vv_padrao      csf_own.dominio.descr%type;    
+vv_habil       csf_own.dominio.descr%type;
+vv_ws_canc     csf_own.dominio.descr%type;
+
+--
+Begin
+	-- Popula variáveis
+	vv_ibge_cidade := '3539806';
+	vv_padrao      := 'eTransparencia';     
+	vv_habil       := 'SIM';
+	vv_ws_canc     := 'SIM';
+
+    begin
+      --
+      SELECT count(*)
+        into vn_dm_tp_amb1
+        from csf_own.empresa
+       where dm_tp_amb = 1
+       group by dm_tp_amb;
+      exception when others then
+        vn_dm_tp_amb1 := 0; 
+      --
+    end;
+   --
+    Begin
+      --
+      SELECT count(*)
+        into vn_dm_tp_amb2
+        from csf_own.empresa
+       where dm_tp_amb = 2
+       group by dm_tp_amb;
+      --
+	  exception when others then 
+        vn_dm_tp_amb2 := 0;
+     --
+    end;
+--
+	if vn_dm_tp_amb2 > vn_dm_tp_amb1 then
+	  --
+	  begin
+	    --  
+	    update csf_own.cidade_webserv_nfse
+		   set url_wsdl = 'DESATIVADO AMBIENTE DE PRODUCAO'
+	     where cidade_id in (select id
+							   from csf_own.cidade
+							  where ibge_cidade in (vv_ibge_cidade))
+		   and dm_tp_amb = 1;
+	  exception when others then
+		  null;
+	  end;
+	  --  
+	  commit;
+	  --
+	end if;
+--
+	begin
+		--
+		update csf_own.cidade_nfse set dm_padrao    = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_padrao') and upper(descr) = upper(vv_padrao))
+								       , dm_habil   = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_habil') and upper(descr) = upper(vv_habil))
+								       , dm_ws_canc = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_ws_canc') and upper(descr) = upper(vv_ws_canc))
+         where cidade_id = (select distinct id from csf_own.cidade where ibge_cidade in (vv_ibge_cidade));
+	exception 
+		when others then
+			raise_application_error(-20103, 'Erro no script Redmine #75703 Atualização do Padrão Poá - SP' || sqlerrm);
+    end;
+	--
+	commit;
+	--
+--
+end;
+--
+/  
+-------------------------------------------------------------------------------------------------------------------------------------------
+Prompt FIM - Redmine #75703 Adicionar cidade Poá ao padrão e-Transparencia
+-------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------
+Prompt INI - Redmine #76219 Sincronização dos scripts Maringá
+-------------------------------------------------------------------------------------------------------------------------------------------
+--
+--CIDADE  : Maringá
+--IBGE    : 4115200
+--PADRAO  : Por Cidade
+--HABIL   : SIM
+--WS_CANC : SIM
+
+--HML: https://nfse-ws.hom-ecity.maringa.pr.gov.br/v2.01
+--PRD: https://nfse-ws.ecity.maringa.pr.gov.br/v2.01
+
+declare 
+   --   
+   -- dm_tp_amb (Tipo de Ambiente 1-Producao; 2-Homologacao)
+   cursor c_dados is
+      select   ( select id from csf_own.cidade where ibge_cidade = '4115200' ) id, dm_situacao,  versao,  dm_tp_amb,  dm_tp_soap,  dm_tp_serv, descr, url_wsdl, dm_upload, dm_ind_emit 
+        from ( --Produção
+			   select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geração de NFS-e'                               descr, 'https://nfse-ws.ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepção e Processamento de lote de RPS'        descr, 'https://nfse-ws.ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situação de lote de RPS'            descr, 'https://nfse-ws.ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'https://nfse-ws.ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'https://nfse-ws.ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'https://nfse-ws.ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituição de NFS-e'                          descr, 'https://nfse-ws.ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'https://nfse-ws.ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'https://nfse-ws.ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'https://nfse-ws.ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               --Homologação
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geração de NFS-e'                               descr, 'https://nfse-ws.hom-ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepção e Processamento de lote de RPS'        descr, 'https://nfse-ws.hom-ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situação de lote de RPS'            descr, 'https://nfse-ws.hom-ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'https://nfse-ws.hom-ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'https://nfse-ws.hom-ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'https://nfse-ws.hom-ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituição de NFS-e'                          descr, 'https://nfse-ws.hom-ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'https://nfse-ws.hom-ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'https://nfse-ws.hom-ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'https://nfse-ws.hom-ecity.maringa.pr.gov.br/v2.01' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual
+              );
+--   
+begin   
+   --
+      for rec_dados in c_dados loop
+         exit when c_dados%notfound or (c_dados%notfound) is null;
+         --
+         begin  
+            insert into csf_own.cidade_webserv_nfse (  id
+                                                    ,  cidade_id
+                                                    ,  dm_situacao
+                                                    ,  versao
+                                                    ,  dm_tp_amb
+                                                    ,  dm_tp_soap
+                                                    ,  dm_tp_serv
+                                                    ,  descr
+                                                    ,  url_wsdl
+                                                    ,  dm_upload
+                                                    ,  dm_ind_emit  )    
+                                             values (  csf_own.cidadewebservnfse_seq.nextval
+                                                    ,  rec_dados.id
+                                                    ,  rec_dados.dm_situacao
+                                                    ,  rec_dados.versao
+                                                    ,  rec_dados.dm_tp_amb
+                                                    ,  rec_dados.dm_tp_soap
+                                                    ,  rec_dados.dm_tp_serv
+                                                    ,  rec_dados.descr
+                                                    ,  rec_dados.url_wsdl
+                                                    ,  rec_dados.dm_upload
+                                                    ,  rec_dados.dm_ind_emit  ); 
+            --
+            commit;        
+            --
+         exception  
+            when dup_val_on_index then 
+               begin 
+                  update csf_own.cidade_webserv_nfse 
+                     set versao      = rec_dados.versao
+                       , dm_tp_soap  = rec_dados.dm_tp_soap
+                       , descr       = rec_dados.descr
+                       , url_wsdl    = rec_dados.url_wsdl
+                       , dm_upload   = rec_dados.dm_upload
+                   where cidade_id   = rec_dados.id 
+                     and dm_tp_amb   = rec_dados.dm_tp_amb 
+                     and dm_tp_serv  = rec_dados.dm_tp_serv 
+                     and dm_ind_emit = rec_dados.dm_ind_emit; 
+                  --
+                  commit; 
+                  --
+               exception when others then 
+                  raise_application_error(-20101, 'Erro no script Redmine #76219 Atualização URL ambiente de homologação e Produção Maringá - PR' || sqlerrm);
+               end; 
+               --
+         end;
+         -- 
+      --
+      end loop;
+   --
+   commit;
+   --
+exception
+   when others then
+      raise_application_error(-20102, 'Erro no script Redmine #76219 Atualização URL ambiente de homologação e Produção Maringá - PR' || sqlerrm);
+end;
+/
+ 
+declare
+--
+vn_dm_tp_amb1  number  := 0;
+vn_dm_tp_amb2  number  := 0;
+vv_ibge_cidade csf_own.cidade.ibge_cidade%type;
+vv_padrao      csf_own.dominio.descr%type;    
+vv_habil       csf_own.dominio.descr%type;
+vv_ws_canc     csf_own.dominio.descr%type;
+
+--
+Begin
+	-- Popula variáveis
+	vv_ibge_cidade := '4115200';
+	vv_padrao      := 'Por Cidade';     
+	vv_habil       := 'SIM';
+	vv_ws_canc     := 'SIM';
+
+    begin
+      --
+      SELECT count(*)
+        into vn_dm_tp_amb1
+        from csf_own.empresa
+       where dm_tp_amb = 1
+       group by dm_tp_amb;
+      exception when others then
+        vn_dm_tp_amb1 := 0; 
+      --
+    end;
+   --
+    Begin
+      --
+      SELECT count(*)
+        into vn_dm_tp_amb2
+        from csf_own.empresa
+       where dm_tp_amb = 2
+       group by dm_tp_amb;
+      --
+	  exception when others then 
+        vn_dm_tp_amb2 := 0;
+     --
+    end;
+--
+	if vn_dm_tp_amb2 > vn_dm_tp_amb1 then
+	  --
+	  begin
+	    --  
+	    update csf_own.cidade_webserv_nfse
+		   set url_wsdl = 'DESATIVADO AMBIENTE DE PRODUCAO'
+	     where cidade_id in (select id
+							   from csf_own.cidade
+							  where ibge_cidade in (vv_ibge_cidade))
+		   and dm_tp_amb = 1;
+	  exception 
+		 when others then
+		   null;
+	  end;
+	  --  
+	  commit;
+	  --
+	end if;
+--
+	begin
+		--
+		update csf_own.cidade_nfse set dm_padrao    = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_padrao') and upper(descr) = upper(vv_padrao))
+								       , dm_habil   = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_habil') and upper(descr) = upper(vv_habil))
+								       , dm_ws_canc = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_ws_canc') and upper(descr) = upper(vv_ws_canc))
+         where cidade_id = (select distinct id from csf_own.cidade where ibge_cidade in (vv_ibge_cidade));
+		exception when others then
+			raise_application_error(-20103, 'Erro no script Redmine #76219 Atualização do Padrão Maringá - PR' || sqlerrm);
+    end;
+	--
+	commit;
+	--
+--
+end;
+--
+/  
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Prompt FIM - Redmine #76219 Sincronização dos scripts Maringá
+-------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------
+Prompt INI - Redmine #76409 Criação de padrão betha a adição de Lages - SC ao padrão
+-------------------------------------------------------------------------------------------------------------------------------------------
+--
+--CIDADE  : Lages - SC
+--IBGE    : 4209300
+--PADRAO  : Betha Sistemas
+--HABIL   : SIM
+--WS_CANC : SIM
+
+declare 
+   --   
+   -- dm_tp_amb (Tipo de Ambiente 1-Producao; 2-Homologacao)
+   cursor c_dados is
+      select   ( select id from csf_own.cidade where ibge_cidade = '4209300' ) id, dm_situacao,  versao,  dm_tp_amb,  dm_tp_soap,  dm_tp_serv, descr, url_wsdl, dm_upload, dm_ind_emit 
+        from ( --Produção
+			   select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geração de NFS-e'                               descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepção e Processamento de lote de RPS'        descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situação de lote de RPS'            descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituição de NFS-e'                          descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               --Homologação
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geração de NFS-e'                               descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-test-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepção e Processamento de lote de RPS'        descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-test-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situação de lote de RPS'            descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-test-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-test-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-test-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-test-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituição de NFS-e'                          descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-test-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-test-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-test-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'http://e-gov.betha.com.br/e-nota-contribuinte-test-ws/nfseWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual
+              );
+--   
+begin   
+   --
+      for rec_dados in c_dados loop
+         exit when c_dados%notfound or (c_dados%notfound) is null;
+         --
+         begin  
+            insert into csf_own.cidade_webserv_nfse (  id
+                                                    ,  cidade_id
+                                                    ,  dm_situacao
+                                                    ,  versao
+                                                    ,  dm_tp_amb
+                                                    ,  dm_tp_soap
+                                                    ,  dm_tp_serv
+                                                    ,  descr
+                                                    ,  url_wsdl
+                                                    ,  dm_upload
+                                                    ,  dm_ind_emit  )    
+                                             values (  csf_own.cidadewebservnfse_seq.nextval
+                                                    ,  rec_dados.id
+                                                    ,  rec_dados.dm_situacao
+                                                    ,  rec_dados.versao
+                                                    ,  rec_dados.dm_tp_amb
+                                                    ,  rec_dados.dm_tp_soap
+                                                    ,  rec_dados.dm_tp_serv
+                                                    ,  rec_dados.descr
+                                                    ,  rec_dados.url_wsdl
+                                                    ,  rec_dados.dm_upload
+                                                    ,  rec_dados.dm_ind_emit  ); 
+            --
+            commit;        
+            --
+         exception  
+            when dup_val_on_index then 
+               begin 
+                  update csf_own.cidade_webserv_nfse 
+                     set versao      = rec_dados.versao
+                       , dm_tp_soap  = rec_dados.dm_tp_soap
+                       , descr       = rec_dados.descr
+                       , url_wsdl    = rec_dados.url_wsdl
+                       , dm_upload   = rec_dados.dm_upload
+                   where cidade_id   = rec_dados.id 
+                     and dm_tp_amb   = rec_dados.dm_tp_amb 
+                     and dm_tp_serv  = rec_dados.dm_tp_serv 
+                     and dm_ind_emit = rec_dados.dm_ind_emit; 
+                  --
+                  commit; 
+                  --
+               exception when others then 
+                  raise_application_error(-20101, 'Erro no script Redmine #76409 Atualização URL ambiente de homologação e Produção Lages - SC' || sqlerrm);
+               end; 
+               --
+         end;
+         -- 
+      --
+      end loop;
+   --
+   commit;
+   --
+exception
+   when others then
+      raise_application_error(-20102, 'Erro no script Redmine #76409 Atualização URL ambiente de homologação e Produção Lages - SC' || sqlerrm);
+end;
+/
+
+declare
+--
+vn_dm_tp_amb1  number  := 0;
+vn_dm_tp_amb2  number  := 0;
+vv_ibge_cidade csf_own.cidade.ibge_cidade%type;
+vv_padrao      csf_own.dominio.descr%type;    
+vv_habil       csf_own.dominio.descr%type;
+vv_ws_canc     csf_own.dominio.descr%type;
+
+--
+Begin
+	-- Popula variáveis
+	vv_ibge_cidade := '4209300';
+	vv_padrao      := 'Betha Sistemas';     
+	vv_habil       := 'SIM';
+	vv_ws_canc     := 'SIM';
+
+    begin
+      --
+      SELECT count(*)
+        into vn_dm_tp_amb1
+        from csf_own.empresa
+       where dm_tp_amb = 1
+       group by dm_tp_amb;
+      exception when others then
+        vn_dm_tp_amb1 := 0; 
+      --
+    end;
+   --
+    Begin
+      --
+      SELECT count(*)
+        into vn_dm_tp_amb2
+        from csf_own.empresa
+       where dm_tp_amb = 2
+       group by dm_tp_amb;
+      --
+	  exception when others then 
+        vn_dm_tp_amb2 := 0;
+     --
+    end;
+--
+	if vn_dm_tp_amb2 > vn_dm_tp_amb1 then
+	  --
+	  begin
+	    --  
+	    update csf_own.cidade_webserv_nfse
+		   set url_wsdl = 'DESATIVADO AMBIENTE DE PRODUCAO'
+	     where cidade_id in (select id
+							   from csf_own.cidade
+							  where ibge_cidade in (vv_ibge_cidade))
+		   and dm_tp_amb = 1;
+	  exception 
+		 when others then
+		   null;
+	  end;
+	  --  
+	  commit;
+	  --
+	end if;
+--
+	begin
+		--
+		update csf_own.cidade_nfse set dm_padrao    = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_padrao') and upper(descr) = upper(vv_padrao))
+								       , dm_habil   = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_habil') and upper(descr) = upper(vv_habil))
+								       , dm_ws_canc = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_ws_canc') and upper(descr) = upper(vv_ws_canc))
+         where cidade_id = (select distinct id from csf_own.cidade where ibge_cidade in (vv_ibge_cidade));
+		exception when others then
+			raise_application_error(-20103, 'Erro no script Redmine #76409 Atualização do Padrão Lages - SC' || sqlerrm);
+    end;
+	--
+	commit;
+	--
+--
+end;
+--
+/  
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Prompt FIM - Redmine #76409 Criação de padrão betha a adição de Lages - SC ao padrão
+-------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------
+Prompt INI - Redmine #76469 Criação de padrão Fiorilli a adição de Ji Parana - RO ao padrão
+-------------------------------------------------------------------------------------------------------------------------------------------
+--
+--CIDADE  : Ji Parana - RO
+--IBGE    : 1100122
+--PADRAO  : Fiorilli
+--HABIL   : SIM
+--WS_CANC : SIM
+
+declare 
+   --   
+   -- dm_tp_amb (Tipo de Ambiente 1-Producao; 2-Homologacao)
+   cursor c_dados is
+      select   ( select id from csf_own.cidade where ibge_cidade = '1100122' ) id, dm_situacao,  versao,  dm_tp_amb,  dm_tp_soap,  dm_tp_serv, descr, url_wsdl, dm_upload, dm_ind_emit 
+        from ( --Produção
+			   select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geração de NFS-e'                               descr, 'http://177.124.184.59:5660/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepção e Processamento de lote de RPS'        descr, 'http://177.124.184.59:5660/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situação de lote de RPS'            descr, 'http://177.124.184.59:5660/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'http://177.124.184.59:5660/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'http://177.124.184.59:5660/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'http://177.124.184.59:5660/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituição de NFS-e'                          descr, 'http://177.124.184.59:5660/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'http://177.124.184.59:5660/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'http://177.124.184.59:5660/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'http://177.124.184.59:5660/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               --Homologação
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geração de NFS-e'                               descr, 'http://fi1.fiorilli.com.br:5663/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepção e Processamento de lote de RPS'        descr, 'http://fi1.fiorilli.com.br:5663/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situação de lote de RPS'            descr, 'http://fi1.fiorilli.com.br:5663/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'http://fi1.fiorilli.com.br:5663/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'http://fi1.fiorilli.com.br:5663/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'http://fi1.fiorilli.com.br:5663/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituição de NFS-e'                          descr, 'http://fi1.fiorilli.com.br:5663/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'http://fi1.fiorilli.com.br:5663/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'http://fi1.fiorilli.com.br:5663/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'http://fi1.fiorilli.com.br:5663/IssWeb-ejb/IssWebWS/IssWebWS?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual
+              );
+--   
+begin   
+   --
+      for rec_dados in c_dados loop
+         exit when c_dados%notfound or (c_dados%notfound) is null;
+         --
+         begin  
+            insert into csf_own.cidade_webserv_nfse (  id
+                                                    ,  cidade_id
+                                                    ,  dm_situacao
+                                                    ,  versao
+                                                    ,  dm_tp_amb
+                                                    ,  dm_tp_soap
+                                                    ,  dm_tp_serv
+                                                    ,  descr
+                                                    ,  url_wsdl
+                                                    ,  dm_upload
+                                                    ,  dm_ind_emit  )    
+                                             values (  csf_own.cidadewebservnfse_seq.nextval
+                                                    ,  rec_dados.id
+                                                    ,  rec_dados.dm_situacao
+                                                    ,  rec_dados.versao
+                                                    ,  rec_dados.dm_tp_amb
+                                                    ,  rec_dados.dm_tp_soap
+                                                    ,  rec_dados.dm_tp_serv
+                                                    ,  rec_dados.descr
+                                                    ,  rec_dados.url_wsdl
+                                                    ,  rec_dados.dm_upload
+                                                    ,  rec_dados.dm_ind_emit  ); 
+            --
+            commit;        
+            --
+         exception  
+            when dup_val_on_index then 
+               begin 
+                  update csf_own.cidade_webserv_nfse 
+                     set versao      = rec_dados.versao
+                       , dm_tp_soap  = rec_dados.dm_tp_soap
+                       , descr       = rec_dados.descr
+                       , url_wsdl    = rec_dados.url_wsdl
+                       , dm_upload   = rec_dados.dm_upload
+                   where cidade_id   = rec_dados.id 
+                     and dm_tp_amb   = rec_dados.dm_tp_amb 
+                     and dm_tp_serv  = rec_dados.dm_tp_serv 
+                     and dm_ind_emit = rec_dados.dm_ind_emit; 
+                  --
+                  commit; 
+                  --
+               exception when others then 
+                  raise_application_error(-20101, 'Erro no script Redmine #76469 Atualização URL ambiente de homologação e Produção Ji Parana - RO' || sqlerrm);
+               end; 
+               --
+         end;
+         -- 
+      --
+      end loop;
+   --
+   commit;
+   --
+exception
+   when others then
+      raise_application_error(-20102, 'Erro no script Redmine #76469 Atualização URL ambiente de homologação e Produção Ji Parana - RO' || sqlerrm);
+end;
+/
+
+declare
+--
+vn_dm_tp_amb1  number  := 0;
+vn_dm_tp_amb2  number  := 0;
+vv_ibge_cidade csf_own.cidade.ibge_cidade%type;
+vv_padrao      csf_own.dominio.descr%type;    
+vv_habil       csf_own.dominio.descr%type;
+vv_ws_canc     csf_own.dominio.descr%type;
+
+--
+Begin
+	-- Popula variáveis
+	vv_ibge_cidade := '1100122';
+	vv_padrao      := 'Fiorilli';     
+	vv_habil       := 'SIM';
+	vv_ws_canc     := 'SIM';
+
+    begin
+      --
+      SELECT count(*)
+        into vn_dm_tp_amb1
+        from csf_own.empresa
+       where dm_tp_amb = 1
+       group by dm_tp_amb;
+      exception when others then
+        vn_dm_tp_amb1 := 0; 
+      --
+    end;
+   --
+    Begin
+      --
+      SELECT count(*)
+        into vn_dm_tp_amb2
+        from csf_own.empresa
+       where dm_tp_amb = 2
+       group by dm_tp_amb;
+      --
+	  exception when others then 
+        vn_dm_tp_amb2 := 0;
+     --
+    end;
+--
+	if vn_dm_tp_amb2 > vn_dm_tp_amb1 then
+	  --
+	  begin
+	    --  
+	    update csf_own.cidade_webserv_nfse
+		   set url_wsdl = 'DESATIVADO AMBIENTE DE PRODUCAO'
+	     where cidade_id in (select id
+							   from csf_own.cidade
+							  where ibge_cidade in (vv_ibge_cidade))
+		   and dm_tp_amb = 1;
+	  exception 
+		 when others then
+		   null;
+	  end;
+	  --  
+	  commit;
+	  --
+	end if;
+--
+	begin
+		--
+		update csf_own.cidade_nfse set dm_padrao    = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_padrao') and upper(descr) = upper(vv_padrao))
+								       , dm_habil   = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_habil') and upper(descr) = upper(vv_habil))
+								       , dm_ws_canc = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_ws_canc') and upper(descr) = upper(vv_ws_canc))
+         where cidade_id = (select distinct id from csf_own.cidade where ibge_cidade in (vv_ibge_cidade));
+		exception when others then
+			raise_application_error(-20103, 'Erro no script Redmine #76469 Atualização do Padrão Ji Parana - RO' || sqlerrm);
+    end;
+	--
+	commit;
+	--
+--
+end;
+--
+/  
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Prompt FIM - Redmine #76469 Criação de padrão Fiorilli a adição de Ji Parana - RO ao padrão
+-------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------
+Prompt INI - Redmine #76568 Criação de padrão betha a adição de PASSO FUNDO - RS ao padrão
+-------------------------------------------------------------------------------------------------------------------------------------------
+--
+--CIDADE  : PASSO FUNDO - RS
+--IBGE    : 4314100
+--PADRAO  : Thema
+--HABIL   : SIM
+--WS_CANC : SIM
+
+declare 
+   --   
+   -- dm_tp_amb (Tipo de Ambiente 1-Producao; 2-Homologacao)
+   cursor c_dados is
+      select   ( select id from csf_own.cidade where ibge_cidade = '4314100' ) id, dm_situacao,  versao,  dm_tp_amb,  dm_tp_soap,  dm_tp_serv, descr, url_wsdl, dm_upload, dm_ind_emit 
+        from ( --Produção
+			   select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geração de NFS-e'                               descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEremessa?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepção e Processamento de lote de RPS'        descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEremessa?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situação de lote de RPS'            descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEconsulta?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEconsulta?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEconsulta?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEcancelamento?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituição de NFS-e'                          descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEremessa?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEdadosCadastrais?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEconsulta?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEconsulta?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               --Homologação
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geração de NFS-e'                               descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEremessa?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepção e Processamento de lote de RPS'        descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEremessa?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situação de lote de RPS'            descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEconsulta?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEconsulta?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEconsulta?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEcancelamento?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituição de NFS-e'                          descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEremessa?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEdadosCadastrais?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEconsulta?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'http://hmlnfse.pmpf.rs.gov.br/thema-nfse/services/NFSEconsulta?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual
+              );
+--   
+begin   
+   --
+      for rec_dados in c_dados loop
+         exit when c_dados%notfound or (c_dados%notfound) is null;
+         --
+         begin  
+            insert into csf_own.cidade_webserv_nfse (  id
+                                                    ,  cidade_id
+                                                    ,  dm_situacao
+                                                    ,  versao
+                                                    ,  dm_tp_amb
+                                                    ,  dm_tp_soap
+                                                    ,  dm_tp_serv
+                                                    ,  descr
+                                                    ,  url_wsdl
+                                                    ,  dm_upload
+                                                    ,  dm_ind_emit  )    
+                                             values (  csf_own.cidadewebservnfse_seq.nextval
+                                                    ,  rec_dados.id
+                                                    ,  rec_dados.dm_situacao
+                                                    ,  rec_dados.versao
+                                                    ,  rec_dados.dm_tp_amb
+                                                    ,  rec_dados.dm_tp_soap
+                                                    ,  rec_dados.dm_tp_serv
+                                                    ,  rec_dados.descr
+                                                    ,  rec_dados.url_wsdl
+                                                    ,  rec_dados.dm_upload
+                                                    ,  rec_dados.dm_ind_emit  ); 
+            --
+            commit;        
+            --
+         exception  
+            when dup_val_on_index then 
+               begin 
+                  update csf_own.cidade_webserv_nfse 
+                     set versao      = rec_dados.versao
+                       , dm_tp_soap  = rec_dados.dm_tp_soap
+                       , descr       = rec_dados.descr
+                       , url_wsdl    = rec_dados.url_wsdl
+                       , dm_upload   = rec_dados.dm_upload
+                   where cidade_id   = rec_dados.id 
+                     and dm_tp_amb   = rec_dados.dm_tp_amb 
+                     and dm_tp_serv  = rec_dados.dm_tp_serv 
+                     and dm_ind_emit = rec_dados.dm_ind_emit; 
+                  --
+                  commit; 
+                  --
+               exception when others then 
+                  raise_application_error(-20101, 'Erro no script Redmine #76568 Atualização URL ambiente de homologação e Produção PASSO FUNDO - RS' || sqlerrm);
+               end; 
+               --
+         end;
+         -- 
+      --
+      end loop;
+   --
+   commit;
+   --
+exception
+   when others then
+      raise_application_error(-20102, 'Erro no script Redmine #76568 Atualização URL ambiente de homologação e Produção PASSO FUNDO - RS' || sqlerrm);
+end;
+/
+
+declare
+--
+vn_dm_tp_amb1  number  := 0;
+vn_dm_tp_amb2  number  := 0;
+vv_ibge_cidade csf_own.cidade.ibge_cidade%type;
+vv_padrao      csf_own.dominio.descr%type;    
+vv_habil       csf_own.dominio.descr%type;
+vv_ws_canc     csf_own.dominio.descr%type;
+
+--
+Begin
+	-- Popula variáveis
+	vv_ibge_cidade := '4314100';
+	vv_padrao      := 'Thema';     
+	vv_habil       := 'SIM';
+	vv_ws_canc     := 'SIM';
+
+    begin
+      --
+      SELECT count(*)
+        into vn_dm_tp_amb1
+        from csf_own.empresa
+       where dm_tp_amb = 1
+       group by dm_tp_amb;
+      exception when others then
+        vn_dm_tp_amb1 := 0; 
+      --
+    end;
+   --
+    Begin
+      --
+      SELECT count(*)
+        into vn_dm_tp_amb2
+        from csf_own.empresa
+       where dm_tp_amb = 2
+       group by dm_tp_amb;
+      --
+	  exception when others then 
+        vn_dm_tp_amb2 := 0;
+     --
+    end;
+--
+	if vn_dm_tp_amb2 > vn_dm_tp_amb1 then
+	  --
+	  begin
+	    --  
+	    update csf_own.cidade_webserv_nfse
+		   set url_wsdl = 'DESATIVADO AMBIENTE DE PRODUCAO'
+	     where cidade_id in (select id
+							   from csf_own.cidade
+							  where ibge_cidade in (vv_ibge_cidade))
+		   and dm_tp_amb = 1;
+	  exception 
+		 when others then
+		   null;
+	  end;
+	  --  
+	  commit;
+	  --
+	end if;
+--
+	begin
+		--
+		update csf_own.cidade_nfse set dm_padrao    = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_padrao') and upper(descr) = upper(vv_padrao))
+								       , dm_habil   = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_habil') and upper(descr) = upper(vv_habil))
+								       , dm_ws_canc = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_ws_canc') and upper(descr) = upper(vv_ws_canc))
+         where cidade_id = (select distinct id from csf_own.cidade where ibge_cidade in (vv_ibge_cidade));
+		exception when others then
+			raise_application_error(-20103, 'Erro no script Redmine #76568 Atualização do Padrão PASSO FUNDO - RS' || sqlerrm);
+    end;
+	--
+	commit;
+	--
+--
+end;
+--
+/  
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+Prompt FIM - Redmine #76568 Criação de padrão betha a adição de PASSO FUNDO - RS ao padrão
+-------------------------------------------------------------------------------------------------------------------------------------------
 
 ----------------------------------------------------------------------------------------
 Prompt FIM Patch 2.9.6.2 - Alteracoes no CSF_OWN
