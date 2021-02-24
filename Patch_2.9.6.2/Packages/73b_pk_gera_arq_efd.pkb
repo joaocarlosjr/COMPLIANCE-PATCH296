@@ -25842,6 +25842,7 @@ is
    i                 pls_integer;
    vv_cod_item       varchar2(60) := null;
    vv_cod_item_ipm   varchar2(60) := null;
+   vn_valor_mun      number;   
    --
     cursor c_1400 is
    /*select c.ibge_cidade mun
@@ -26023,13 +26024,13 @@ is
                         and nf.empresa_id       = gt_row_abertura_efd.empresa_id
                         and nf.dm_arm_nfe_terc  = 0
                         and nf.dm_st_proc       = 4 -- Autorizada
-                        and ((nf.dm_ind_emit = 1 and to_date(nvl(nf.dt_sai_ent, nf.dt_emiss), 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
+                        and ((nf.dm_ind_emit = 1 and trunc(nvl(nf.dt_sai_ent, nf.dt_emiss)) between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
                               or
-                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 1 and to_date(nf.dt_emiss, 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
+                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 1 and trunc(nf.dt_emiss) between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
                               or
-                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 0 and to_date(nf.dt_emiss, 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
+                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 0 and trunc(nf.dt_emiss) between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
                               or
-                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 1 and to_date(nvl(nf.dt_sai_ent, nf.dt_emiss), 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim))
+                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 1 and trunc(nvl(nf.dt_sai_ent, nf.dt_emiss)) between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim))
                         and mf.id               = nf.modfiscal_id
                         and mf.cod_mod          in ('01', '1B', '04', '55', '65')
                         and inf.notafiscal_id   = nf.id
@@ -26189,13 +26190,13 @@ is
                         and nf.empresa_id       = gt_row_abertura_efd.empresa_id
                         and nf.dm_arm_nfe_terc  = 0
                         and nf.dm_st_proc       = 4 -- Autorizada
-                        and ((nf.dm_ind_emit = 1 and to_date(nvl(nf.dt_sai_ent, nf.dt_emiss), 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
+                        and ((nf.dm_ind_emit = 1 and trunc(nvl(nf.dt_sai_ent, nf.dt_emiss)) between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
                               or
-                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 1 and to_date(nf.dt_emiss, 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
+                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 1 and trunc(nf.dt_emiss) between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
                               or
-                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 0 and to_date(nf.dt_emiss, 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
+                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 0 and trunc(nf.dt_emiss) between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim)
                               or
-                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 1 and to_date(nvl(nf.dt_sai_ent, nf.dt_emiss), 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim))
+                             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 1 and trunc(nvl(nf.dt_sai_ent, nf.dt_emiss)) between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim))
                         and mf.id               = nf.modfiscal_id
                         and mf.cod_mod          in ('01', '1B', '04', '55', '65')
                         and inf.notafiscal_id   = nf.id
@@ -26283,13 +26284,13 @@ is
                and ct.dm_st_proc           = 4 --#55532
                --
                and ct.empresa_id           = gt_row_abertura_efd.empresa_id
-               and ((ct.dm_ind_emit = 1 and to_date(nvl(ct.dt_sai_ent,ct.dt_hr_emissao), 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim )
+               and ((ct.dm_ind_emit = 1 and trunc(nvl(ct.dt_sai_ent,ct.dt_hr_emissao)) between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim )
                      or
-                    (ct.dm_ind_emit = 0 and ct.dm_ind_oper = 1 and to_date(ct.dt_hr_emissao, 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim )
+                    (ct.dm_ind_emit = 0 and ct.dm_ind_oper = 1 and trunc(ct.dt_hr_emissao) between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim )
                      or
-                    (ct.dm_ind_emit = 0 and ct.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 0 and to_date(ct.dt_hr_emissao, 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim )
+                    (ct.dm_ind_emit = 0 and ct.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 0 and trunc(ct.dt_hr_emissao) between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim )
                      or
-                    (ct.dm_ind_emit = 0 and ct.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 1 and to_date(nvl(ct.dt_sai_ent, ct.dt_hr_emissao), 'dd/mm/rrrr') between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim ) )
+                    (ct.dm_ind_emit = 0 and ct.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 1 and trunc(nvl(ct.dt_sai_ent, ct.dt_hr_emissao)) between gt_row_abertura_efd.dt_ini and gt_row_abertura_efd.dt_fim ) )
                --
                and (  -- parte 1
                       ( cfop.cd between 5351 and 5399 ) or
@@ -26300,7 +26301,7 @@ is
                    )
              group by c.ibge_cidade
           )
-       where nvl(valor,0) > 0
+       --where nvl(valor,0) > 0  -- Retirado pois valores zerados ou negativos são tratados po municipio na gravação. #76194
        order by mun;
    --
 begin
@@ -26337,7 +26338,27 @@ begin
                vt_tab_reg_1400(i).mun = rec_1400.mun then
                --
                vn_fase := 5;
-               vt_tab_reg_1400(i).valor := nvl(vt_tab_reg_1400(i).valor,0) + nvl(rec_1400.valor,0);
+               --
+               vn_valor_mun := 0;
+               vn_valor_mun := rec_1400.valor;
+               --
+               vn_fase := 5.1;
+               -- 			    
+               if vv_cod_item_ipm = 'SPDIPAM22' then      -- NF
+                  --			   
+                  if nvl(vn_valor_mun, 0) <= 0 then
+                     vn_valor_mun := '0,01';
+                  end if; 
+                  --				  
+               elsif vv_cod_item_ipm = 'SPDIPAM23' then   -- CT
+                  --			   
+                  if nvl(vn_valor_mun,0) <= 0 then
+                     vn_valor_mun := 1;
+                  end if;
+                  --				  
+               end if;			   
+               --			   
+               vt_tab_reg_1400(i).valor := nvl(vt_tab_reg_1400(i).valor,0) + nvl(vn_valor_mun,0);
                exit;
                --
             end if;
@@ -26350,7 +26371,29 @@ begin
             vt_tab_reg_1400(i).reg          := '1400';
             vt_tab_reg_1400(i).cod_item_ipm := nvl(vv_cod_item_ipm,vv_cod_item);
             vt_tab_reg_1400(i).mun          := rec_1400.mun;
-            vt_tab_reg_1400(i).valor        := rec_1400.valor;
+            --
+            vn_fase := 6.1;
+            --			
+            vn_valor_mun := 0;
+            vn_valor_mun := rec_1400.valor;
+            --
+            vn_fase := 6.2;
+            -- 			    
+            if vv_cod_item_ipm = 'SPDIPAM22' then      -- NF
+               --			   
+               if nvl(vn_valor_mun, 0) <= 0 then
+                  vn_valor_mun := '0,01';
+               end if; 
+               --				  
+            elsif vv_cod_item_ipm = 'SPDIPAM23' then   -- CT
+               --			   
+               if nvl(vn_valor_mun,0) <= 0 then
+                  vn_valor_mun := 1;
+               end if;
+               --				  
+            end if;			   
+            -- 			
+            vt_tab_reg_1400(i).valor        := vn_valor_mun;
          when others then
             null;
       end;
@@ -37561,6 +37604,7 @@ procedure pkb_monta_reg_C100 is
   vn_antecipacao_credito_icms number;
   vn_idx_codinf               number := 0;
   vn_dm_ind_ie_dest           nota_fiscal_dest.dm_ind_ie_dest%type;
+  vv_volta_origem_dado_pessoa varchar2(1) := null;    
   --     
   cursor c_nf_inut is
     select mf.cod_mod, 
@@ -39200,7 +39244,7 @@ begin
                   --vt_tri_tab_reg_c113(i)(j)(k).cod_part := pk_csf.fkg_pessoa_cod_part (rec_c113.pessoa_id);
                   vt_tri_tab_reg_c113(i)(j)(k).cod_part   := pk_csf_api_efd.fkb_ret_cnpjcpj_ibge_cod_part(en_pessoa_id          => rec_c113.pessoa_id,
                                                                                                           en_tipo_retorna       => 1, -- 0-PESSOA_ID / 1-COD_PART    
-                                                                                                          en_origem_dado_pessoa => gn_origem_dado_pessoa,
+                                                                                                          en_origem_dado_pessoa => 0, -- Fixo reg C113 - Cadastro pessoa - #76361
                                                                                                           en_notafiscal_id      => rec_c113.notafiscal_id);
                   vt_tri_tab_reg_c113(i)(j)(k).cod_mod    := pk_csf.fkg_cod_mod_id(en_modfiscal_id => rec_c113.modfiscal_id);
                   vt_tri_tab_reg_c113(i)(j)(k).ser        := rec_c113.serie;
@@ -39216,8 +39260,25 @@ begin
                     --
                     vn_fase := 17.17;
                     --
+                    -- Verificando se o parametro está como "DOCUMENTO_FISCAL" colcoar como "CADASTRO_PESSOA" pois conhecimento
+                    -- de transporte deve-se pegar do cadastro de pessoa.		 
+                    if gn_origem_dado_pessoa = 1 then
+                       --
+                       gn_origem_dado_pessoa       := 0;			
+                       vv_volta_origem_dado_pessoa := 'S';
+                       --
+                    end if;
+                    --		 
                     pkb_monta_reg_0150(en_pessoa_id     => rec_c113.pessoa_id,
                                        en_notafiscal_id => rec_c113.notafiscal_id);
+                    --
+                    -- Se foi trocado pois o parametro estava "DOCUMENTO_FISCAL" retornar o parametro conforme estava.		 
+                    if nvl( vv_volta_origem_dado_pessoa, 'N') = 'S' then
+                       --
+                       gn_origem_dado_pessoa       := 1;
+                       vv_volta_origem_dado_pessoa := null;				
+                       --
+                    end if;
                     --
                   end if;
                   --
@@ -59148,9 +59209,224 @@ procedure pkb_insert_tabela_tmp is
 begin
   --
   -- Nota Fiscal
-  insert /*+ APPEND */
-  into tmp_nota_fiscal
-    select * -- menção da tabela nota fiscal somente no insert da temporária.
+  insert 
+  into tmp_nota_fiscal 
+  (ID,
+EMPRESA_ID,
+PESSOA_ID,
+SITDOCTO_ID,
+NATOPER_ID,
+LOTE_ID,
+INUTILIZANF_ID,
+VERSAO,
+ID_TAG_NFE,
+PK_NITEM,
+NAT_OPER,
+DM_IND_PAG,
+MODFISCAL_ID,
+DM_IND_EMIT,
+DM_IND_OPER,
+DT_SAI_ENT,
+DT_EMISS,
+NRO_NF,
+SERIE,
+UF_EMBARQ,
+LOCAL_EMBARQ,
+NF_EMPENHO,
+PEDIDO_COMPRA,
+CONTRATO_COMPRA,
+DM_ST_PROC,
+DT_ST_PROC,
+DM_FORMA_EMISS,
+DM_IMPRESSA,
+DM_TP_IMPR,
+DM_TP_AMB,
+DM_FIN_NFE,
+DM_PROC_EMISS,
+VERS_PROC,
+DT_AUT_SEFAZ,
+DM_AUT_SEFAZ,
+CIDADE_IBGE_EMIT,
+UF_IBGE_EMIT,
+DT_HR_ENT_SIST,
+NRO_CHAVE_NFE,
+CNF_NFE,
+DIG_VERIF_CHAVE,
+VERS_APL,
+DT_HR_RECBTO,
+NRO_PROTOCOLO,
+DIGEST_VALUE,
+MSGWEBSERV_ID,
+COD_MSG,
+MOTIVO_RESP,
+NFE_PROC_XML,
+DM_ST_EMAIL,
+ID_USUARIO_ERP,
+IMPRESSORA_ID,
+USUARIO_ID,
+DM_ST_INTEGRA,
+VIAS_DANFE_CUSTOM,
+NRO_CHAVE_NFE_ADIC,
+NRO_TENTATIVAS_IMPR,
+DT_ULT_TENTA_IMPR,
+SUB_SERIE,
+CODCONSITEMCONT_ID,
+INFORCOMPDCTOFISCAL_ID,
+COD_CTA,
+DM_TP_LIGACAO,
+DM_COD_GRUPO_TENSAO,
+DM_TP_ASSINANTE,
+SISTORIG_ID,
+UNIDORG_ID,
+SERIE_SCAN,
+NRO_NF_SCAN,
+HORA_SAI_ENT,
+NRO_CHAVE_CTE_REF,
+DT_CONT,
+JUST_CONT,
+DM_RET_NF_ERP,
+XML_WSSINAL_SUFRAMA,
+DM_ST_WSSINAL_SUFRAMA,
+DM_ARM_NFE_TERC,
+DM_REC_XML,
+DM_DANFE_REC,
+NRO_EMAIL_ENV_FORN,
+DM_FIN_EMAIL_FORN,
+SEQ_NRO_ORD_EMB,
+DT_HR_REG_DPEC,
+NRO_REG_DPEC,
+DT_EMAIL_ENV_FORN,
+NRO_ORD_EMB,
+DM_ID_DEST,
+DM_IND_FINAL,
+DM_IND_PRES,
+LOCAL_DESPACHO,
+EMPRESAINTEGRBANCO_ID,
+INF_CPL_IMP,
+HASH,
+QR_CODE,
+DM_LEGADO,
+DM_IND_ATIV_PART,
+DM_MOT_DES_ICMS_PART,
+DM_CALC_ICMSST_PART,
+VERSION,
+DM_DOWNLOAD_XML_SIC,
+URL_CHAVE,
+DM_ENVIO_REINF,
+COD_MENSAGEM,
+MSG_SEFAZ,
+QR_CODE_NFCE,
+CSC_NFCE,
+DM_NRO_CHAVE_NFE_ORIG,
+MODELODANFE_ID)
+    select ID,
+EMPRESA_ID,
+PESSOA_ID,
+SITDOCTO_ID,
+NATOPER_ID,
+LOTE_ID,
+INUTILIZANF_ID,
+VERSAO,
+ID_TAG_NFE,
+PK_NITEM,
+NAT_OPER,
+DM_IND_PAG,
+MODFISCAL_ID,
+DM_IND_EMIT,
+DM_IND_OPER,
+DT_SAI_ENT,
+DT_EMISS,
+NRO_NF,
+SERIE,
+UF_EMBARQ,
+LOCAL_EMBARQ,
+NF_EMPENHO,
+PEDIDO_COMPRA,
+CONTRATO_COMPRA,
+DM_ST_PROC,
+DT_ST_PROC,
+DM_FORMA_EMISS,
+DM_IMPRESSA,
+DM_TP_IMPR,
+DM_TP_AMB,
+DM_FIN_NFE,
+DM_PROC_EMISS,
+VERS_PROC,
+DT_AUT_SEFAZ,
+DM_AUT_SEFAZ,
+CIDADE_IBGE_EMIT,
+UF_IBGE_EMIT,
+DT_HR_ENT_SIST,
+NRO_CHAVE_NFE,
+CNF_NFE,
+DIG_VERIF_CHAVE,
+VERS_APL,
+DT_HR_RECBTO,
+NRO_PROTOCOLO,
+DIGEST_VALUE,
+MSGWEBSERV_ID,
+COD_MSG,
+MOTIVO_RESP,
+NFE_PROC_XML,
+DM_ST_EMAIL,
+ID_USUARIO_ERP,
+IMPRESSORA_ID,
+USUARIO_ID,
+DM_ST_INTEGRA,
+VIAS_DANFE_CUSTOM,
+NRO_CHAVE_NFE_ADIC,
+NRO_TENTATIVAS_IMPR,
+DT_ULT_TENTA_IMPR,
+SUB_SERIE,
+CODCONSITEMCONT_ID,
+INFORCOMPDCTOFISCAL_ID,
+COD_CTA,
+DM_TP_LIGACAO,
+DM_COD_GRUPO_TENSAO,
+DM_TP_ASSINANTE,
+SISTORIG_ID,
+UNIDORG_ID,
+SERIE_SCAN,
+NRO_NF_SCAN,
+HORA_SAI_ENT,
+NRO_CHAVE_CTE_REF,
+DT_CONT,
+JUST_CONT,
+DM_RET_NF_ERP,
+XML_WSSINAL_SUFRAMA,
+DM_ST_WSSINAL_SUFRAMA,
+DM_ARM_NFE_TERC,
+DM_REC_XML,
+DM_DANFE_REC,
+NRO_EMAIL_ENV_FORN,
+DM_FIN_EMAIL_FORN,
+SEQ_NRO_ORD_EMB,
+DT_HR_REG_DPEC,
+NRO_REG_DPEC,
+DT_EMAIL_ENV_FORN,
+NRO_ORD_EMB,
+DM_ID_DEST,
+DM_IND_FINAL,
+DM_IND_PRES,
+LOCAL_DESPACHO,
+EMPRESAINTEGRBANCO_ID,
+INF_CPL_IMP,
+HASH,
+QR_CODE,
+DM_LEGADO,
+DM_IND_ATIV_PART,
+DM_MOT_DES_ICMS_PART,
+DM_CALC_ICMSST_PART,
+VERSION,
+DM_DOWNLOAD_XML_SIC,
+URL_CHAVE,
+DM_ENVIO_REINF,
+COD_MENSAGEM,
+MSG_SEFAZ,
+QR_CODE_NFCE,
+CSC_NFCE,
+DM_NRO_CHAVE_NFE_ORIG,
+MODELODANFE_ID -- menção da tabela nota fiscal somente no insert da temporária.
       from nota_fiscal nf
      where nf.dm_st_proc      in (4, 6, 7, 8) -- 4-Autorizada, 6-Denegada, 7-Cancelada, 8-Inutilizada
        and nf.empresa_id      = gt_row_abertura_efd.empresa_id
@@ -59168,7 +59444,114 @@ begin
              or
             (nf.dm_ind_emit = 0 and nf.dm_ind_oper = 0 and gn_dm_dt_escr_dfepoe = 1 and trunc(nvl(nf.dt_sai_ent, nf.dt_emiss)) between trunc(gt_row_abertura_efd.dt_ini) and trunc(gt_row_abertura_efd.dt_fim)))
     union all
-    select * -- menção da tabela nota fiscal somente no insert da temporária.
+    select ID,
+EMPRESA_ID,
+PESSOA_ID,
+SITDOCTO_ID,
+NATOPER_ID,
+LOTE_ID,
+INUTILIZANF_ID,
+VERSAO,
+ID_TAG_NFE,
+PK_NITEM,
+NAT_OPER,
+DM_IND_PAG,
+MODFISCAL_ID,
+DM_IND_EMIT,
+DM_IND_OPER,
+DT_SAI_ENT,
+DT_EMISS,
+NRO_NF,
+SERIE,
+UF_EMBARQ,
+LOCAL_EMBARQ,
+NF_EMPENHO,
+PEDIDO_COMPRA,
+CONTRATO_COMPRA,
+DM_ST_PROC,
+DT_ST_PROC,
+DM_FORMA_EMISS,
+DM_IMPRESSA,
+DM_TP_IMPR,
+DM_TP_AMB,
+DM_FIN_NFE,
+DM_PROC_EMISS,
+VERS_PROC,
+DT_AUT_SEFAZ,
+DM_AUT_SEFAZ,
+CIDADE_IBGE_EMIT,
+UF_IBGE_EMIT,
+DT_HR_ENT_SIST,
+NRO_CHAVE_NFE,
+CNF_NFE,
+DIG_VERIF_CHAVE,
+VERS_APL,
+DT_HR_RECBTO,
+NRO_PROTOCOLO,
+DIGEST_VALUE,
+MSGWEBSERV_ID,
+COD_MSG,
+MOTIVO_RESP,
+NFE_PROC_XML,
+DM_ST_EMAIL,
+ID_USUARIO_ERP,
+IMPRESSORA_ID,
+USUARIO_ID,
+DM_ST_INTEGRA,
+VIAS_DANFE_CUSTOM,
+NRO_CHAVE_NFE_ADIC,
+NRO_TENTATIVAS_IMPR,
+DT_ULT_TENTA_IMPR,
+SUB_SERIE,
+CODCONSITEMCONT_ID,
+INFORCOMPDCTOFISCAL_ID,
+COD_CTA,
+DM_TP_LIGACAO,
+DM_COD_GRUPO_TENSAO,
+DM_TP_ASSINANTE,
+SISTORIG_ID,
+UNIDORG_ID,
+SERIE_SCAN,
+NRO_NF_SCAN,
+HORA_SAI_ENT,
+NRO_CHAVE_CTE_REF,
+DT_CONT,
+JUST_CONT,
+DM_RET_NF_ERP,
+XML_WSSINAL_SUFRAMA,
+DM_ST_WSSINAL_SUFRAMA,
+DM_ARM_NFE_TERC,
+DM_REC_XML,
+DM_DANFE_REC,
+NRO_EMAIL_ENV_FORN,
+DM_FIN_EMAIL_FORN,
+SEQ_NRO_ORD_EMB,
+DT_HR_REG_DPEC,
+NRO_REG_DPEC,
+DT_EMAIL_ENV_FORN,
+NRO_ORD_EMB,
+DM_ID_DEST,
+DM_IND_FINAL,
+DM_IND_PRES,
+LOCAL_DESPACHO,
+EMPRESAINTEGRBANCO_ID,
+INF_CPL_IMP,
+HASH,
+QR_CODE,
+DM_LEGADO,
+DM_IND_ATIV_PART,
+DM_MOT_DES_ICMS_PART,
+DM_CALC_ICMSST_PART,
+VERSION,
+DM_DOWNLOAD_XML_SIC,
+URL_CHAVE,
+DM_ENVIO_REINF,
+COD_MENSAGEM,
+MSG_SEFAZ,
+QR_CODE_NFCE,
+CSC_NFCE,
+DM_NRO_CHAVE_NFE_ORIG,
+MODELODANFE_ID -- menção da tabela nota fiscal somente no insert da temporária.
       from nota_fiscal nf
      where nf.dm_st_proc      in (4, 6, 7, 8) -- 4-Autorizada, 6-Denegada, 7-Cancelada, 8-Inutilizada
        and nf.empresa_id      = gt_row_abertura_efd.empresa_id

@@ -3,6 +3,21 @@ create or replace package csf_own.pk_gera_arq_efd is
 -------------------------------------------------------------------------------------------------------
 -- Especificação do pacote de procedimentos de criação do arquivo do sped fiscal
 --
+-- Em 22/02/2021   - Luis Marques - 2.9.5.5 / 2.9.6-2 / 2.9.7
+-- Redmine #76361  - Registro C113 - Participante saindo incorreto / Registro 0150 - nome do participante incorreto
+-- Rotina Alterada - pkb_monta_reg_C100 - Fixado para registro C113 para trazer os dados do cadastro de pessoa ignorando parametro
+--                   ORIGEM_DADO_PESSOA, conforme manual SPED por se tratar de nota referenciada.
+--
+-- Em 19/02/2021   - Luis Marques - 2.9.5.5 / 2.9.6-2 / 2.9.7
+-- Redmine #76194  - Embasamento legal GIA - Valores negativos para o município
+-- Rotina Alterada - pkb_monta_reg_1400 - Colocado verificação para se valores de rateio por municipio forem negativos no caso de 
+--                   nota fiscal colocada R$ 0,01 e no caso de conhecimento de transporte coloca R$ 1,00 igual a GIA-SP 30.
+--
+-- Em 18/02/2020   - Allan Magrini - 2.9.6-2 / 2.9.7
+-- Redmine #76296 - Erro "valor maior que a precisão especificada" na geração do SPED
+-- Rotina Alterada - pkb_monta_reg_1400 alterados no cursor c_1400 os to_date para trunc
+--                   pkb_insert_tabela_tmp inseridos os campos no insert da tmp_nota_fiscal e retirado o camando /*+ APPEND */
+--
 -- Em 12/02/2021   - Luis Marques - 2.9.6-2 / 2.9.7
 -- Redmine #76110  - Verificar restante dos CNPJ's
 -- Rotina Alterada - pkb_monta_reg_1400 - Ajuste nas leituras de Notas retirando valor fixo de empresa para que todas as
