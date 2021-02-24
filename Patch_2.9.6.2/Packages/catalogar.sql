@@ -84,5 +84,12 @@ prompt 667_PB_CORRIGIR_PESSOA_NF_CT
 @@667_PB_CORRIGIR_PESSOA_NF_CT.prc
 show err
 
+prompt 668a_pk_rel_lucro_expl
+@@668a_pk_rel_lucro_expl.pks
+show err
+prompt 668b_pk_rel_lucro_expl
+@@668b_pk_rel_lucro_expl.pkb
+show err
+
 Prompt Catalogar Objetos Invalidos
 @@rec_obj_invalid.sql
