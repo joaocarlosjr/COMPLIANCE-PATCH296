@@ -1999,6 +1999,99 @@ end;
 ---------------------------------------------------------------------------------------------------------
 Prompt Inicio Redmine #75742: Customização ACG.
 ---------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------------------------------
+Prompt INI Redmine #76520 - PJ do Informe de rendimentos saindo em branco
+-------------------------------------------------------------------------------------------------------------------------------
+
+declare
+  vn_existe number := null;
+begin
+   begin
+      select count(1)
+        into vn_existe
+        from all_tab_columns c
+       where c.OWNER       = 'CSF_OWN'
+         and c.TABLE_NAME  = 'REL_JUR_INF_REND_DIRF'
+         and c.COLUMN_NAME = 'NOME_EMPRESA' 
+         and c.DATA_LENGTH = 60;
+   exception
+      when others then
+         vn_existe := null;
+   end;
+   --
+   if nvl(vn_existe, 0) > 0 then
+      --  
+      vn_existe := null;
+      --	  
+      begin
+         select count(1)
+           into vn_existe		 
+           from all_tab_columns c
+          where c.OWNER      = 'CSF_OWN'
+           and c.TABLE_NAME  = 'REL_JUR_INF_REND_DIRF'   
+           and c.COLUMN_NAME = 'NOME_FORN' 
+           and c.DATA_LENGTH = 60;
+      exception		   
+         when others then
+             vn_existe := null;
+      end;
+      --
+      if nvl(vn_existe, 0) > 0 then	  
+         --  
+         vn_existe := null;
+         --	  
+         begin 
+            select count(1) 
+              into vn_existe			
+             from all_tab_columns c
+            where c.OWNER       = 'CSF_OWN'
+              and c.TABLE_NAME  = 'REL_JUR_INF_REND_DIRF' 
+              and c.COLUMN_NAME = 'NOME_RESP' 
+              and c.DATA_LENGTH = 60;
+         exception
+            when others then
+               vn_existe := null;
+         end;
+         --
+      end if;
+      --
+   end if;	  
+   --
+   if nvl(vn_existe, 0) > 0 then  
+      --   
+      BEGIN
+         EXECUTE IMMEDIATE 'alter table CSF_OWN.REL_JUR_INF_REND_DIRF modify nome_empresa VARCHAR2(70)';
+      EXCEPTION
+         WHEN OTHERS THEN
+            RAISE_APPLICATION_ERROR ( -20101, 'Erro ao modificar coluna NOME_EMPRESA tabela REL_JUR_INF_REND_DIRF - '||SQLERRM );
+      END;	  
+      --
+      BEGIN
+         EXECUTE IMMEDIATE 'alter table CSF_OWN.REL_JUR_INF_REND_DIRF modify nome_forn VARCHAR2(70)';
+      EXCEPTION
+         WHEN OTHERS THEN
+            RAISE_APPLICATION_ERROR ( -20101, 'Erro ao modificar coluna NOME_FORN tabela REL_JUR_INF_REND_DIRF - '||SQLERRM );
+      END;	  
+      --
+      BEGIN
+         EXECUTE IMMEDIATE 'alter table CSF_OWN.REL_JUR_INF_REND_DIRF modify nome_resp VARCHAR2(70)';
+      EXCEPTION
+         WHEN OTHERS THEN
+            RAISE_APPLICATION_ERROR ( -20101, 'Erro ao modificar coluna NOME_RESP tabela REL_JUR_INF_REND_DIRF - '||SQLERRM );
+      END;	  
+      --
+   end if;
+   -- 
+   commit;
+   --   
+end;
+/
+
+-------------------------------------------------------------------------------------------------------------------------------
+Prompt INI Redmine #76520 - PJ do Informe de rendimentos saindo em branco
+-------------------------------------------------------------------------------------------------------------------------------
+
 ----------------------------------------------------------------------------------------
 Prompt FIM Patch 2.9.6.2 - Alteracoes no CSF_OWN
 ------------------------------------------------------------------------------------------
