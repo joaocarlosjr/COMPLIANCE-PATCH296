@@ -2001,7 +2001,7 @@ Prompt Inicio Redmine #75742: Customização ACG.
 ---------------------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------------------------------------------------
-Prompt INI Redmine  #76109 - Novo processo de integração contabil
+Prompt INI Redmine  #76108 - Novo processo de integra��o contabil
 -------------------------------------------------------------------------------------------------------------------------------------
 declare
    vn_existe number := null;
@@ -2020,7 +2020,6 @@ begin
                                         TP_REGISTRO     NUMBER,
                                         CD_MULTORG      VARCHAR2(10),
                                         HASH_MULTORG    VARCHAR2(255),
-                                        EMPRESA_ID      NUMBER,
                                         NM_OBJ_INT      VARCHAR2(30),
                                         VERSAO_LAYOUT   NUMBER(4),
                                         DT_ARQUIVO      DATE,
@@ -2033,7 +2032,6 @@ begin
       execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.TP_REGISTRO     is ''Tipo do registro''';
       execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.CD_MULTORG      is ''Código do MultOrg''';
       execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.HASH_MULTORG    is ''Hash do MultOrg''';
-      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.EMPRESA_ID      is ''ID da Empresa''';
       execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.NM_OBJ_INT      is ''Nome do objeto de integração: SALDO; LANCAMENTO; PARTIDA; PLANOCONTA''';
       execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.VERSAO_LAYOUT   is ''Versão do layout. Fixo 1''';
       execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.DT_ARQUIVO      is ''Data do arquivo. Data em que arquivo foi gerado''';
@@ -2051,7 +2049,6 @@ begin
       execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.TP_REGISTRO     is ''Tipo do registro''';
       execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.CD_MULTORG      is ''Código do MultOrg''';
       execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.HASH_MULTORG    is ''Hash do MultOrg''';
-      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.EMPRESA_ID      is ''ID da Empresa''';
       execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.NM_OBJ_INT      is ''Nome do objeto de integração: SALDO; LANCAMENTO; PARTIDA; PLANOCONTA''';
       execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.VERSAO_LAYOUT   is ''Versão do layout. Fixo 1''';
       execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.DT_ARQUIVO      is ''Data do arquivo. Data em que arquivo foi gerado''';
@@ -2858,7 +2855,7 @@ begin
 end;
 /
 -------------------------------------------------------------------------------------------------------------------------------------
-Prompt FIM Redmine  #76109 - Novo processo de integração contabil
+Prompt FIM Redmine #76108 - Novo processo de integra��o contabil
 -------------------------------------------------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------------------------------------------
