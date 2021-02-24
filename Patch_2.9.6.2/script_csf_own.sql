@@ -15,14 +15,14 @@ insert into csf_own.versao_sistema ( ID
 commit
 /
 -------------------------------------------------------------------------------------------------------------------------------
-Prompt INI - Redmine #75477 -  Cria��o de Job Scheduler JOB_CORRIGIR_NF_CT
+Prompt INI - Redmine #75477 -  Criação de Job Scheduler JOB_CORRIGIR_NF_CT
 -------------------------------------------------------------------------------------------------------------------------------
 
 DECLARE 
   vn_cont NUMBER;
 BEGIN
   --
-  -- Verifica se o Job JOB_CORRIGIR_NF_CT j� foi criado, caso existir sai da rotina
+  -- Verifica se o Job JOB_CORRIGIR_NF_CT já foi criado, caso existir sai da rotina
   BEGIN
     SELECT COUNT(1)
       INTO vn_cont
@@ -52,10 +52,10 @@ EXCEPTION
 END;
 /
 -------------------------------------------------------------------------------------------------------------------------------
-Prompt FIM - Redmine #75477 -  Cria��o de Job Scheduler JOB_CORRIGIR_NF_CT
+Prompt FIM - Redmine #75477 -  Criação de Job Scheduler JOB_CORRIGIR_NF_CT
 -------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------------
-Prompt INI - Redmine #75898 Cria��o de padr�o NFem a adi��o de Joinville-SC ao padr�o
+Prompt INI - Redmine #75898 Criação de padrão NFem a adição de Joinville-SC ao padrão
 -------------------------------------------------------------------------------------------------------------------------------------------
 --
 --CIDADE  : Joinville - SC
@@ -69,25 +69,25 @@ declare
    -- dm_tp_amb (Tipo de Ambiente 1-Producao; 2-Homologacao)
    cursor c_dados is
       select   ( select id from csf_own.cidade where ibge_cidade = '4209102' ) id, dm_situacao,  versao,  dm_tp_amb,  dm_tp_soap,  dm_tp_serv, descr, url_wsdl, dm_upload, dm_ind_emit 
-        from ( --Produ��o
-			   select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Gera��o de NFS-e'                               descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
-               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recep��o e Processamento de lote de RPS'        descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
-               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situa��o de lote de RPS'            descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+        from ( --Produção
+			   select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geração de NFS-e'                               descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepção e Processamento de lote de RPS'        descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situação de lote de RPS'            descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
                select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
                select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
                select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
-               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substitui��o de NFS-e'                          descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituição de NFS-e'                          descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
                select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
                select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
                select 1 dm_situacao, '1' versao, 1 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'https://nfemws.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
-               --Homologa��o
-               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Gera��o de NFS-e'                               descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
-               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recep��o e Processamento de lote de RPS'        descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
-               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situa��o de lote de RPS'            descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               --Homologação
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  1 dm_tp_serv, 'Geração de NFS-e'                               descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  2 dm_tp_serv, 'Recepção e Processamento de lote de RPS'        descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  3 dm_tp_serv, 'Consulta de Situação de lote de RPS'            descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
                select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  4 dm_tp_serv, 'Consulta de NFS-e por RPS'                      descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
                select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  5 dm_tp_serv, 'Consulta de NFS-e'                              descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
                select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  6 dm_tp_serv, 'Cancelamento de NFS-e'                          descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
-               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substitui��o de NFS-e'                          descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
+               select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  7 dm_tp_serv, 'Substituição de NFS-e'                          descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
                select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  8 dm_tp_serv, 'Consulta de Empresas Autorizadas a emitir NFS-e'descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
                select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap,  9 dm_tp_serv, 'Login'                                          descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual union
                select 1 dm_situacao, '1' versao, 2 dm_tp_amb, 2 dm_tp_soap, 10 dm_tp_serv, 'Consulta de Lote de RPS'                        descr, 'https://nfemwshomologacao.joinville.sc.gov.br/NotaFiscal/Servicos.asmx?wsdl' url_wsdl, 0 dm_upload,  0 dm_ind_emit from dual
@@ -141,7 +141,7 @@ begin
                   commit; 
                   --
                exception when others then 
-                  raise_application_error(-20101, 'Erro no script Redmine #75898 Atualiza��o URL ambiente de homologa��o e Produ��o Joinville - SC' || sqlerrm);
+                  raise_application_error(-20101, 'Erro no script Redmine #75898 Atualização URL ambiente de homologação e Produção Joinville - SC' || sqlerrm);
                end; 
                --
          end;
@@ -153,7 +153,7 @@ begin
    --
 exception
    when others then
-      raise_application_error(-20102, 'Erro no script Redmine #75898 Atualiza��o URL ambiente de homologa��o e Produ��o Joinville - SC' || sqlerrm);
+      raise_application_error(-20102, 'Erro no script Redmine #75898 Atualização URL ambiente de homologação e Produção Joinville - SC' || sqlerrm);
 end;
 /
 
@@ -216,7 +216,7 @@ begin
               commit; 
               --
            exception when others then 
-                raise_application_error(-20101, 'Erro no script Redmine #75898 Adicionar Padr�o para emiss�o de NFS-e (NFem)' || sqlerrm);
+                raise_application_error(-20101, 'Erro no script Redmine #75898 Adicionar Padrão para emissão de NFS-e (NFem)' || sqlerrm);
              --
           end;
   end; 
@@ -234,7 +234,7 @@ vv_ws_canc     csf_own.dominio.descr%type;
 
 --
 Begin
-	-- Popula vari�veis
+	-- Popula variáveis
 	vv_ibge_cidade := '4209102';
 	vv_padrao      := 'NFem';     
 	vv_habil       := 'SIM';
@@ -291,7 +291,7 @@ Begin
 								       , dm_ws_canc = (select distinct vl from csf_own.dominio where upper(dominio) = upper('cidade_nfse.dm_ws_canc') and upper(descr) = upper(vv_ws_canc))
          where cidade_id = (select distinct id from csf_own.cidade where ibge_cidade in (vv_ibge_cidade));
 		exception when others then
-			raise_application_error(-20103, 'Erro no script Redmine #75898 Atualiza��o do Padr�o Joinville - SC' || sqlerrm);
+			raise_application_error(-20103, 'Erro no script Redmine #75898 Atualização do Padrão Joinville - SC' || sqlerrm);
     end;
 	--
 	commit;
@@ -302,7 +302,7 @@ end;
 /  
 
 -------------------------------------------------------------------------------------------------------------------------------------------
-Prompt FIM - Redmine #75898 Cria��o de padr�o NFem a adi��o de Joinville-SC ao padr�o
+Prompt FIM - Redmine #75898 Criação de padrão NFem a adição de Joinville-SC ao padrão
 -------------------------------------------------------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------------------------------------------
@@ -382,7 +382,7 @@ begin
       -- 
       -- Add comments to the table   
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP.dt_exe_serv is ''Data de compet�ncia ou em que servi�o foi executado''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP.dt_exe_serv is ''Data de competência ou em que serviço foi executado''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao alterar comentario de CONHEC_TRANSP - '||SQLERRM );
@@ -444,7 +444,7 @@ begin
                                          values( csf_own.objutilintegr_seq.nextval
                                                , (select oi.id from csf_own.obj_util_integr oi where oi.obj_name = 'VW_CSF_CONHEC_TRANSP_FF')
                                                , 'DT_EXE_SERV'
-                                               , 'Data de compet�ncia ou em que servi�o foi executado'
+                                               , 'Data de competência ou em que serviço foi executado'
                                                , 0
                                                , 10
                                                , 0
@@ -452,7 +452,7 @@ begin
       exception
          when dup_val_on_index then
             update csf_own.ff_obj_util_integr ff
-               set ff.descr         = 'Data de compet�ncia ou em que servi�o foi executado'
+               set ff.descr         = 'Data de competência ou em que serviço foi executado'
                  , ff.dm_tipo_campo = 0
                  , ff.tamanho       = 10
                  , ff.qtde_decimal  = 0
@@ -472,7 +472,7 @@ Prompt FIM Redmine #74016 - Criar DT_EXE_SERV no conhecimento de transporte
 -------------------------------------------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------------------------------------------
-Prompt INI Redmine #73063 - Altera��es para emiss�o de conhecimento de transporte.
+Prompt INI Redmine #73063 - Alterações para emissão de conhecimento de transporte.
 -------------------------------------------------------------------------------------------------------------------------------
  
 declare
@@ -1078,7 +1078,7 @@ begin
               commit; 
               --
            exception when others then 
-                raise_application_error(-20101, 'Erro no script Redmine #75898 Adicionar Padr?o para emiss�o de NFS-e (NFem)' || sqlerrm);
+                raise_application_error(-20101, 'Erro no script Redmine #75898 Adicionar Padr?o para emissão de NFS-e (NFem)' || sqlerrm);
              --
           end;
   end; 
@@ -1164,7 +1164,7 @@ end;
 /  
 
 -------------------------------------------------------------------------------------------------------------------------------------------
-Prompt FIM - Redmine #75898 Cria��o de padr?o NFem a adi??o de Joinville-SC ao padr?o
+Prompt FIM - Redmine #75898 Criação de padr?o NFem a adi??o de Joinville-SC ao padr?o
 -------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------------
 Prompt INI - Redmine #75749 Sincroniza??o dos scripts Padr?o Tinus Goiana - PE
@@ -1394,12 +1394,12 @@ begin
                                  values ( tipoobjintegr_seq.nextval
                                         , (select o.id from csf_own.obj_integr o where o.cd = '4')
                                         , '4'
-                                        , 'Inutiliza??o de emiss�o Pr?pria de Conhec. de Transporte'
+                                        , 'Inutiliza??o de emissão Pr?pria de Conhec. de Transporte'
                                         );       
    exception
      when others then
        update csf_own.tipo_obj_integr
-          set descr = 'Inutiliza??o de emiss�o Pr?pria de Conhec. de Transporte'
+          set descr = 'Inutiliza??o de emissão Pr?pria de Conhec. de Transporte'
         where objintegr_id in (select o.id from csf_own.obj_integr o where o.cd = '4')
           and cd           = '4';       
    end; 
@@ -1412,12 +1412,12 @@ begin
                                  values ( tipoobjintegr_seq.nextval
                                         , (select o.id from csf_own.obj_integr o where o.cd = '4')
                                         , '5'
-                                        , 'Carta de Corre??o emiss�o Pr?pria de Conhec. de Transporte'
+                                        , 'Carta de Corre??o emissão Pr?pria de Conhec. de Transporte'
                                         );       
    exception
      when others then
        update csf_own.tipo_obj_integr
-          set descr = 'Carta de Corre??o emiss�o Pr?pria de Conhec. de Transporte'
+          set descr = 'Carta de Corre??o emissão Pr?pria de Conhec. de Transporte'
         where objintegr_id in (select o.id from csf_own.obj_integr o where o.cd = '4')
           and cd           = '5';       
    end; 
@@ -1428,7 +1428,7 @@ end;
 /
 
 --------------------------------------------------------------------------------------------------------------------------------------
-Prompt FIM Redmine Redmine #73063 - Altera��es para emiss�o de conhecimento de transporte.
+Prompt FIM Redmine Redmine #73063 - Alterações para emissão de conhecimento de transporte.
 --------------------------------------------------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------------------------------------------
@@ -1589,7 +1589,7 @@ begin
       -- 
       -- Add comments to the table   
       BEGIN
-         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP.dt_exe_serv is ''Data de compet�ncia ou em que servi�o foi executado''';
+         EXECUTE IMMEDIATE 'comment on column CSF_OWN.CONHEC_TRANSP.dt_exe_serv is ''Data de competência ou em que serviço foi executado''';
       EXCEPTION
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao alterar comentario de CONHEC_TRANSP - '||SQLERRM );
@@ -1619,7 +1619,7 @@ begin
          WHEN OTHERS THEN
             RAISE_APPLICATION_ERROR ( -20101, 'Erro ao incluir coluna "DT_EXE_SERV" em TMP_CONHEC_TRANSP - '||SQLERRM );
       END;
-      -- 
+      --
    end if;
    -- 
    vn_qtde := 0;
@@ -1651,7 +1651,7 @@ begin
                                          values( csf_own.objutilintegr_seq.nextval
                                                , (select oi.id from csf_own.obj_util_integr oi where oi.obj_name = 'VW_CSF_CONHEC_TRANSP_FF')
                                                , 'DT_EXE_SERV'
-                                               , 'Data de compet�ncia ou em que servi�o foi executado'
+                                               , 'Data de competência ou em que serviço foi executado'
                                                , 0
                                                , 10
                                                , 0
@@ -1659,7 +1659,7 @@ begin
       exception
          when dup_val_on_index then
             update csf_own.ff_obj_util_integr ff
-               set ff.descr         = 'Data de compet�ncia ou em que servi�o foi executado'
+               set ff.descr         = 'Data de competência ou em que serviço foi executado'
                  , ff.dm_tipo_campo = 0
                  , ff.tamanho       = 10
                  , ff.qtde_decimal  = 0
@@ -1772,7 +1772,7 @@ end;
 Prompt FIM Redmine #76385 - Inclus?da sequence ctdifaliq_seq na seq_tab
 -------------------------------------------------------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------------------------------
-Prompt Inicio Redmine #75742: Customiza��o ACG.
+Prompt Inicio Redmine #75742: Customização ACG.
 ---------------------------------------------------------------------------------------------------------
 
 
@@ -1934,7 +1934,7 @@ begin
       execute immediate 'ALTER TABLE CSF_OWN.PARAM_GERA_REG_SUB_APUR_ICMS DROP CONSTRAINT PARAMGERRSAI_CFOPCSTPER_UK';
     exception
      when others then
-       raise_application_error(-20101, 'Erro ao excluir constraint no script 75742 Customiza��o ACG - ' || sqlerrm);
+       raise_application_error(-20101, 'Erro ao excluir constraint no script 75742 Customização ACG - ' || sqlerrm);
     end ;
     --
   end if;
@@ -1946,7 +1946,7 @@ begin
   using index tablespace CSF_DATA';
     exception
      when others then
-       raise_application_error(-20101, 'Erro ao excluir constraint no script 75742 Customiza��o ACG - ' || sqlerrm);
+       raise_application_error(-20101, 'Erro ao excluir constraint no script 75742 Customização ACG - ' || sqlerrm);
     end ;
 
 end;
@@ -1979,7 +1979,7 @@ begin
       execute immediate 'ALTER TABLE CSF_OWN.PARAM_GERA_INF_PROV_DOC_FISC DROP CONSTRAINT PARAMGERAIPDF_CFOPCSTPER_UK';
     exception
      when others then
-       raise_application_error(-20101, 'Erro ao excluir constraint no script 75742 Customiza��o ACG - ' || sqlerrm);
+       raise_application_error(-20101, 'Erro ao excluir constraint no script 75742 Customização ACG - ' || sqlerrm);
     end ;
     --
   end if;
@@ -1990,15 +1990,876 @@ begin
   using index tablespace CSF_DATA';
     exception
      when others then
-       raise_application_error(-20101, 'Erro ao excluir constraint no script 75742 Customiza��o ACG - ' || sqlerrm);
+       raise_application_error(-20101, 'Erro ao excluir constraint no script 75742 Customização ACG - ' || sqlerrm);
     end ;
   --
 end;
 /
 
 ---------------------------------------------------------------------------------------------------------
-Prompt Inicio Redmine #75742: Customiza��o ACG.
+Prompt Inicio Redmine #75742: Customização ACG.
 ---------------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------------------------------------------
+Prompt INI Redmine  #76109 - Novo processo de integração contabil
+-------------------------------------------------------------------------------------------------------------------------------------
+declare
+   vn_existe number := null;
+begin
+   select count(*)
+     into vn_existe
+     from sys.all_tables
+    where OWNER       = 'CSF_OWN'
+      and TABLE_NAME  = 'TMP_TIPO_CTRL_ARQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create table csf_own.TMP_TIPO_CTRL_ARQ
+                                      (
+                                        ID              NUMBER,
+                                        TP_REGISTRO     NUMBER,
+                                        CD_MULTORG      VARCHAR2(10),
+                                        HASH_MULTORG    VARCHAR2(255),
+                                        EMPRESA_ID      NUMBER,
+                                        NM_OBJ_INT      VARCHAR2(30),
+                                        VERSAO_LAYOUT   NUMBER(4),
+                                        DT_ARQUIVO      DATE,
+                                        IDENT_UNICO_ARQ NUMBER(10),
+                                        NM_MAX_IDENT    NUMBER(10)
+                                      ) tablespace CSF_DATA';
+      --
+      execute immediate 'comment on table  CSF_OWN.TMP_TIPO_CTRL_ARQ                 is ''REGISTRO TIPO CONTROLE DO ARQUIVO''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.ID              is ''ID da tabela TMP_TIPO_CTRL_ARQ''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.TP_REGISTRO     is ''Tipo do registro''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.CD_MULTORG      is ''Código do MultOrg''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.HASH_MULTORG    is ''Hash do MultOrg''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.EMPRESA_ID      is ''ID da Empresa''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.NM_OBJ_INT      is ''Nome do objeto de integração: SALDO; LANCAMENTO; PARTIDA; PLANOCONTA''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.VERSAO_LAYOUT   is ''Versão do layout. Fixo 1''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.DT_ARQUIVO      is ''Data do arquivo. Data em que arquivo foi gerado''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.IDENT_UNICO_ARQ is ''Identificador único do arquivo.ID sequencial único que permite rastrear os arquivos e também saber o estágio da integração''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.NM_MAX_IDENT    is ''Numero máximo do identificador.ID do futuro ultimo arquivo para permitir saber em que momento deve ser iniciada a validação de dados.''';
+      --
+      execute immediate 'create index CSF_OWN.TMP_TIPO_CTRL_ARQ_IDX on CSF_OWN.TMP_TIPO_CTRL_ARQ (ID) tablespace CSF_INDEX';
+      --
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_TIPO_CTRL_ARQ to CSF_WORK';
+      --
+   else
+      --
+      execute immediate 'comment on table  CSF_OWN.TMP_TIPO_CTRL_ARQ                 is ''REGISTRO TIPO CONTROLE DO ARQUIVO''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.ID              is ''ID da tabela TMP_TIPO_CTRL_ARQ''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.TP_REGISTRO     is ''Tipo do registro''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.CD_MULTORG      is ''Código do MultOrg''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.HASH_MULTORG    is ''Hash do MultOrg''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.EMPRESA_ID      is ''ID da Empresa''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.NM_OBJ_INT      is ''Nome do objeto de integração: SALDO; LANCAMENTO; PARTIDA; PLANOCONTA''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.VERSAO_LAYOUT   is ''Versão do layout. Fixo 1''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.DT_ARQUIVO      is ''Data do arquivo. Data em que arquivo foi gerado''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.IDENT_UNICO_ARQ is ''Identificador único do arquivo.ID sequencial único que permite rastrear os arquivos e também saber o estágio da integração''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_CTRL_ARQ.NM_MAX_IDENT    is ''Numero máximo do identificador.ID do futuro ultimo arquivo para permitir saber em que momento deve ser iniciada a validação de dados.''';
+      --
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_TIPO_CTRL_ARQ to CSF_WORK';
+      --
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da tabela TMP_TIPO_CTRL_ARQ. Erro: ' || sqlerrm);
+end;
+/
+-- sequence
+declare
+   vn_existe number := null;
+begin
+   select count(*)
+     into vn_existe
+     from sys.all_sequences s
+    where s.SEQUENCE_OWNER = 'CSF_OWN'
+      and s.SEQUENCE_NAME  = 'TMPTPCTRLARQ_SEQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create sequence CSF_OWN.TMPTPCTRLARQ_SEQ minvalue 1 maxvalue 9999999999999999999999999999 start with 1 increment by 1 nocache';
+      execute immediate 'grant select on CSF_OWN.TMPTPCTRLARQ_SEQ to CSF_WORK';
+      --
+   elsif nvl(vn_existe,0) > 0 then
+      --
+      execute immediate 'grant select on CSF_OWN.TMPTPCTRLARQ_SEQ to CSF_WORK';
+      --
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da sequence TMPTPCTRLARQ_SEQ. Erro: ' || sqlerrm);
+end;
+/
+
+declare
+  --
+  vv_sql    long;
+  vn_existe number := 0;
+  --
+begin
+   BEGIN
+        SELECT COUNT(1)
+	INTO vn_existe
+	FROM CSF_OWN.SEQ_TAB
+	WHERE UPPER(SEQUENCE_NAME) = UPPER('TMPTPCTRLARQ_SEQ');
+   EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+        vn_existe := 0;
+	WHEN OTHERS THEN
+	vn_existe := -1;
+    END;
+    --
+    IF NVL(vn_existe, 0) = 0 THEN
+	BEGIN
+         INSERT INTO CSF_OWN.SEQ_TAB (ID, SEQUENCE_NAME, TABLE_NAME)
+          VALUES (CSF_OWN.SEQTAB_SEQ.NEXTVAL, 'TMPTPCTRLARQ_SEQ', 'TMP_TIPO_CTRL_ARQ');
+          COMMIT;
+ 	EXCEPTION
+	 WHEN OTHERS THEN
+	  NULL;
+	END;
+    END IF;
+    --
+end;
+/
+
+declare
+   vn_existe number := null;
+begin
+   select count(*)
+     into vn_existe
+     from sys.all_tables
+    where OWNER       = 'CSF_OWN'
+      and TABLE_NAME  = 'TMP_CAB_SALDO';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create table csf_own.TMP_CAB_SALDO
+                            (
+                              ID                NUMBER,
+                              TMPTIPOCTRLARQ_ID NUMBER,
+                              TP_REGISTRO       NUMBER,
+                              CNPJ_EMPRESA      VARCHAR2(14),
+                              DT_INICIAL        DATE,
+                              DT_FINAL          DATE
+                            ) tablespace CSF_DATA';
+      --
+      execute immediate 'comment on table  csf_own.TMP_CAB_SALDO                   is ''REGISTRO TIPO CABEÇALHO DO SALDO''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.ID                is ''ID da tabela TMP_CAB_SALDO''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.TMPTIPOCTRLARQ_ID is ''ID da tabela TMP_TIPO_CTRL_ARQ''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.TP_REGISTRO       is ''Tipo do registro. Fixo 1.''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.CNPJ_EMPRESA      is ''CNPJ da empresa. CNPJ com 14 dígitos (considerar 0 a esquerda)''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.DT_INICIAL        is ''Data inicial do Saldo''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.DT_FINAL          is ''Data final do saldo''';
+      --
+      execute immediate 'create index CSF_OWN.TMP_CAB_SALDO_IDX1 on CSF_OWN.TMP_CAB_SALDO (ID)                   tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_CAB_SALDO_IDX2 on CSF_OWN.TMP_CAB_SALDO (TMPTIPOCTRLARQ_ID)    tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_CAB_SALDO_IDX3 on CSF_OWN.TMP_CAB_SALDO (DT_INICIAL, DT_FINAL) tablespace CSF_INDEX';
+      --
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_CAB_SALDO to CSF_WORK';
+      --
+   else
+      --
+      execute immediate 'comment on table  csf_own.TMP_CAB_SALDO                   is ''REGISTRO TIPO CABEÇALHO DO SALDO''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.ID                is ''ID da tabela TMP_CAB_SALDO''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.TMPTIPOCTRLARQ_ID is ''ID da tabela TMP_TIPO_CTRL_ARQ''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.TP_REGISTRO       is ''Tipo do registro. Fixo 1.''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.CNPJ_EMPRESA      is ''CNPJ da empresa. CNPJ com 14 dígitos (considerar 0 a esquerda)''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.DT_INICIAL        is ''Data inicial do Saldo''';
+      execute immediate 'comment on column csf_own.TMP_CAB_SALDO.DT_FINAL          is ''Data final do saldo''';
+      --
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_CAB_SALDO to CSF_WORK';
+      --
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da tabela TMP_CAB_SALDO. Erro: ' || sqlerrm);
+end;
+/
+
+declare
+   vn_existe number := null;
+begin
+   select count(*)
+     into vn_existe
+     from sys.all_sequences s
+    where s.SEQUENCE_OWNER = 'CSF_OWN'
+      and s.SEQUENCE_NAME  = 'TMPCABSALDO_SEQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create sequence CSF_OWN.TMPCABSALDO_SEQ minvalue 1 maxvalue 9999999999999999999999999999 start with 1 increment by 1 nocache';
+      execute immediate 'grant select on CSF_OWN.TMPCABSALDO_SEQ to CSF_WORK';
+      --
+   elsif nvl(vn_existe,0) > 0 then
+      --
+      execute immediate 'grant select on CSF_OWN.TMPCABSALDO_SEQ to CSF_WORK';
+      --
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da sequence TMPCABSALDO_SEQ. Erro: ' || sqlerrm);
+end;
+/
+
+declare
+  --
+  vv_sql    long;
+  vn_existe number := 0;
+  --
+begin
+   BEGIN
+   SELECT COUNT(1)
+     INTO vn_existe
+     FROM CSF_OWN.SEQ_TAB
+     WHERE UPPER(SEQUENCE_NAME) = UPPER('TMPCABSALDO_SEQ');
+   EXCEPTION
+     WHEN NO_DATA_FOUND THEN
+       vn_existe := 0;
+     WHEN OTHERS THEN
+       vn_existe := -1;
+   END;
+	--
+    IF NVL(vn_existe, 0) = 0 THEN
+     BEGIN
+        INSERT INTO CSF_OWN.SEQ_TAB (ID, SEQUENCE_NAME, TABLE_NAME)
+        VALUES (CSF_OWN.SEQTAB_SEQ.NEXTVAL, 'TMPCABSALDO_SEQ', 'TMP_CAB_SALDO');
+      COMMIT;
+      EXCEPTION
+      WHEN OTHERS THEN
+      NULL;
+    END;
+   END IF;
+   --
+end;
+/
+
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_tables 
+    where OWNER       = 'CSF_OWN'
+      and TABLE_NAME  = 'TMP_TIPO_DET_SALDO';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create table csf_own.TMP_TIPO_DET_SALDO
+                                      (
+                                        ID             NUMBER,
+                                        TMPCABSALDO_ID NUMBER,
+                                        TP_REGISTO     NUMBER,
+                                        COD_CTA        VARCHAR2(255),
+                                        COD_CCUS       VARCHAR2(60),
+                                        VL_SLD_INI     NUMBER(19,2),
+                                        DM_IND_DC_INI  VARCHAR2(1),
+                                        VL_DEB         NUMBER(19,2),
+                                        VL_CRED        NUMBER(19,2),
+                                        VL_SLD_FIN     NUMBER(19,2),
+                                        DM_IND_DC_FIN  VARCHAR2(1)
+                                      )
+                                      tablespace CSF_DATA';
+      --                                                        
+      execute immediate 'comment on table CSF_OWN.TMP_TIPO_DET_SALDO is ''REGISTRO TIPO DETALHE DO SALDO''';
+      -- 
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.ID  is ''ID da tabela TMP_TIPO_DET_SALDO''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.TMPCABSALDO_ID  is ''ID da tabela TMP_CAB_SALDO''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.TP_REGISTO  is ''Tipo do registro. Fixo 5.''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.COD_CTA  is ''Código da Conta contabil''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.COD_CCUS  is ''Código do centro de custos''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_SLD_INI  is ''Valor do Saldo Inicial''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.DM_IND_DC_INI  is ''Indicador de situação do saldo inicial - D ou C. D = Débito / C = Crédito.''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_DEB  is ''Valor do saldo a débito''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_CRED  is ''Valor do saldo a crédito''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_SLD_FIN  is ''Valor do Saldo Final''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.DM_IND_DC_FIN  is ''Indicador de situação do saldo final - D ou C. D = Débito / C = Crédito.''';
+      -- 
+      execute immediate 'create index CSF_OWN.TMP_TIPO_DET_SALDO_IDX1 on CSF_OWN.TMP_TIPO_DET_SALDO (ID)  tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_TIPO_DET_SALDO_IDX2 on CSF_OWN.TMP_TIPO_DET_SALDO (TMPCABSALDO_ID) tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_TIPO_DET_SALDO_IDX3 on CSF_OWN.TMP_TIPO_DET_SALDO (TP_REGISTO, COD_CTA, COD_CCUS) tablespace CSF_INDEX';
+      
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_TIPO_DET_SALDO to CSF_WORK';
+      --    
+   else
+      --
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.ID  is ''ID da tabela TMP_TIPO_DET_SALDO''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.TMPCABSALDO_ID  is ''ID da tabela TMP_CAB_SALDO''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.TP_REGISTO  is ''Tipo do registro. Fixo 5.''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.COD_CTA  is ''Código da Conta contabil''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.COD_CCUS  is ''Código do centro de custos''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_SLD_INI  is ''Valor do Saldo Inicial''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.DM_IND_DC_INI  is ''Indicador de situação do saldo inicial - D ou C. D = Débito / C = Crédito.''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_DEB  is ''Valor do saldo a débito''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_CRED  is ''Valor do saldo a crédito''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.VL_SLD_FIN  is ''Valor do Saldo Final''';
+      execute immediate 'comment on column CSF_OWN.TMP_TIPO_DET_SALDO.DM_IND_DC_FIN  is ''Indicador de situação do saldo final - D ou C. D = Débito / C = Crédito.''';
+      -- 
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_TIPO_DET_SALDO to CSF_WORK';
+      --    
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da tabela TMP_TIPO_DET_SALDO. Erro: ' || sqlerrm);      
+end;
+/
+-- sequence
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_sequences s
+    where s.SEQUENCE_OWNER = 'CSF_OWN'
+      and s.SEQUENCE_NAME  = 'TMPTPDETSLD_SEQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create sequence CSF_OWN.TMPTPDETSLD_SEQ minvalue 1 maxvalue 9999999999999999999999999999 start with 1 increment by 1 nocache';
+      execute immediate 'grant select on CSF_OWN.TMPTPDETSLD_SEQ to CSF_WORK';      
+      --
+   elsif nvl(vn_existe,0) > 0 then
+      --
+      execute immediate 'grant select on CSF_OWN.TMPTPDETSLD_SEQ to CSF_WORK';      
+      --
+   end if;   
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da sequence TMPTPDETSLD_SEQ. Erro: ' || sqlerrm);      
+end;
+/
+
+declare
+  --
+  vv_sql    long;
+  vn_existe number := 0;
+  --
+begin
+    BEGIN
+      SELECT COUNT(1)
+      INTO vn_existe
+	  FROM CSF_OWN.SEQ_TAB
+	 WHERE UPPER(SEQUENCE_NAME) = UPPER('TMPTPDETSLD_SEQ');
+     EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+	vn_existe := 0;
+      WHEN OTHERS THEN
+	vn_existe := -1;
+    END;
+	--
+    IF NVL(vn_existe, 0) = 0 THEN
+     BEGIN
+      INSERT INTO CSF_OWN.SEQ_TAB (ID, SEQUENCE_NAME, TABLE_NAME)
+      VALUES (CSF_OWN.SEQTAB_SEQ.NEXTVAL, 'TMPTPDETSLD_SEQ', 'TMP_TIPO_DET_SALDO');
+      COMMIT;
+      EXCEPTION
+        WHEN OTHERS THEN
+          NULL;
+     END;
+    END IF;
+   --
+   commit;
+end;
+/
+
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_tables 
+    where OWNER       = 'CSF_OWN'
+      and TABLE_NAME  = 'TMP_CAB_LANCTO';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create table csf_own.TMP_CAB_LANCTO
+                                      (
+                                        ID                NUMBER,
+                                        TMPTIPOCTRLARQ_ID NUMBER,
+                                        TP_REGISTRO       NUMBER,
+                                        CNPJ_EMPRESA      VARCHAR2(14)
+                                       ) tablespace CSF_DATA';
+      --                                                        
+      execute immediate 'comment on table  CSF_OWN.TMP_CAB_LANCTO                   is ''REGISTRO TIPO CABEÇALHO DO LANÇAMENTO''';
+      --       
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.ID                is ''ID da tabela TMP_CAB_LANCTO''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.TMPTIPOCTRLARQ_ID is ''ID da tabela TMP_TIPO_DET_SALDO''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.TP_REGISTRO       is ''Tipo do registro. Fixo 1.''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.CNPJ_EMPRESA      is ''CNPJ da empresa. CNPJ com 14 dígitos (considerar 0 a esquerda).''';      
+      ---      
+      execute immediate 'create index CSF_OWN.TMP_CAB_LANCTO_IDX1 on CSF_OWN.TMP_CAB_LANCTO (ID)                tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_CAB_LANCTO_IDX2 on CSF_OWN.TMP_CAB_LANCTO (TMPTIPOCTRLARQ_ID) tablespace CSF_INDEX';      
+      ---      
+    
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_CAB_LANCTO to CSF_WORK';
+      --    
+   else
+      --
+      execute immediate 'comment on table  CSF_OWN.TMP_CAB_LANCTO                   is ''REGISTRO TIPO CABEÇALHO DO LANÇAMENTO''';
+      --       
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.ID                is ''ID da tabela TMP_CAB_LANCTO''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.TMPTIPOCTRLARQ_ID is ''ID da tabela TMP_TIPO_DET_SALDO''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.TP_REGISTRO       is ''Tipo do registro. Fixo 1.''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_LANCTO.CNPJ_EMPRESA      is ''CNPJ da empresa. CNPJ com 14 dígitos (considerar 0 a esquerda).''';      
+      --- 
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_CAB_LANCTO to CSF_WORK';
+      --    
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da tabela TMP_CAB_LANCTO. Erro: ' || sqlerrm);      
+end;
+/
+-- sequence
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_sequences s
+    where s.SEQUENCE_OWNER = 'CSF_OWN'
+      and s.SEQUENCE_NAME  = 'TMPCABLANCTO_SEQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create sequence CSF_OWN.TMPCABLANCTO_SEQ minvalue 1 maxvalue 9999999999999999999999999999 start with 1 increment by 1 nocache';
+      execute immediate 'grant select on CSF_OWN.TMPCABLANCTO_SEQ to CSF_WORK';      
+      --
+   elsif nvl(vn_existe,0) > 0 then
+      --
+      execute immediate 'grant select on CSF_OWN.TMPCABLANCTO_SEQ to CSF_WORK';      
+      --
+   end if;   
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da sequence TMPCABLANCTO_SEQ. Erro: ' || sqlerrm);      
+end;
+/
+
+declare
+  --
+  vv_sql    long;
+  vn_existe number := 0;
+  --
+begin
+   BEGIN
+     SELECT COUNT(1)
+     INTO vn_existe
+     FROM CSF_OWN.SEQ_TAB
+     WHERE UPPER(SEQUENCE_NAME) = UPPER('TMPCABLANCTO_SEQ');
+   EXCEPTION
+   WHEN NO_DATA_FOUND THEN
+	vn_existe := 0;
+   WHEN OTHERS THEN
+        vn_existe := -1;
+   END;
+	--
+    IF NVL(vn_existe, 0) = 0 THEN
+    BEGIN
+      INSERT INTO CSF_OWN.SEQ_TAB (ID, SEQUENCE_NAME, TABLE_NAME)
+      VALUES (CSF_OWN.SEQTAB_SEQ.NEXTVAL, 'TMPCABLANCTO_SEQ', 'TMP_CAB_LANCTO');
+      COMMIT;
+    EXCEPTION
+    WHEN OTHERS THEN
+     NULL;
+    END;
+    END IF;
+   --
+end;
+/
+
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_tables 
+    where OWNER       = 'CSF_OWN'
+      and TABLE_NAME  = 'TMP_DET_LANCTO';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create table csf_own.TMP_DET_LANCTO
+                              (
+                                ID              NUMBER,
+                                TMPCABLANCTO_ID NUMBER,
+                                TP_REGISTRO     NUMBER,
+                                NUM_LCTO        VARCHAR2(255),
+                                DT_LCTO         DATE,
+                                VL_LCTO         NUMBER(19,2),
+                                DM_IND_LCTO     VARCHAR2(1),
+                                QTDE_PARTIDAS   NUMBER(6)
+                              ) tablespace CSF_DATA';
+      --                                                        
+      execute immediate 'comment on table  CSF_OWN.TMP_DET_LANCTO                   is ''REGISTRO TIPO DETALHE DO LANÇAMENTO''';
+      --
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.ID                is ''ID da tabela TMP_DET_LANCTO''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.TMPCABLANCTO_ID   is ''ID da tabela TMP_CAB_LANCTO''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.TP_REGISTRO       is ''Tipo do registro. Fixo 5.''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.NUM_LCTO          is ''Número do lançamento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.DT_LCTO           is ''Data do Lançamento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.VL_LCTO           is ''Valor do Lançamento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.DM_IND_LCTO       is ''Indicador do tipo de lançamento - N ou E''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.QTDE_PARTIDAS     is ''Quantidade de partidas''';      
+      ---      
+      execute immediate 'create index CSF_OWN.TMP_DET_LANCTO_IDX1 on CSF_OWN.TMP_DET_LANCTO (ID)                                tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_DET_LANCTO_IDX2 on CSF_OWN.TMP_DET_LANCTO (TMPCABLANCTO_ID)                   tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_DET_LANCTO_IDX3 on CSF_OWN.TMP_DET_LANCTO (TP_REGISTRO, DT_LCTO, DM_IND_LCTO) tablespace CSF_INDEX';
+      ---      
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_DET_LANCTO to CSF_WORK';
+      --    
+   else
+      --                                                        
+      execute immediate 'comment on table  CSF_OWN.TMP_DET_LANCTO                   is ''REGISTRO TIPO DETALHE DO LANÇAMENTO''';
+      --
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.ID                is ''ID da tabela TMP_DET_LANCTO''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.TMPCABLANCTO_ID   is ''ID da tabela TMP_CAB_LANCTO''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.TP_REGISTRO       is ''Tipo do registro. Fixo 5.''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.NUM_LCTO          is ''Número do lançamento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.DT_LCTO           is ''Data do Lançamento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.VL_LCTO           is ''Valor do Lançamento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.DM_IND_LCTO       is ''Indicador do tipo de lançamento - N ou E''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_LANCTO.QTDE_PARTIDAS     is ''Quantidade de partidas''';      
+      ---   
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_DET_LANCTO to CSF_WORK';
+      --    
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da tabela TMP_DET_LANCTO. Erro: ' || sqlerrm);      
+end;
+/
+
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_sequences s
+    where s.SEQUENCE_OWNER = 'CSF_OWN'
+      and s.SEQUENCE_NAME  = 'TMPDETLANCTO_SEQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create sequence CSF_OWN.TMPDETLANCTO_SEQ minvalue 1 maxvalue 9999999999999999999999999999 start with 1 increment by 1 nocache';
+      execute immediate 'grant select on CSF_OWN.TMPDETLANCTO_SEQ to CSF_WORK';      
+      --
+   elsif nvl(vn_existe,0) > 0 then
+      --
+      execute immediate 'grant select on CSF_OWN.TMPDETLANCTO_SEQ to CSF_WORK';      
+      --
+   end if;   
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da sequence TMPDETLANCTO_SEQ. Erro: ' || sqlerrm);      
+end;
+/
+
+declare
+  --
+  vv_sql    long;
+  vn_existe number := 0;
+  --
+begin
+   BEGIN
+        SELECT COUNT(1)
+	  INTO vn_existe
+	 FROM CSF_OWN.SEQ_TAB
+	 WHERE UPPER(SEQUENCE_NAME) = UPPER('TMPDETLANCTO_SEQ');
+     EXCEPTION
+     WHEN NO_DATA_FOUND THEN
+	 vn_existe := 0;
+     WHEN OTHERS THEN
+	  vn_existe := -1;
+    END;
+	--
+    IF NVL(vn_existe, 0) = 0 THEN
+     BEGIN
+       INSERT INTO CSF_OWN.SEQ_TAB (ID, SEQUENCE_NAME, TABLE_NAME)
+       VALUES (CSF_OWN.SEQTAB_SEQ.NEXTVAL, 'TMPDETLANCTO_SEQ', 'TMP_DET_LANCTO');
+       COMMIT;
+     EXCEPTION
+       WHEN OTHERS THEN
+	  NULL;
+       END;
+    END IF;
+   --
+end;
+/
+
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_tables 
+    where OWNER       = 'CSF_OWN'
+      and TABLE_NAME  = 'TMP_CAB_PARTIDA';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create table CSF_OWN.TMP_CAB_PARTIDA
+                        (
+                          ID                NUMBER,
+                          TMPTIPOCTRLARQ_ID NUMBER,
+                          TP_REGISTRO       NUMBER,
+                          CNPJ_EMPRESA      VARCHAR2(14),
+                          NUM_LCTO          VARCHAR2(255)
+                        )
+                        tablespace CSF_DATA';
+      ---      
+      execute immediate 'comment on table  CSF_OWN.TMP_CAB_PARTIDA                   is ''REGISTRO TIPO CABEÇALHO DA PARTIDA''';
+      -- 
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.ID                is ''ID da tabela TMP_CAB_PARTIDA''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.TMPTIPOCTRLARQ_ID is ''ID da tabela TMP_TIPO_CTRL_ARQ''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.TP_REGISTRO       is ''Tipo do registro''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.CNPJ_EMPRESA      is ''CNPJ da empresa''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.NUM_LCTO          is ''Numero do Lançamento''';            
+      ---
+      execute immediate 'create index CSF_OWN.TMP_CAB_PARTIDA_IDX1 on CSF_OWN.TMP_CAB_PARTIDA (ID)                tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_CAB_PARTIDA_IDX2 on CSF_OWN.TMP_CAB_PARTIDA (TMPTIPOCTRLARQ_ID) tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_CAB_PARTIDA_IDX3 on CSF_OWN.TMP_CAB_PARTIDA (NUM_LCTO)          tablespace CSF_INDEX';
+      ---
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_CAB_PARTIDA to CSF_WORK';
+      --    
+   else
+      --
+      execute immediate 'comment on table  CSF_OWN.TMP_CAB_PARTIDA                   is ''REGISTRO TIPO CABEÇALHO DA PARTIDA''';
+      -- 
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.ID                is ''ID da tabela TMP_CAB_PARTIDA''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.TMPTIPOCTRLARQ_ID is ''ID da tabela TMP_TIPO_CTRL_ARQ''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.TP_REGISTRO       is ''Tipo do registro''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.CNPJ_EMPRESA      is ''CNPJ da empresa''';
+      execute immediate 'comment on column CSF_OWN.TMP_CAB_PARTIDA.NUM_LCTO          is ''Numero do Lançamento''';      
+      ---   
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_CAB_PARTIDA to CSF_WORK';
+      --    
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da tabela TMP_CAB_PARTIDA. Erro: ' || sqlerrm);      
+end;
+/
+
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_sequences s
+    where s.SEQUENCE_OWNER = 'CSF_OWN'
+      and s.SEQUENCE_NAME  = 'TMPCABPARTIDA_SEQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create sequence CSF_OWN.TMPCABPARTIDA_SEQ minvalue 1 maxvalue 9999999999999999999999999999 start with 1 increment by 1 nocache';
+      execute immediate 'grant select on CSF_OWN.TMPCABPARTIDA_SEQ to CSF_WORK';      
+      --
+   elsif nvl(vn_existe,0) > 0 then
+      --
+      execute immediate 'grant select on CSF_OWN.TMPCABPARTIDA_SEQ to CSF_WORK';      
+      --
+   end if;   
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da sequence TMPCABPARTIDA_SEQ. Erro: ' || sqlerrm);      
+end;
+/
+
+declare
+  --
+  vv_sql    long;
+  vn_existe number := 0;
+  --
+begin
+   BEGIN
+   SELECT COUNT(1)
+      INTO vn_existe
+   FROM CSF_OWN.SEQ_TAB
+   WHERE UPPER(SEQUENCE_NAME) = UPPER('TMPCABPARTIDA_SEQ');
+   EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+     vn_existe := 0;
+   WHEN OTHERS THEN
+     vn_existe := -1;
+   END;
+    --
+    IF NVL(vn_existe, 0) = 0 THEN
+    BEGIN
+      INSERT INTO CSF_OWN.SEQ_TAB (ID, SEQUENCE_NAME, TABLE_NAME)
+      VALUES (CSF_OWN.SEQTAB_SEQ.NEXTVAL, 'TMPCABPARTIDA_SEQ', 'TMP_CAB_PARTIDA');
+      COMMIT;
+     EXCEPTION
+       WHEN OTHERS THEN
+        NULL;
+    END;
+    END IF;
+   --
+end;
+/
+
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_tables 
+    where OWNER       = 'CSF_OWN'
+      and TABLE_NAME  = 'TMP_DET_PARTIDA';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create table csf_own.TMP_DET_PARTIDA
+                                (
+                                  ID               NUMBER,
+                                  TMPCABPARTIDA_ID NUMBER,
+                                  TP_REGISTRO      NUMBER,
+                                  COD_CTA          VARCHAR2(255),
+                                  COD_CCUS         VARCHAR2(60),
+                                  VL_DC            NUMBER(19,2),
+                                  DM_IND_DC        VARCHAR2(1),
+                                  NUM_ARQ          VARCHAR2(255),
+                                  COD_HIST_PAD     VARCHAR2(30),
+                                  COMPL_HIST       VARCHAR2(4000),
+                                  COD_PART         VARCHAR2(60),
+                                  NUM_SEQ_PART     NUMBER(7)
+                                ) tablespace CSF_DATA';
+      ---      
+      execute immediate 'comment on table CSF_OWN.TMP_DET_PARTIDA                   is ''REGISTRO TIPO DETALHE DA PARTIDA''';
+      -- 
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.ID               is ''ID da tabela TMP_DET_PARTIDA''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.TMPCABPARTIDA_ID is ''ID da tabela TMP_CAB_PARTIDA''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.TP_REGISTRO      is ''Tipo do registro''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_CTA          is ''Código da Conta contabil''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_CCUS         is ''Código do centro de custos''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.VL_DC            is ''Valor da partida''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.DM_IND_DC        is ''Indicador de situação da partida - D ou C. D = Débito / C = Crédito''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.NUM_ARQ          is ''Numero ou código de arquivo do documento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_HIST_PAD     is ''Código do histórico padrão''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COMPL_HIST       is ''Complemento do histórico contabil''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_PART         is ''Código do participante''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.NUM_SEQ_PART     is ''Numero sequencial da partida''';               
+      ---
+      execute immediate 'create index CSF_OWN.TMP_DET_PARTIDA_IDX1 on CSF_OWN.TMP_DET_PARTIDA (ID) tablespace CSF_INDEX';
+      execute immediate 'create index CSF_OWN.TMP_DET_PARTIDA_IDX2 on CSF_OWN.TMP_DET_PARTIDA (TMPCABPARTIDA_ID) tablespace CSF_INDEX';
+      ---
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_DET_PARTIDA to CSF_WORK';
+      --    
+   else
+      --
+      execute immediate 'comment on table CSF_OWN.TMP_DET_PARTIDA                   is ''REGISTRO TIPO DETALHE DA PARTIDA''';
+      -- 
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.ID               is ''ID da tabela TMP_DET_PARTIDA''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.TMPCABPARTIDA_ID is ''ID da tabela TMP_CAB_PARTIDA''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.TP_REGISTRO      is ''Tipo do registro''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_CTA          is ''Código da Conta contabil''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_CCUS         is ''Código do centro de custos''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.VL_DC            is ''Valor da partida''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.DM_IND_DC        is ''Indicador de situação da partida - D ou C. D = Débito / C = Crédito''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.NUM_ARQ          is ''Numero ou código de arquivo do documento''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_HIST_PAD     is ''Código do histórico padrão''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COMPL_HIST       is ''Complemento do histórico contabil''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.COD_PART         is ''Código do participante''';
+      execute immediate 'comment on column CSF_OWN.TMP_DET_PARTIDA.NUM_SEQ_PART     is ''Numero sequencial da partida''';               
+      ---   
+      execute immediate 'grant select, insert, update, delete on CSF_OWN.TMP_DET_PARTIDA to CSF_WORK';
+      --    
+   end if;
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da tabela TMP_DET_PARTIDA. Erro: ' || sqlerrm);      
+end;
+/
+-- sequence
+declare
+   vn_existe number := null;
+begin 
+   select count(*)
+     into vn_existe
+     from sys.all_sequences s
+    where s.SEQUENCE_OWNER = 'CSF_OWN'
+      and s.SEQUENCE_NAME  = 'TMPDETPARTIDA_SEQ';
+   --
+   if nvl(vn_existe,0) = 0 then
+      --
+      execute immediate 'create sequence CSF_OWN.TMPDETPARTIDA_SEQ minvalue 1 maxvalue 9999999999999999999999999999 start with 1 increment by 1 nocache';
+      execute immediate 'grant select on CSF_OWN.TMPDETPARTIDA_SEQ to CSF_WORK';      
+      --
+   elsif nvl(vn_existe,0) > 0 then
+      --
+      execute immediate 'grant select on CSF_OWN.TMPDETPARTIDA_SEQ to CSF_WORK';      
+      --
+   end if;   
+   --
+   commit;
+exception
+   when others then
+      raise_application_error(-20001, 'Erro no script 76108. Criacao da sequence TMPDETPARTIDA_SEQ. Erro: ' || sqlerrm);      
+end;
+/
+
+declare
+  --
+  vv_sql    long;
+  vn_existe number := 0;
+  --
+begin
+   BEGIN
+     SELECT COUNT(1)
+        INTO vn_existe
+     FROM CSF_OWN.SEQ_TAB
+     WHERE UPPER(SEQUENCE_NAME) = UPPER('TMPDETPARTIDA_SEQ');
+   EXCEPTION
+   WHEN NO_DATA_FOUND THEN
+        vn_existe := 0;
+   WHEN OTHERS THEN
+        vn_existe := -1;
+   END;
+	--
+   IF NVL(vn_existe, 0) = 0 THEN
+   BEGIN
+     INSERT INTO CSF_OWN.SEQ_TAB (ID, SEQUENCE_NAME, TABLE_NAME)
+     VALUES (CSF_OWN.SEQTAB_SEQ.NEXTVAL, 'TMPDETPARTIDA_SEQ', 'TMP_DET_PARTIDA');
+     COMMIT;
+   EXCEPTION
+    WHEN OTHERS THEN
+      NULL;
+   END;
+   END IF;
+   --
+end;
+/
+-------------------------------------------------------------------------------------------------------------------------------------
+Prompt FIM Redmine  #76109 - Novo processo de integração contabil
+-------------------------------------------------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------------------------------------------
 Prompt INI Redmine #76520 - PJ do Informe de rendimentos saindo em branco
